@@ -27,9 +27,11 @@ const pool = new Pool({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-    // ssl: {
-    //     rejectUnauthorized: false  // Autorise les certificats auto-signés (utile pour certaines configurations)
-    // }
+//--------------    décommenter ces lignes suivants si veux tourner en local
+    ssl: {
+        rejectUnauthorized: false  // Autorise les certificats auto-signés (utile pour certaines configurations)
+    }
+//--------------
 });
 
 // Vérifier la connexion à la base de données
