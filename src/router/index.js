@@ -12,6 +12,9 @@ import Router from 'vue-router'
 import HomePage from '../pages/HomePage.vue'
 import LoginPage from '../pages/LoginPage.vue'
 import SignUp from '../pages/SignUp.vue'
+import CreateEvents from '../pages/CreateEvents.vue'
+import ListEvents from '../pages/ListEvents.vue'
+import MapView from '../pages/MapView.vue'
 
 Vue.use(Router)
 
@@ -32,7 +35,21 @@ export default new Router({
       path: '/signup',
       name: 'SignUp',
       component: SignUp
+    },
+    {
+      path: '/listEvents',
+      name: 'ListEvents',
+      component: ListEvents
+    },
+    {
+      path: '/createEvents',
+      name: 'CreateEvents',
+      component: CreateEvents
+    },
+    {
+      path: '/map',
+      name: 'map',
+      component: MapView
     }
-
   ]
 })
