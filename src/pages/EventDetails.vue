@@ -2,8 +2,8 @@
     <v-app>
       <v-main>
         <v-app-bar app color="primary" dark>
-      <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
-    </v-app-bar>
+          <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
+        </v-app-bar>
   
         <v-container>
           <v-card>
@@ -51,14 +51,14 @@
     },
     mounted() {
       // Récupérer les détails de l'événement depuis les props ou les params
-      const eventId = this.$route.params.id;
-      this.fetchEventDetails(eventId);
+      const eventId = this.$route.params.id; // ID de l'événement
+      this.fetchEventDetails(eventId); // Appel de la fonction pour récupérer les détails
     },
     methods: {
       async fetchEventDetails(id) {
         try {
           const response = await axios.get(`http://localhost:3000/events/${id}`);
-          this.event = response.data;
+          this.event = response.data[0]; // Récupérer le premier élément du tableau
         } catch (error) {
           console.error('Erreur lors de la récupération des détails de l\'événement:', error);
         }
