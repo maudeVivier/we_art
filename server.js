@@ -313,6 +313,93 @@ app.post('/users', async (req, res) => {
     }
 });
 
+
+// POST - Rechercher un utilisateur (Connexion)
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Connexion d'un utilisateur
+ *     description: Permet à un utilisateur de se connecter en fournissant son email et son mot de passe.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "user@example.com"
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "MotDePasse123"
+ *     responses:
+ *       200:
+ *         description: Utilisateur connecté avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 msg:
+ *                   type: string
+ *                   example: "connecte"
+ *                 idUser:
+ *                   type: integer
+ *                   example: 1
+ *       401:
+ *         description: Identifiants invalides (email ou mot de passe incorrect).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé"
+ *       500:
+ *         description: Erreur interne lors de la tentative de connexion.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur interne lors de la recherche de l'utilisateur"
+ */
+app.post('/users/login', async (req, res) => {  // Utilise POST au lieu de GET pour les données sensibles
+    const { email, password } = req.body;
+    const bcrypt = require('bcrypt');
+
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({ message: 'Utilisateur non trouvé' });
+        }
+        const user = result.rows[0];
+        // Comparer le mot de passe donné avec le hash stocké dans la base de données
+        const isMatch = bcrypt.compareSync(password, user.password);
+
+        if (isMatch) {
+            res.json({
+                'msg' : "connecte",
+                'idUser' : user.id
+            });
+        } else {
+            res.status(401).json("non connecte");
+        }
+    } catch (err) {
+        console.error('Erreur lors de la recherche de l\'utilisateur:', err);
+        res.status(500).send({ error: 'Erreur interne lors de la recherche de l\'utilisateur' });
+    }
+});
+
+
 // PATCH - Mettre à jour un utilisateur
 /**
  * @swagger

@@ -40,6 +40,8 @@
   </template>
   
   <script>
+  import axios from 'axios'
+
   export default {
     name: 'LoginPage',
     data() {
@@ -49,13 +51,43 @@
       }
     },
     methods: {
-      submitLogin() {
-        // Logique pour soumettre les identifiants (API call ou vérification locale)
-        console.log("Email:", this.email);
-        console.log("Password:", this.password);
-        // Rediriger après succès, ou afficher une erreur
-        this.$router.push('/');
-      }
+      async submitLogin() {
+        try {
+          console.log("Email:", this.email);
+          console.log("Password:", this.password);
+          const response = await axios.post('http://localhost:3000/users/login', {
+          //const response = await axios.post('https://we-art.onrender.com/users/login', {
+            email: this.email,
+            password: this.password,
+          });
+          if (response.data.msg == "connecte"){
+            // Rediriger après succès
+            this.$router.push('/');
+          }else{
+            //Afficher une erreur sur la page
+            console.log("pas connecter car email ou mot de passe incorrect")
+          }
+        } catch (error) {
+          if (error.response) {
+            switch (error.response.status) {
+              case 400:
+                this.errorMessage = 'Veuillez vérifier les informations fournies.';
+                break;
+              case 409:
+                this.errorMessage = 'Cet email est déjà utilisé. Veuillez en choisir un autre.';
+                break;
+              case 500:
+                this.errorMessage = 'Une erreur interne est survenue. Veuillez réessayer plus tard icicic.';
+                break;
+              default:
+                this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+            }
+          } else {
+            console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+          }
+        }
+      },
     }
   }
   </script>
