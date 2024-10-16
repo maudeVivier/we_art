@@ -6,6 +6,9 @@ const cors = require('cors');
 const path = require('path');
 const serveStatic = require("serve-static")
 
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
 
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -13,6 +16,15 @@ const swaggerUi = require('swagger-ui-express');
 
 const app = express();
 const PORT = process.env.PORT || 3000; // Utilise la variable d'environnement pour le port
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Ou un autre service d'emailing que vous utilisez
+    auth: {
+        user: process.env.EMAIL_GMAIL, 
+        pass: process.env.MDP_GMAIL
+    }
+});
+
 
 
 // Définition des options pour swagger-jsdoc
@@ -294,12 +306,34 @@ app.post('/users', async (req, res) => {
     }
 
     try {
+        let verificationToken = crypto.randomBytes(32).toString('hex');
         const result = await pool.query(
-            'INSERT INTO users (firstName, lastName, email, password, birthday, sex, type, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone]
+            'INSERT INTO users (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+            [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone, verificationToken, false]
         );
+
+
         const newUser = result.rows[0];
         console.log(newUser);
+
+        const verificationLink = `https://we-art.onrender.com/verify-email?token=${verificationToken}`;
+        const mailOptions = {
+            from: process.env.EMAIL_GMAIL,
+            to: newUser.email,
+            subject: 'Vérification de votre email',
+            html: `<p>Bonjour ${newUser.firstname} ${newUser.lastname},</p>
+                   <p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour vérifier votre email :</p>
+                   <a href="${verificationLink}">Vérifier mon email</a>`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Erreur lors de l\'envoi de l\'email de vérification:', error);
+                return res.status(500).json({ message: 'Une erreur est survenue lors de l\'envoi de l\'email de vérification.' });
+            }
+            console.log('Email de vérification envoyé:', info.response);
+            res.status(201).json({ message: 'Utilisateur créé. Un email de vérification a été envoyé.', user: newUser });
+        });
 
         res.status(201).json(newUser);
     } catch (error) {
@@ -310,6 +344,76 @@ app.post('/users', async (req, res) => {
             console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
             res.status(500).json({ message: 'Une erreur interne est survenue.' });
         }
+    }
+});
+
+
+/**
+ * @swagger
+ * /verify-email:
+ *   get:
+ *     summary: Vérifier l'e-mail d'un utilisateur
+ *     description: Vérifie l'e-mail d'un utilisateur en utilisant un token de vérification envoyé par e-mail.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Token de vérification reçu par e-mail
+ *         example: "12345abcdef"
+ *     responses:
+ *       200:
+ *         description: E-mail vérifié avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email vérifié avec succès"
+ *       400:
+ *         description: Token invalide ou non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Token invalide"
+ *       500:
+ *         description: Erreur interne lors de la vérification de l'e-mail.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur est survenue lors de la vérification de l'email."
+ */
+app.get('/verify-email', async (req, res) => {
+    const { token } = req.query;
+
+    try {
+        // Rechercher l'utilisateur par le token de vérification
+        const result = await pool.query('SELECT * FROM users WHERE verification_token = $1', [token]);
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(400).json({ message: 'Token invalide' });
+        }
+
+        // Mettre à jour l'utilisateur comme vérifié
+        await pool.query('UPDATE users SET is_verified = true, verification_token = null WHERE id = $1', [user.id]);
+
+        res.status(200).json({ message: 'Email vérifié avec succès' });
+    } catch (error) {
+        console.error('Erreur lors de la vérification de l\'email:', error);
+        res.status(500).json({ message: 'Une erreur est survenue lors de la vérification de l\'email.' });
     }
 });
 
