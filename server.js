@@ -306,7 +306,7 @@ app.post('/users', async (req, res) => {
     }
 
     try {
-        let verificationToken = crypto.randomBytes(32).toString('hex');
+        let verificationToken = Math.floor(1000 + Math.random() * 9000);
         const result = await pool.query(
             'INSERT INTO users (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
             [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone, verificationToken, false]
@@ -316,14 +316,13 @@ app.post('/users', async (req, res) => {
         const newUser = result.rows[0];
         console.log(newUser);
 
-        const verificationLink = `https://we-art.onrender.com/verify-email?token=${verificationToken}`;
         const mailOptions = {
             from: process.env.EMAIL_GMAIL,
             to: newUser.email,
             subject: 'Vérification de votre email',
             html: `<p>Bonjour ${newUser.firstname} ${newUser.lastname},</p>
                    <p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour vérifier votre email :</p>
-                   <a href="${verificationLink}">Vérifier mon email</a>`
+                   <p>Le code de verification est : ${verificationToken}</p>`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -350,10 +349,10 @@ app.post('/users', async (req, res) => {
 
 /**
  * @swagger
- * /verify-email:
+ * /verify-code:
  *   get:
  *     summary: Vérifier l'e-mail d'un utilisateur
- *     description: Vérifie l'e-mail d'un utilisateur en utilisant un token de vérification envoyé par e-mail.
+ *     description: Vérifie l'e-mail d'un utilisateur en utilisant un code de vérification envoyé par e-mail.
  *     tags: [Users]
  *     parameters:
  *       - in: query
@@ -395,7 +394,7 @@ app.post('/users', async (req, res) => {
  *                   type: string
  *                   example: "Une erreur est survenue lors de la vérification de l'email."
  */
-app.get('/verify-email', async (req, res) => {
+app.get('/verify-code', async (req, res) => {
     const { token } = req.query;
 
     try {
