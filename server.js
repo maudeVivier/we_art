@@ -153,6 +153,19 @@ app.delete('/users/:id', async (req, res) => {
 });
 
 
+// EVENEMENTS
+// GET - Récupérer un evenement en particulier
+app.get('/events/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM events WHERE id = $1', [id]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erreur lors de la récupération de l\'evenement:', err);
+        res.status(500).send({ error: 'Erreur lors de la récupération de l\'evenement' });
+    }
+});
+
 // Démarrer le serveur
 app.listen(PORT, () => {
     console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
