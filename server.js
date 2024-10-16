@@ -574,6 +574,71 @@ app.get('/events/:id', async (req, res) => {
 // Pour les evenement
 
 // GET - Récupérer tous les evenements
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     summary: Récupérer tous les événements
+ *     description: Retourne la liste de tous les événements dans la base de données.
+ *     tags: [Events]
+ *     responses:
+ *       200:
+ *         description: Liste des événements.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Conférence Tech"
+ *                   description:
+ *                     type: string
+ *                     example: "Une conférence sur les nouvelles technologies."
+ *                   street:
+ *                     type: string
+ *                     example: "3 rue de la métallurgie"
+ *                   city:
+ *                     type: string
+ *                     example: "Lyon"
+ *                   postal_code:
+ *                     type: string
+ *                     example: "69003"
+ *                   country:
+ *                     type: string
+ *                     example: "France"
+ *                   start_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   end_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   created_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   latitude:
+ *                     type: string
+ *                     example: "45.754205"
+ *                   longitude:
+ *                     type: string
+ *                     example: "4.869387"
+ *                   
+ *       500:
+ *         description: Erreur interne lors de la récupération des événements.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération des évènements."
+ */
 app.get('/events', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM events');
@@ -589,6 +654,114 @@ app.get('/events', async (req, res) => {
 const opencage = require('opencage-api-client');
 
 // POST - Créer un nouvel evenement
+/**
+ * @swagger
+ * /events:
+ *   post:
+ *     summary: Créer un nouvel événement
+ *     description: Permet de créer un nouvel événement dans la base de données.
+ *     tags: [Events]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Conférence Tech"
+ *               description:
+ *                 type: string
+ *                 example: "Une conférence sur les nouvelles technologies."
+ *               street:
+ *                 type: string
+ *                 example: "3 rue de la métallurgie"
+ *               city:
+ *                 type: string
+ *                 example: "Lyon"
+ *               postal_code:
+ *                 type: string
+ *                 example: "69003"
+ *               country:
+ *                 type: string
+ *                 example: "France"
+ *               start_date:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2024-10-16T23:10:00.000Z"
+ *               end_date:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2024-10-16T23:10:00.000Z"
+ *     responses:
+ *       201:
+ *         description: Événement créé avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: "Conférence Tech"
+ *                 description:
+ *                   type: string
+ *                   example: "Une conférence sur les nouvelles technologies."
+ *                 street:
+ *                   type: string
+ *                   example: "3 rue de la métallurgie"
+ *                 city:
+ *                   type: string
+ *                   example: "Lyon"
+ *                 postal_code:
+ *                   type: string
+ *                   example: "69003"
+ *                 country:
+ *                   type: string
+ *                   example: "France"
+ *                 start_date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 end_date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 created_date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 latitude:
+ *                   type: string
+ *                   example: "45.754205"
+ *                 longitude:
+ *                   type: string
+ *                   example: "4.869387"
+ *       400:
+ *         description: Adresse non trouvée.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Adresse non trouvée"
+ *       500:
+ *         description: Erreur interne lors de la création de l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur interne est survenue."
+ */
 app.post('/events', async (req, res) => {
     const { name, description, street, postal_code, city, country, start_date, end_date } = req.body;  // Modifications pour correspondre aux colonnes
     console.log('(server.js)' + req.body)
