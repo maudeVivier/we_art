@@ -79,7 +79,7 @@ app.post('/users', async (req, res) => {
         case "Non-binaire":
             sexEnglish = "Non-binary";
             break;
-        case "Non spécifié":
+        case "Ne se prononce pas":
             sexEnglish = "Not Specified";
             break;
         default:
