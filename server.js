@@ -62,13 +62,46 @@ app.get('/users', async (req, res) => {
 
 // POST - Créer un nouvel utilisateur
 app.post('/users', async (req, res) => {
-    const { firstName, lastName, email, password, age, sex, type, phone } = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstName, lastName, email, password, birthday, sex, type, phone } = req.body;  // Modifications pour correspondre aux colonnes
     console.log(req.body)
-    console.log('post : ' + firstName + ' ' + lastName + ' ' + email + ' ' + type);
+    const bcrypt = require('bcrypt');
+    const saltRounds = 10;
+    const hash = bcrypt.hashSync(password, saltRounds);
+    console.log('post : ' + firstName + ' ' + lastName + ' ' + email + ' ' + type + ' '  + hash);
+    let sexEnglish = "";
+    switch (sex) {
+        case "Homme":
+            sexEnglish = "Man";
+            break;
+        case "Femme":
+            sexEnglish = "Woman";
+            break;
+        case "Non-binaire":
+            sexEnglish = "Non-binary";
+            break;
+        case "Non spécifié":
+            sexEnglish = "Not Specified";
+            break;
+        default:
+            return res.status(400).json({ error: 'Invalid sex value' });
+    }
+
+    let typeEnglish;
+    switch (type) {
+        case "Organisateur":
+            typeEnglish = "Organizer";
+            break;
+        case "Participant":
+            typeEnglish = "Participant";
+            break;
+        default:
+            return res.status(400).json({ error: 'Invalid type value' });
+    }
+
     try {
         const result = await pool.query(
-            'INSERT INTO users (firstName, lastName, email, password, age, sex, type, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [firstName, lastName, email, password, age, sex, type, phone]
+            'INSERT INTO users (firstName, lastName, email, password, birthday, sex, type, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone]
         );
         const newUser = result.rows[0];
         console.log(newUser);
@@ -88,11 +121,11 @@ app.post('/users', async (req, res) => {
 // PATCH - Mettre à jour un utilisateur
 app.patch('/users/:id', async (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, email, age, sex, type } = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstName, lastName, email, birthday, sex, type } = req.body;  // Modifications pour correspondre aux colonnes
     try {
         const result = await pool.query(
-            'UPDATE users SET firstName = $1, lastName = $2, email = $3, age = $4, sex = $5, type = $6 WHERE id = $7 RETURNING *',
-            [firstName, lastName, email, age, sex, type, id]
+            'UPDATE users SET firstName = $1, lastName = $2, email = $3, birthday = $4, sex = $5, type = $6 WHERE id = $7 RETURNING *',
+            [firstName, lastName, email, birthday, sex, type, id]
         );
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });

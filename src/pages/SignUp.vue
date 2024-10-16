@@ -106,14 +106,14 @@
 
         async createUser() {
         try {
-          //const response = await axios.post('http://localhost:3000/users', {
-          const response = await axios.post('https://we-art.onrender.com/users', {
+          const response = await axios.post('http://localhost:3000/users', {
+          //const response = await axios.post('https://we-art.onrender.com/users', {
             firstName: this.firstName,
             lastName: this.name,
             email: this.email,
             password: this.password,
             phone: this.phoneNumber,
-            age: this.birthDate,
+            birthday: this.birthDate,
             sex: this.gender,
             type: this.userType
           });
