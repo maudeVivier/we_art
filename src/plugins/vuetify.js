@@ -9,16 +9,25 @@ import '@mdi/font/css/materialdesignicons.css'; // Optionnel, si tu utilises Mat
 import 'vuetify/dist/vuetify.min.css'; // Importer les styles de Vuetify 2.x
 
 // Composables
-import Vuetify from 'vuetify'
+import Vuetify from 'vuetify';
 import Vue from 'vue';
 
-Vue.use(Vuetify)
+Vue.use(Vuetify);
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 const vuetify = new Vuetify({
   theme: {
-    defaultTheme: 'dark',
+    themes: {
+      dark: {
+        primary: '#F2992C', // Définit la couleur primaire pour le thème sombre
+      },
+      light: {
+        primary: '#F2992C', // Définit la couleur primaire pour le thème clair
+      },
+    },
+    defaultTheme: 'dark', // Définir le thème par défaut
   },
-})
+});
 
-export default vuetify
+export default vuetify;
+

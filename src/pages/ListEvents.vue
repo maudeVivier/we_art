@@ -1,82 +1,161 @@
 <template>
-    <div>
-      <h1>Liste des Événements</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nom</th>
-            <th>Description</th>
-            <th>Adresse</th>
-            <th>Ville</th>
-            <th>Code Postal</th>
-            <th>Pays</th>
-            <th>Date de Début</th>
-            <th>Date de Fin</th>
-            <th>Date de Création</th>
-            <th>Latitude</th>
-            <th>Longitude</th>            
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="event in events" :key="event.id">
-            <td>{{ event.id }}</td>
-            <td>{{ event.name }}</td>
-            <td>{{ event.description }}</td>
-            <td>{{ event.street }}</td>
-            <td>{{ event.city }}</td>
-            <td>{{ event.postal_code }}</td>
-            <td>{{ event.country }}</td>
-            <td>{{ new Date(event.start_date).toLocaleString() }}</td>
-            <td>{{ event.end_date ? new Date(event.end_date).toLocaleString() : 'N/A' }}</td>
-            <td>{{ new Date(event.created_at).toLocaleString() }}</td>
-            <td>{{ event.latitude }}</td>
-            <td>{{ event.longitude }}</td>        
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        events: [],
-      };
+  <v-app>
+    <v-main>
+      <v-app-bar app color="primary" dark>
+      <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
+    </v-app-bar>
+
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <h1>Nos Événements</h1>
+          </v-card-title>
+
+          <v-toolbar flat>
+            <v-spacer></v-spacer>
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Rechercher"
+              single-line
+              hide-details
+            ></v-text-field>
+          </v-toolbar>
+
+          <v-row>
+            <!-- Loop through the events and create a card for each -->
+            <v-col
+              v-for="event in filteredEvents"
+              :key="event.id"
+              cols="12"
+              md="4"
+            >
+              <v-card class="mx-auto" max-width="400">
+                <!-- image ne s'affiche pas "event.image"-->
+                <v-img
+                  :src="photo_default_catalogue"
+                  alt="Image de l'événement"
+                  height="200px"
+                ></v-img>
+
+                <!-- Nom de l'événement en grand -->
+                <v-card-title class="title">{{ event.name }}</v-card-title>
+
+                <v-card-text>
+                  <!-- Description de l'événement -->
+                  <p><strong>Description :</strong> {{ event.description }}</p>
+
+                  <!-- Lieu de l'événement (Adresse et Ville) -->
+                  <p><strong>Lieu :</strong> {{ event.street }}, {{ event.city }}</p>
+
+                  <!-- Dates de l'événement -->
+                  <p>
+                    <strong>Date :</strong> 
+                    {{ new Date(event.start_date).toLocaleDateString() }} -
+                    {{ event.end_date ? new Date(event.end_date).toLocaleDateString() : 'N/A' }}
+                  </p>
+                </v-card-text>
+
+                <v-card-actions>
+                  <!-- Détails supplémentaires -->
+                  <v-btn color="primary" @click="showDetails(event)">Voir</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+
+          <!-- Bouton Ajouter un Événement -->
+          <v-row>
+            <v-col cols="12" class="text-center">
+              <v-btn
+                color="primary"
+                dark
+                @click="goToCreateEvent"
+                large
+                class="mt-4"
+              >
+                <v-icon left>mdi-plus</v-icon>
+                Ajouter un événement
+              </v-btn>
+            </v-col>
+          </v-row>
+
+        </v-card>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
+
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      search: '',
+      events: [],
+      photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
+    };
+  },
+  computed: {
+    filteredEvents() {
+      // Filtrer les événements selon la recherche
+      return this.events.filter((event) =>
+        event.name.toLowerCase().includes(this.search.toLowerCase()) ||
+        event.city.toLowerCase().includes(this.search.toLowerCase()) ||
+        event.description.toLowerCase().includes(this.search.toLowerCase())
+      );
     },
-    mounted() {
-      this.fetchEvents();
-    },
-    methods: {
-      async fetchEvents() {
-        try {
-          const response = await axios.get('http://localhost:3000/events');
-          this.events = response.data;
-        } catch (error) {
-          console.error('Erreur lors de la récupération des événements:', error);
-        }
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-  }
-  </style>
-  
+  },
+  mounted() {
+    this.fetchEvents();
+  },
+  methods: {
+    async fetchEvents() {
+    try {
+      const response = await axios.get('http://localhost:3000/events');
+      this.events = response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des événements:', error);
+    }
+  },
+  showDetails(event) {
+    // Redirige vers la page des détails de l'événement avec l'ID de l'événement
+    this.$router.push({ path: `/eventDetails/${event.id}` });
+  },
+  goToCreateEvent() {
+    this.$router.push('/createEvents');
+  },
+  },
+};
+</script>
+
+
+<style scoped>
+.v-card {
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.v-card-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  color: #3f51b5;
+}
+
+.v-card-text p {
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.v-btn {
+  margin-left: auto;
+}
+
+.v-img {
+  border-bottom: 1px solid #eee;
+}
+</style>

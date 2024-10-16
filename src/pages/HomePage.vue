@@ -94,7 +94,7 @@ export default {
 
 .router-link {
   text-decoration: none;
-  color: #1976d2;
+  color: #F2992C;
   font-weight: bold;
 }
 

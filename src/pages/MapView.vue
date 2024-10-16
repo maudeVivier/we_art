@@ -1,4 +1,17 @@
 <template>
+  <v-app>
+    <v-main>
+      <v-app-bar app color="primary" dark>
+        <v-toolbar-title>
+          <h1>WE ART</h1>
+        </v-toolbar-title>
+      </v-app-bar>
+
+      <v-container>
+        <v-card>
+          <v-card-title>
+            <h1>Événement</h1>
+          </v-card-title>
     <div>
       <l-map :zoom="zoom" :center="center" style="height: 500px; width: 100%;">
         <l-tile-layer :url="url" :attribution="attribution" />
@@ -21,6 +34,10 @@
         </l-marker>
       </l-map>
     </div>
+  </v-card>
+      </v-container>
+    </v-main>
+  </v-app>
   </template>
   
   <script>
@@ -40,19 +57,21 @@
     data() {
       return {
         zoom: 13,
-        center: [45.483852, 4.372934], // Coordonnées par défaut (ex. Paris)
+        // Coordonnées de Lyon
+        center: [45.7640, 4.8357], // Coordonnées de Lyon
         url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        defaultPhotoUrl: require('@/assets/logo.png'), // Utiliser '@' pour accéder au dossier 'src'
+        defaultPhotoUrl: require('@/assets/evenementiel.jpg'), // Utiliser '@' pour accéder au dossier 'src'
         customIcon: L.icon({ // Définir l'icône personnalisée
-            iconUrl: require('@/assets/logo.png'), // Chemin vers l'image du marqueur
-            iconSize: [25, 41], // Taille de l'icône
+            iconUrl: require('@/assets/map.png'), // Chemin vers l'image du marqueur
+            iconSize: [30, 41], // Taille de l'icône
             iconAnchor: [12, 41], // Point d'ancrage de l'icône
             popupAnchor: [1, -34], // Point d'ancrage du popup
         }),
         events:[]
       };
     },
+
     mounted(){
         console.log("MOUNTED");
       this.fetchEvents();

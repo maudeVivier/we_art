@@ -18,6 +18,20 @@
       </v-btn>
 
       <v-btn
+        :to="{ name: 'ListEvents' }"
+      >
+        <span>Événements</span>
+        <v-icon>mdi-calendar</v-icon> <!-- Changer ici -->
+      </v-btn>
+
+      <v-btn
+        :to="{ name: 'map' }"
+      >
+        <span>Carte</span>
+        <v-icon>mdi-map</v-icon> <!-- Changer ici -->
+      </v-btn>
+
+      <v-btn
         :to="{ name: 'Login' }"
       >
         <span>Connexion</span>
@@ -28,6 +42,7 @@
     </v-bottom-navigation>
   </v-app>
 </template>
+
 
 <script>
 export default {
@@ -89,7 +104,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .router-link {
   text-decoration: none;
-  color: #1976d2;
+  color: #F2992C;
   font-weight: bold;
 }
 

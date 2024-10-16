@@ -39,7 +39,7 @@
   
         return {
           width: `${startPosition}%`, // La largeur totale de la ligne
-          backgroundColor: '#1976d2', // Couleur de la ligne active
+          backgroundColor: '#F2992C', // Couleur de la ligne active
           position: 'absolute',
           top: '15px', // Ajustez selon la hauteur de vos cercles
           height: `${lineHeight}px`,
@@ -86,7 +86,7 @@
   }
   
   .circle.active {
-    background-color: #1976d2; /* Couleur de fond des cercles actifs */
+    background-color: #F2992C; /* Couleur de fond des cercles actifs */
     color: white; /* Couleur du texte pour les cercles actifs */
   }
   

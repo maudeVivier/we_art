@@ -166,6 +166,60 @@ app.get('/events/:id', async (req, res) => {
     }
 });
 
+// Pour les evenement
+
+// GET - Récupérer tous les evenements
+app.get('/events', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM events');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des évènements:', err);
+        res.status(500).send({ error: 'Erreur lors de la récupération des évènements' });
+    }
+});
+
+// ici mettre le get id d'un utilisateur
+
+const opencage = require('opencage-api-client');
+
+// POST - Créer un nouvel evenement
+app.post('/events', async (req, res) => {
+    const { name, description, street, postal_code, city, country, start_date, end_date } = req.body;  // Modifications pour correspondre aux colonnes
+    console.log('(server.js)' + req.body)
+    console.log('(server.js) post : ' + name + ' ' + description + ' ' + start_date + ' ' + end_date)
+    try {
+        // Géocode l'adresse pour obtenir la latitude et la longitude
+        const address = `${street}, ${postal_code} ${city}`;
+        console.log(address);
+
+        const data = await opencage.geocode({ q: address, key: process.env.OPENCAGE_API_KEY });
+
+        if (data.status.code === 200 && data.results.length > 0) {
+            const place = data.results[0];
+            const latitude = place.geometry.lat;
+            const longitude = place.geometry.lng;
+
+            const result = await pool.query(
+                'INSERT INTO events (name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+                [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude]
+            );
+            const newEvent = result.rows[0];
+            console.log('(server.js)' + newEvent);
+
+            res.status(201).json(newEvent);
+        }
+        else {
+            res.status(400).json({ message: 'Adresse non trouvée' });
+          }
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout de l\'evenement server.js', error);
+        res.status(500).json({ message: 'Une erreur interne est survenue. server.js'});
+    }
+});
+
+
+
 // Démarrer le serveur
 app.listen(PORT, () => {
     console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
