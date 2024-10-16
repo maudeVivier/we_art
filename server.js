@@ -6,8 +6,40 @@ const cors = require('cors');
 const path = require('path');
 const serveStatic = require("serve-static")
 
+
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+
 const app = express();
 const PORT = process.env.PORT || 3000; // Utilise la variable d'environnement pour le port
+
+
+// Définition des options pour swagger-jsdoc
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API Documentation',
+            version: '1.0.0',
+            description: 'Documentation de votre API',
+            contact: {
+                name: 'Nom du développeur',
+            },
+            servers: [{
+                url: `http://localhost:${PORT}`,
+            }],
+        },
+    },
+    apis: ['./server.js'],  // Fichier(s) contenant les annotations Swagger (vous pouvez en ajouter plusieurs)
+};
+
+
+// Initialisation de swagger-jsdoc
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
+// Route pour accéder à la documentation Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Servir tous les fichiers dans le dossier 'dist'
 app.use(serveStatic(path.join(__dirname, 'dist')));
@@ -49,7 +81,61 @@ pool.connect((err, client, release) => {
   });
 
 // Routes
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Users
+ *     description: Gestion des utilisateurs
+ */
+
+
+
 // GET - Récupérer tous les utilisateurs
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     description: Retourne la liste de tous les utilisateurs dans la base de données.
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Liste des utilisateurs.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   firstName:
+ *                     type: string
+ *                     example: John
+ *                   lastName:
+ *                     type: string
+ *                     example: Doe
+ *                   birthday:
+ *                      type: string
+ *                      example: "2000-12-01"
+ *                   sex:
+ *                      type: string
+ *                      enum: [Man, Woman, Non-binary, Not Specified]
+ *                      example: "Man"
+ *                   phone:
+ *                      type: string
+ *                      example: "0612345678"
+ *                   email:
+ *                     type: string
+ *                     example: "john.doe@example.com"
+ *                   type:
+ *                      type: string
+ *                      enum: [Organizer, Participant]
+ *                      example: "Organizer"
+ */
 app.get('/users', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM users');
@@ -60,7 +146,116 @@ app.get('/users', async (req, res) => {
     }
 });
 
+
 // POST - Créer un nouvel utilisateur
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     summary: Créer un nouvel utilisateur
+ *     description: Crée un nouvel utilisateur dans la base de données.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: "John"
+ *               lastName:
+ *                 type: string
+ *                 example: "Doe"
+ *               email:
+ *                 type: string
+ *                 example: "john.doe@example.com"
+ *               password:
+ *                 type: string
+ *                 example: "Password123"
+ *               birthday:
+ *                 type: string
+ *                 format: date
+ *                 example: "2000-12-01"
+ *               sex:
+ *                 type: string
+ *                 enum: [Homme, Femme, Non-binaire, Non spécifié]
+ *                 example: "Homme"
+ *               type:
+ *                 type: string
+ *                 enum: [Organisateur, Participant]
+ *                 example: "Participant"
+ *               phone:
+ *                 type: string
+ *                 example: "0612345678"
+ *     responses:
+ *       201:
+ *         description: Utilisateur créé avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 firstName:
+ *                   type: string
+ *                   example: "John"
+ *                 lastName:
+ *                   type: string
+ *                   example: "Doe"
+ *                 email:
+ *                   type: string
+ *                   example: "john.doe@example.com"
+ *                 birthday:
+ *                   type: string
+ *                   format: date
+ *                   example: "2000-12-01"
+ *                 sex:
+ *                   type: string
+ *                   enum: [Man, Woman, Non-binary, Not Specified]
+ *                   example: "Man"
+ *                 phone:
+ *                   type: string
+ *                   example: "0612345678"
+ *                 type:
+ *                   type: string
+ *                   enum: [Organizer, Participant]
+ *                   example: "Participant"
+ *       400:
+ *         description: Valeur invalide pour sex ou type.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   enum: [Invalid sex value, Invalid type value]
+ *                   example: "Invalid sex value"  
+ *       409:
+ *         description: L'email est déjà utilisé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cet email est déjà utilisé."
+ *       500:
+ *         description: Erreur interne du serveur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur interne est survenue."
+ */
 app.post('/users', async (req, res) => {
     const { firstName, lastName, email, password, birthday, sex, type, phone } = req.body;  // Modifications pour correspondre aux colonnes
     console.log(req.body)
@@ -119,6 +314,102 @@ app.post('/users', async (req, res) => {
 });
 
 // PATCH - Mettre à jour un utilisateur
+/**
+ * @swagger
+ * /users/{id}:
+ *   patch:
+ *     summary: Mettre à jour un utilisateur
+ *     description: Met à jour les informations d'un utilisateur existant dans la base de données.
+ *     tags: [Users]  
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID de l'utilisateur à mettre à jour
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: "John"
+ *               lastName:
+ *                 type: string
+ *                 example: "Doe"
+ *               email:
+ *                 type: string
+ *                 example: "john.doe@example.com"
+ *               birthday:
+ *                 type: string
+ *                 format: date
+ *                 example: "2000-12-01"
+ *               sex:
+ *                 type: string
+ *                 enum: [Man, Woman, Non-binary, Not Specified]
+ *                 example: "Man"
+ *               type:
+ *                 type: string
+ *                 enum: [Organizer, Participant]
+ *                 example: "Organizer"
+ *     responses:
+ *       200:
+ *         description: Utilisateur mis à jour avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 firstName:
+ *                   type: string
+ *                   example: "John"
+ *                 lastName:
+ *                   type: string
+ *                   example: "Doe"
+ *                 email:
+ *                   type: string
+ *                   example: "john.doe@example.com"
+ *                 birthday:
+ *                   type: string
+ *                   format: date
+ *                   example: "2000-12-01"
+ *                 sex:
+ *                   type: string
+ *                   enum: [Man, Woman, Non-binary, Not Specified]
+ *                   example: "Man"
+ *                 type:
+ *                   type: string
+ *                   enum: [Organizer, Participant]
+ *                   example: "Organizer"
+ *       404:
+ *         description: Utilisateur non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé"
+ *       500:
+ *         description: Erreur interne lors de la mise à jour de l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la mise à jour de l'utilisateur."
+ */
 app.patch('/users/:id', async (req, res) => {
     const { id } = req.params;
     const { firstName, lastName, email, birthday, sex, type } = req.body;  // Modifications pour correspondre aux colonnes
@@ -138,6 +429,53 @@ app.patch('/users/:id', async (req, res) => {
 });
 
 // DELETE - Supprimer un utilisateur
+/**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     summary: Supprimer un utilisateur
+ *     description: Supprime un utilisateur de la base de données à partir de son ID.
+ *     tags: [Users] 
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID de l'utilisateur à supprimer
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Utilisateur supprimé avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur supprimé"
+ *       404:
+ *         description: Utilisateur non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur non trouvé"
+ *       500:
+ *         description: Erreur interne lors de la suppression de l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la suppression de l'utilisateur."
+ */
 app.delete('/users/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -154,7 +492,74 @@ app.delete('/users/:id', async (req, res) => {
 
 
 // EVENEMENTS
+/**
+ * @swagger
+ * tags:
+ *   - name: Events
+ *     description: Gestion des évènements
+ */
+
 // GET - Récupérer un evenement en particulier
+/**
+ * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary: Récupérer un événement par ID
+ *     description: Renvoie les détails d'un événement spécifique à partir de son ID.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID de l'événement à récupérer
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Détails de l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: "Conférence Tech"
+ *                 date:
+ *                   type: string
+ *                   format: date
+ *                   example: "2024-10-20"
+ *                 location:
+ *                   type: string
+ *                   example: "Paris, France"
+ *                 description:
+ *                   type: string
+ *                   example: "Une conférence sur les nouvelles technologies."
+ *       404:
+ *         description: Événement non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Événement non trouvé"
+ *       500:
+ *         description: Erreur interne lors de la récupération de l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération de l'événement."
+ */
 app.get('/events/:id', async (req, res) => {
     const { id } = req.params;
     try {
