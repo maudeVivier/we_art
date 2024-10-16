@@ -2,8 +2,8 @@
   <v-app>
     <v-main>
       <v-app-bar app color="primary" dark>
-      <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
-    </v-app-bar>
+        <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
+      </v-app-bar>
 
       <v-container>
         <v-card>
@@ -31,24 +31,17 @@
               md="4"
             >
               <v-card class="mx-auto" max-width="400">
-                <!-- image ne s'affiche pas "event.image"-->
                 <v-img
                   :src="photo_default_catalogue"
                   alt="Image de l'événement"
                   height="200px"
                 ></v-img>
 
-                <!-- Nom de l'événement en grand -->
                 <v-card-title class="title">{{ event.name }}</v-card-title>
 
                 <v-card-text>
-                  <!-- Description de l'événement -->
                   <p><strong>Description :</strong> {{ event.description }}</p>
-
-                  <!-- Lieu de l'événement (Adresse et Ville) -->
                   <p><strong>Lieu :</strong> {{ event.street }}, {{ event.city }}</p>
-
-                  <!-- Dates de l'événement -->
                   <p>
                     <strong>Date :</strong> 
                     {{ new Date(event.start_date).toLocaleDateString() }} -
@@ -57,10 +50,19 @@
                 </v-card-text>
 
                 <v-card-actions>
-                  <!-- Détails supplémentaires -->
                   <v-btn color="primary" @click="showDetails(event)">Voir</v-btn>
                 </v-card-actions>
               </v-card>
+            </v-col>
+
+            <!-- Loading Spinner -->
+            <v-col v-if="loading" cols="12" class="text-center">
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                size="60"
+              ></v-progress-circular>
+              <p>Chargement des événements...</p>
             </v-col>
           </v-row>
 
@@ -86,7 +88,6 @@
   </v-app>
 </template>
 
-
 <script>
 import axios from 'axios';
 
@@ -95,12 +96,13 @@ export default {
     return {
       search: '',
       events: [],
+      loading: false, // Loading state
       photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
     };
   },
   computed: {
     filteredEvents() {
-      // Filtrer les événements selon la recherche
+      // Filter events based on search input
       return this.events.filter((event) =>
         event.name.toLowerCase().includes(this.search.toLowerCase()) ||
         event.city.toLowerCase().includes(this.search.toLowerCase()) ||
@@ -113,24 +115,26 @@ export default {
   },
   methods: {
     async fetchEvents() {
-    try {
-      const response = await axios.get('http://localhost:3000/events');
-      this.events = response.data;
-    } catch (error) {
-      console.error('Erreur lors de la récupération des événements:', error);
-    }
-  },
-  showDetails(event) {
-    // Redirige vers la page des détails de l'événement avec l'ID de l'événement
-    this.$router.push({ path: `/eventDetails/${event.id}` });
-  },
-  goToCreateEvent() {
-    this.$router.push('/createEvents');
-  },
+      this.loading = true; // Start loading
+      try {
+        const response = await axios.get('http://localhost:3000/events');
+        this.events = response.data;
+      } catch (error) {
+        console.error('Erreur lors de la récupération des événements:', error);
+      } finally {
+        this.loading = false; // End loading
+      }
+    },
+    showDetails(event) {
+      // Redirect to the event details page with the event ID
+      this.$router.push({ path: `/eventDetails/${event.id}` });
+    },
+    goToCreateEvent() {
+      this.$router.push('/createEvents');
+    },
   },
 };
 </script>
-
 
 <style scoped>
 .v-card {

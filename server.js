@@ -271,7 +271,7 @@ app.post('/users', async (req, res) => {
         case "Femme":
             sexEnglish = "Woman";
             break;
-        case "Non-binaire":
+        case "Non binaire":
             sexEnglish = "Non-binary";
             break;
         case "Ne se prononce pas":

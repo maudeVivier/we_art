@@ -18,7 +18,7 @@
               <!-- Nom de l'Événement -->
               <v-text-field
                 v-model="name"
-                label="Nom de l'Événement"
+                label="Nom de l'Événement *"
                 required
                 outlined
                 dense
@@ -27,7 +27,7 @@
               <!-- Description -->
               <v-textarea
                 v-model="description"
-                label="Description"
+                label="Description *"
                 required
                 outlined
                 dense
@@ -46,7 +46,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     v-model="formattedStartDate"
-                    label="Date et Heure de Début"
+                    label="Date et Heure de Début *"
                     readonly
                     v-bind="attrs"
                     v-on="on"
@@ -77,7 +77,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     v-model="formattedEndDate"
-                    label="Date et Heure de Fin"
+                    label="Date et Heure de Fin *"
                     readonly
                     v-bind="attrs"
                     v-on="on"
@@ -99,7 +99,7 @@
               <!-- Nom de la Rue -->
               <v-text-field
                 v-model="street"
-                label="Nom et Numéro de la Rue"
+                label="Nom et Numéro de la Rue *"
                 required
                 outlined
                 dense
@@ -108,7 +108,7 @@
               <!-- Code Postal -->
               <v-text-field
                 v-model="postal_code"
-                label="Code Postal"
+                label="Code Postal *"
                 required
                 outlined
                 dense
@@ -117,7 +117,7 @@
               <!-- Ville -->
               <v-text-field
                 v-model="city"
-                label="Ville"
+                label="Ville *"
                 required
                 outlined
                 dense
@@ -126,15 +126,29 @@
               <!-- Pays -->
               <v-text-field
                 v-model="country"
-                label="Pays"
+                label="Pays *"
                 required
                 outlined
                 dense
               ></v-text-field>
 
               <!-- Bouton de soumission -->
-              <v-btn type="submit" color="primary" class="mt-4">Créer l'Événement</v-btn>
+              <v-btn type="submit" color="primary" class="mt-4" :disabled="loading">
+                <v-icon v-if="loading" small left>mdi-loading</v-icon>
+                Créer l'Événement
+              </v-btn>
             </form>
+
+            <!-- Loading Spinner -->
+            <div v-if="loading" class="text-center mt-5">
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                size="60"
+              ></v-progress-circular>
+              <p>Création de l'événement en cours...</p>
+            </div>
+
             <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
             <!-- Snackbar pour le message de succès -->
             <v-snackbar v-model="successMessage" timeout="3000">
@@ -171,6 +185,7 @@ export default {
       endDateMenu: false,   // Contrôle du menu de date de fin
       errorMessage: null,
       successMessage: false, // Nouveau champ pour le message de succès
+      loading: false, // Ajout de l'état de chargement
     };
   },
   computed: {
@@ -191,6 +206,7 @@ export default {
   },
   methods: {
     async createEvent() {
+      this.loading = true; // Démarre le chargement
       try {
         const formattedStartDateTime = moment(`${this.start_date} ${this.start_time}`).format('YYYY-MM-DD HH:mm:ss');
         const formattedEndDateTime = moment(`${this.end_date} ${this.end_time}`).format('YYYY-MM-DD HH:mm:ss');
@@ -214,6 +230,8 @@ export default {
         console.error('Erreur lors de l\'ajout de l\'événement', error);
         this.errorMessage = 'Une erreur est survenue lors de la création de l\'événement. Veuillez réessayer.';
         this.successMessage = false; // Assurez-vous de cacher le message de succès en cas d'erreur
+      } finally {
+        this.loading = false; // Terminer le chargement
       }
     },
     resetForm() {
