@@ -192,7 +192,7 @@ app.get('/users', async (req, res) => {
  *                 example: "2000-12-01"
  *               sex:
  *                 type: string
- *                 enum: [Homme, Femme, Non-binaire, Non spécifié]
+ *                 enum: [Homme, Femme, Non-binaire, Ne se prononce pas]
  *                 example: "Homme"
  *               type:
  *                 type: string

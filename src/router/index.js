@@ -16,6 +16,7 @@ import CreateEvents from '../pages/CreateEvents.vue'
 import ListEvents from '../pages/ListEvents.vue'
 import MapView from '../pages/MapView.vue'
 import EventDetails from '../pages/EventDetails.vue'; // Page de détails
+import AddFakeData from '../pages/AddFakeData.vue'
 
 Vue.use(Router)
 
@@ -57,6 +58,11 @@ export default new Router({
       name: 'EventDetails',
       component: EventDetails,
       props: true
+    },
+    {
+      path: '/addFakeData',
+      name: 'addFakeData',
+      component: AddFakeData
     }
   ]
 })
