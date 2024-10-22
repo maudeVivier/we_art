@@ -195,7 +195,7 @@ export default {
         console.error(`Erreur pour l'utilisateur ${user.email}:`, responseData.message || responseData);
         throw new Error(`Erreur lors de l'envoi pour ${user.email}: ${responseData.message || 'Erreur inconnue'}`);
       }
-
+      this.generatedUsers = []
       console.log(`Utilisateur ${responseData} créé avec succès.`);
       return responseData;
     });
