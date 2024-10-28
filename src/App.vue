@@ -5,6 +5,7 @@
 
     <!-- Bottom Navigation -->
     <v-bottom-navigation
+      app
       v-model="active"
       color="primary"
       grow
@@ -64,6 +65,7 @@ v-bottom-navigation {
   bottom: 0;
   left: 0;
   width: 100%;
+  z-index: 10;
 }
 /* Appliquer la police aux titres */
 h1, h2, h3, h4, h5, h6 {
@@ -110,6 +112,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .v-card {
   text-align: center;
+}
+
+.v-application--wrap {
+  padding-bottom: 10px; /* Ajuster selon la hauteur de la barre de navigation */
 }
 
 /* Animation pour faire tourner le logo */

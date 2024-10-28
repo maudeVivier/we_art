@@ -79,6 +79,8 @@
                 <v-icon left>mdi-plus</v-icon>
                 Ajouter un événement
               </v-btn>
+
+              
             </v-col>
           </v-row>
 

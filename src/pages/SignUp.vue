@@ -1,20 +1,26 @@
 <template>
   <v-app>
     <v-dialog v-model="dialog" max-width="600px">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Confirmation</span>
-        </v-card-title>
-        <v-card-text>
-          <!-- Show success or error message based on the outcome -->
-          <div v-if="successMessage">{{ successMessage }}</div>
-          <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="closeDialog">OK</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+  <v-card>
+    <v-card-title>
+      <span class="headline">Information</span>
+    </v-card-title>
+    <v-card-text>
+      <!-- Show success or error message based on the outcome -->
+      <div v-if="successMessage">
+        {{ successMessage }}
+      </div>
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="handleAction">
+        <span v-if="successMessage">Se connecter</span>
+        <span v-else>OK</span>
+      </v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
 
     <v-main>
       <v-app-bar app color="primary" dark>
@@ -26,10 +32,6 @@
             <h1>Inscription</h1>
           </v-card-title>
 
-          <!-- Indicateur d'étape -->
-          <div>
-            <StepIndicator :currentStep="currentStep" :steps="steps" />
-          </div>
           <v-card-text>
             <!-- Affichage du formulaire en fonction de l'étape -->
             <div v-if="currentStep === 1">
@@ -86,14 +88,6 @@
                 @blur="validateUserType"
               ></v-select>
               <v-text-field 
-                v-model="password" 
-                label="Mot de passe *" 
-                required 
-                type="password"
-                :error-messages="passwordError"
-                @blur="validatePassword"
-              ></v-text-field>
-              <v-text-field 
                 v-model="phoneNumber" 
                 label="Numéro de téléphone *" 
                 required
@@ -103,79 +97,138 @@
             </div>
 
             <div v-if="currentStep === 4">
-              <v-card class="pa-4">
-                <v-card-title>
-                  <h2>Confirmez vos informations :</h2>
-                </v-card-title>
-                <v-card-text>
-                  <v-list>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Nom:</v-list-item-title>
-                        <v-list-item-subtitle>{{ name }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Prénom:</v-list-item-title>
-                        <v-list-item-subtitle>{{ firstName }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Email:</v-list-item-title>
-                        <v-list-item-subtitle>{{ email }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Mot de passe:</v-list-item-title>
-                        <v-list-item-subtitle>{{ password }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Date de naissance:</v-list-item-title>
-                        <v-list-item-subtitle>{{ birthDate }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Type:</v-list-item-title>
-                        <v-list-item-subtitle>{{ userType }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Sexe:</v-list-item-title>
-                        <v-list-item-subtitle>{{ gender }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-list-item-title>Numéro de téléphone:</v-list-item-title>
-                        <v-list-item-subtitle>{{ phoneNumber }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                  <v-btn @click="editInformation" color="primary">Éditer</v-btn>
-                </v-card-text>
-              </v-card>
+              <v-text-field 
+                v-model="password" 
+                label="Mot de passe *" 
+                required 
+                type="password"
+                :error-messages="passwordError"
+                @blur="validatePassword"
+              ></v-text-field>
+              <v-text-field 
+                v-model="passwordConfirm" 
+                label="Confirmez votre mot de passe *" 
+                required 
+                type="password"
+                :error-messages="passwordConfirmError"
+                @blur="validatePasswordConfirm"
+              ></v-text-field>
             </div>
+
+            <div v-if="currentStep === 5">
+  <v-card class="pa-4">
+    <v-card-title>
+      <h2>Récapitulatif des informations :</h2>
+    </v-card-title>
+    <v-card-text>
+      <v-list>
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Nom:</span>
+              <span>{{ name }}</span>
+              <v-btn icon @click="editField('name')" class="icon-pencil">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Prénom:</span>
+              <span>{{ firstName }}</span>
+              <v-btn icon @click="editField('firstName')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Email:</span>
+              <span>{{ email }}</span>
+              <v-btn icon @click="editField('email')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Mot de passe:</span>
+              <span>**********</span>
+              <v-btn icon @click="editField('password')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Date de naissance:</span>
+              <span>{{ birthDate }}</span>
+              <v-btn icon @click="editField('birthDate')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Type:</span>
+              <span>{{ userType }}</span>
+              <v-btn icon @click="editField('userType')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Sexe:</span>
+              <span>{{ gender }}</span>
+              <v-btn icon @click="editField('gender')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: bold;">Numéro de téléphone:</span>
+              <span>{{ phoneNumber }}</span>
+              <v-btn icon @click="editField('phoneNumber')" class="icon-pencil">
+                <v-icon >mdi-pencil</v-icon>
+              </v-btn>
+            </div>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-btn @click="createUser" v-if="currentStep === 5" color="primary">Créer mon compte</v-btn>
+    </v-card-text>
+  </v-card>
+</div>
+
 
           </v-card-text>
   
           <v-card-actions>
             <v-btn @click="prevStep" :disabled="currentStep === 1">Précédent</v-btn>
-            <v-btn @click="nextStep" :disabled="currentStep === 4">Suivant</v-btn>
-            <v-btn @click="createUser" v-if="currentStep === 4">Valider</v-btn>
+            <v-btn @click="nextStep" :disabled="currentStep === 5">Suivant</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -184,22 +237,18 @@
 </template>
 
 <script>
-import StepIndicator from '../components/StepIndicator.vue'; // Assure-toi que le chemin est correct
 import axios from 'axios';
 
 export default {
-  components: {
-    StepIndicator,
-  },
-  
   data() {
     return {
       currentStep: 1,
-      steps: ['Informations personnelles', 'Informations de contact', 'Type d’utilisateur', 'Confirmation'],
+      steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif'],
       name: '',
       firstName: '',
       email: '',
       password: '',
+      passwordConfirm: '', // Nouvel état pour la confirmation du mot de passe
       birthDate: '',
       userType: '',
       userTypes: ['Organisateur', 'Participant'],
@@ -211,6 +260,7 @@ export default {
       firstNameError: '',
       emailError: '',
       passwordError: '',
+      passwordConfirmError: '', // Erreur de confirmation du mot de passe
       birthDateError: '',
       userTypeError: '',
       genderError: '',
@@ -230,6 +280,14 @@ export default {
       }
     },
 
+    handleAction() {
+      if (this.successMessage) {
+        this.$router.push('/login'); // Rediriger vers la page de connexion en cas de succès
+      } else {
+        this.closeDialog(); // Fermer simplement la boîte de dialogue en cas d'erreur
+      }
+    },
+
     validateCurrentStep() {
       switch (this.currentStep) {
         case 1:
@@ -237,12 +295,34 @@ export default {
         case 2:
           return this.validateBirthDate() && this.validateGender();
         case 3:
-          return this.validateEmail() && this.validateUserType() && this.validatePassword() && this.validatePhoneNumber();
+          return this.validateEmail() && this.validateUserType()  && this.validatePhoneNumber();
+        case 4:
+          return this.validatePassword() && this.validatePasswordConfirm(); // Validation pour la confirmation du mot de passe
         default:
           return true;
       }
     },
-
+    editField(fieldName) {
+      // Récupérer le numéro d'étape en fonction du champ à éditer
+      switch (fieldName) {
+        case 'name':
+        case 'firstName':
+          this.currentStep = 1; // Étape pour les informations personnelles
+          break;
+        case 'birthDate':
+        case 'gender':
+          this.currentStep = 2; // Étape pour les informations de contact
+          break;
+        case 'email':
+        case 'userType':
+        case 'phoneNumber':
+          this.currentStep = 3; // Étape pour le type d'utilisateur et autres informations
+          break;
+        case 'password':
+          this.currentStep = 4; // Étape pour le type d'utilisateur et autres informations
+          break;
+      }
+    },
     validateName() {
       this.nameError = this.name ? '' : 'Veuillez remplir le champ.';
       return !this.nameError;
@@ -255,7 +335,7 @@ export default {
 
     validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      this.emailError = this.email ? (emailRegex.test(this.email) ? '' : 'Adresse email invalide.') : 'Veuillez remplir le champ.';
+      this.emailError = emailRegex.test(this.email) ? '' : 'Veuillez entrer un email valide.';
       return !this.emailError;
     },
 
@@ -264,13 +344,18 @@ export default {
       return !this.passwordError;
     },
 
+    validatePasswordConfirm() {
+      this.passwordConfirmError = this.passwordConfirm === this.password ? '' : 'Les mots de passe ne correspondent pas.';
+      return !this.passwordConfirmError;
+    },
+
     validateBirthDate() {
       this.birthDateError = this.birthDate ? '' : 'Veuillez remplir le champ.';
       return !this.birthDateError;
     },
 
     validateUserType() {
-      this.userTypeError = this.userType ? '' : 'Veuillez remplir le champ.';
+      this.userTypeError = this.userType ? '' : 'Veuillez sélectionner un type d\'utilisateur.';
       return !this.userTypeError;
     },
 
@@ -285,56 +370,61 @@ export default {
     },
 
     async createUser() {
-      if (!this.validateCurrentStep()) {
-        return;
-      }
-      try {
-        const response = await axios.post('http://localhost:3000/users', {
-          firstName: this.firstName,
-          lastName: this.name,
-          email: this.email,
-          password: this.password,
-          phone: this.phoneNumber,
-          birthday: this.birthDate,
-          sex: this.gender,
-          type: this.userType
-        });
-        console.log('Utilisateur ajouté:', response.data);
-        this.successMessage = 'Nous avons bien créé votre compte.'; // Set success message
-        this.errorMessage = ''; // Clear any previous error message
-        this.dialog = true; // Ouvre le dialog de confirmation
-        this.resetForm();
-      } catch (error) {
-        if (error.response) {
-          switch (error.response.status) {
-            case 400:
-              this.errorMessage = 'Veuillez vérifier les informations fournies.';
-              break;
-            case 409:
-              this.errorMessage = 'Cet email est déjà utilisé. Veuillez en choisir un autre.';
-              break;
-            case 500:
-              this.errorMessage = 'Une erreur interne est survenue. Veuillez réessayer.';
-              break;
-            default:
-              this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-          }
-        } else {
-          console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+  if (!this.validateCurrentStep()) {
+    return;
+  }
+  try {
+    const response = await axios.post('http://localhost:3000/users', {
+      firstName: this.firstName,
+      lastName: this.name,
+      email: this.email,
+      password: this.password,
+      phone: this.phoneNumber,
+      birthday: this.birthDate,
+      sex: this.gender,
+      type: this.userType
+    });
+    console.log('Utilisateur ajouté avec succès:', response.data);
+    // Set success message and open dialog
+    this.successMessage = 'Nous avons bien créé votre compte.';
+    this.errorMessage = ''; 
+    this.dialog = true;  // Open the dialog for success
+    this.resetForm();
+    
+  } catch (error) {
+    // Handle error cases
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          this.errorMessage = 'Veuillez vérifier les informations fournies.';
+          break;
+        case 409:
+          this.errorMessage = 'Cet email est déjà utilisé. Veuillez en choisir un autre.';
+          break;
+        case 500:
+          this.errorMessage = 'Une erreur interne est survenue. Veuillez réessayer.';
+          break;
+        default:
           this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-        }
-        this.successMessage = ''; // Clear any previous success message
-        this.dialog = true; // Ouvre le dialog même en cas d'erreur
       }
-    },
+    } else {
+      console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+      this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+    }
+    
+    // Clear success message and open the dialog with error message
+    this.successMessage = '';
+    this.dialog = true; // Open the dialog even if there's an error
+  }
+},
+
 
     closeDialog() {
       this.dialog = false; // Ferme le dialog
+      this.successMessage = ''; // Réinitialiser les messages après fermeture
+      this.errorMessage = ''; 
     },
 
-    editInformation() {
-      this.currentStep = 1; // Réinitialise à l'étape 1 pour éditer les informations
-    },
 
     prevStep() {
       if (this.currentStep > 1) {
@@ -347,6 +437,7 @@ export default {
       this.name = '';
       this.email = '';
       this.password = '';
+      this.passwordConfirm = ''; // Réinitialiser la confirmation du mot de passe
       this.phoneNumber = '';
       this.birthDate = '';
       this.gender = '';
@@ -355,6 +446,7 @@ export default {
       this.firstNameError = '';
       this.emailError = '';
       this.passwordError = '';
+      this.passwordConfirmError = ''; // Réinitialiser l'erreur de confirmation
       this.birthDateError = '';
       this.userTypeError = '';
       this.genderError = '';
@@ -378,5 +470,10 @@ export default {
 
 .v-list-item-subtitle {
   text-align: left;
+}
+
+.icon-pencil{
+  background-color: #F2992C;
+  color: #ffedd7 !important;
 }
 </style>
