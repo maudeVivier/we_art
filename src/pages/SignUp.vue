@@ -375,6 +375,7 @@ export default {
   }
   try {
     const response = await axios.post('http://localhost:3000/users', {
+    //const response = await axios.post('https://we-art.onrender.com/users', {
       firstName: this.firstName,
       lastName: this.name,
       email: this.email,

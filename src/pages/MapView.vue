@@ -86,7 +86,8 @@ export default {
   methods: {
     async fetchEvents() {
       try {
-        const response = await axios.get('http://localhost:3000/events'); // Appel à l'API
+        //const response = await axios.get('http://localhost:3000/events'); // Appel à l'API
+        const response = await axios.get('https://we-art.onrender.com/events');
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);

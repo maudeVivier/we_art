@@ -211,7 +211,8 @@ export default {
         const formattedStartDateTime = moment(`${this.start_date} ${this.start_time}`).format('YYYY-MM-DD HH:mm:ss');
         const formattedEndDateTime = moment(`${this.end_date} ${this.end_time}`).format('YYYY-MM-DD HH:mm:ss');
 
-        const response = await axios.post('http://localhost:3000/events', {
+        //const response = await axios.post('http://localhost:3000/events', {
+        const response = await axios.post('https://we-art.onrender.com/events', {
           name: this.name,
           description: this.description,
           street: this.street,        // Ajout du champ Rue
