@@ -298,3 +298,106 @@ exports.getEventById = async (req, res) => {
         res.status(500).send({ error: 'Erreur lors de la récupération de l\'evenement' });
     }
 };
+
+
+
+// POST - Participer à un evenement
+/**
+ * @swagger
+ * /events/{eventId}/users/{userId}:
+ *   post:
+ *     summary: Ajouter un utilisateur à un événement
+ *     description: Ajoute un utilisateur spécifique à un événement spécifique.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement auquel ajouter l'utilisateur
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur à ajouter à l'événement
+ *     responses:
+ *       201:
+ *         description: Utilisateur ajouté à l'événement avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur ajouté à l'événement avec succès."
+ *       400:
+ *         description: Requête invalide (ex. utilisateur ou événement non trouvé).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Utilisateur ou événement introuvable."
+ *       409:
+ *         description: L'utilisateur participe déjà à cet événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "L'utilisateur participe déjà à cet événement."
+ *       500:
+ *         description: Erreur interne lors de l'ajout de l'utilisateur à l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de l'ajout de l'utilisateur à l'événement."
+ */
+exports.addUserToEvent = async (req, res) => {
+    const { eventId, userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur et l'événement existent
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+
+        if (userCheck.rowCount === 0 || eventCheck.rowCount === 0) {
+            return res.status(400).json({ error: "Utilisateur ou événement introuvable." });
+        }
+
+
+        // Vérifier si l'utilisateur participe déjà à l'événement
+        const participationCheck = await pool.query(
+            'SELECT * FROM participantsevents WHERE idUser = $1 AND idEvent = $2',
+            [userId, eventId]
+        );
+
+        if (participationCheck.rowCount > 0) {
+            // L'utilisateur participe déjà à l'événement
+            return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
+        }
+
+        // Insérer dans la table de jointure User_Event
+        await pool.query(
+            'INSERT INTO participantsevents (idUser, idEvent) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            [userId, eventId]
+        );
+
+        res.status(201).json({ message: "Utilisateur ajouté à l'événement avec succès." });
+    } catch (err) {
+        console.error("Erreur lors de l'ajout de l'utilisateur à l'événement:", err);
+        res.status(500).send({ error: "Erreur lors de l'ajout de l'utilisateur à l'événement." });
+    }
+};
+
