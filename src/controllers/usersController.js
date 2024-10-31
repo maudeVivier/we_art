@@ -588,3 +588,110 @@ exports.verifyEmail = async (req, res) => {
         res.status(500).json({ message: 'Une erreur est survenue lors de la vérification de l\'email.' });
     }
 };
+
+// GET - Récupérer tous les événements d'un utilisateur
+/**
+ * @swagger
+ * /users/{userId}/events:
+ *   get:
+ *     summary: Récupérer tous les événements d'un utilisateur
+ *     description: Retourne la liste de tous les événements auxquels un utilisateur spécifique participe.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Liste des événements auxquels l'utilisateur participe.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   idEvent:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Conférence Tech"
+ *                   description:
+ *                     type: string
+ *                     example: "Une conférence sur les nouvelles technologies."
+ *                   street:
+ *                     type: string
+ *                     example: "3 rue de la métallurgie"
+ *                   city:
+ *                     type: string
+ *                     example: "Lyon"
+ *                   postal_code:
+ *                     type: string
+ *                     example: "69003"
+ *                   country:
+ *                     type: string
+ *                     example: "France"
+ *                   start_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   end_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   created_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   latitude:
+ *                     type: string
+ *                     example: "45.754205"
+ *                   longitude:
+ *                     type: string
+ *                     example: "4.869387"
+ *       404:
+ *         description: Utilisateur introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur introuvable."
+ *       500:
+ *         description: Erreur interne lors de la récupération des événements de l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération des événements de l'utilisateur."
+ */
+exports.getUserEvents = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur existe
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ message: "Utilisateur introuvable." });
+        }
+
+        // Récupérer tous les événements auxquels l'utilisateur participe
+        const result = await pool.query(
+            `SELECT e.* FROM events e
+            INNER JOIN participantsevents pe ON e.id = pe.idEvent
+            WHERE pe.idUser = $1`,
+            [userId]
+        );
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error("Erreur lors de la récupération des événements de l'utilisateur:", err);
+        res.status(500).send({ error: "Erreur lors de la récupération des événements de l'utilisateur." });
+    }
+};
