@@ -528,14 +528,22 @@ exports.loginUser = async (req, res) => { // Utilise POST au lieu de GET pour le
  *     summary: Vérifier l'e-mail d'un utilisateur
  *     description: Vérifie l'e-mail d'un utilisateur en utilisant un code de vérification envoyé par e-mail.
  *     tags: [Users]
- *     parameters:
- *       - in: query
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Token de vérification reçu par e-mail
- *         example: "12345abcdef"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: Token de vérification reçu par e-mail
+ *                 example: "1234"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: L'e-mail de l'utilisateur à vérifier
+ *                 example: "user@example.com"
  *     responses:
  *       200:
  *         description: E-mail vérifié avec succès.
@@ -569,10 +577,10 @@ exports.loginUser = async (req, res) => { // Utilise POST au lieu de GET pour le
  *                   example: "Une erreur est survenue lors de la vérification de l'email."
  */
 exports.verifyEmail = async (req, res) => {
-    const { token } = req.query;
+    const { token, email } = req.body;
     try {
         // Rechercher l'utilisateur par le token de vérification
-        const result = await pool.query('SELECT * FROM users WHERE verification_token = $1', [token]);
+        const result = await pool.query('SELECT * FROM users WHERE verification_token = $1 and email = $2', [token, email]);
         const user = result.rows[0];
 
         if (!user) {
