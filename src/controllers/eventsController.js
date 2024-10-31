@@ -483,3 +483,110 @@ exports.removeUserFromEvent = async (req, res) => {
     }
 };
 
+// POST - Ajouter un commentaire à un événement
+// POST - Ajouter un commentaire à un événement
+/**
+ * @swagger
+ * /events/{eventId}/comments:
+ *   post:
+ *     summary: Ajouter un commentaire à un événement
+ *     description: Ajoute un commentaire avec une notation à un événement spécifique.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement auquel le commentaire est ajouté
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notation:
+ *                 type: integer
+ *                 example: 5
+ *               description:
+ *                 type: string
+ *                 example: "Événement exceptionnel!"
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       201:
+ *         description: Commentaire ajouté avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 notation:
+ *                   type: integer
+ *                   example: 5
+ *                 description:
+ *                   type: string
+ *                   example: "Événement exceptionnel!"
+ *                 idUser:
+ *                   type: integer
+ *                   example: 1
+ *                 idEvent:
+ *                   type: integer
+ *                   example: 1
+ *                 created_at:
+ *                   type: string
+ *                   example: "2024-10-31T10:00:00Z"
+ *       400:
+ *         description: La notation doit être comprise entre 1 et 5.
+ *       404:
+ *         description: Utilisateur ou événement introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Utilisateur introuvable."
+ *       500:
+ *         description: Erreur interne lors de l'ajout du commentaire.
+ */
+exports.addComment = async (req, res) => {
+    const { notation, description, userId } = req.body;
+    const { eventId } = req.params;
+
+    try {
+        // Vérification de la notation
+        if (notation < 1 || notation > 5) {
+            return res.status(400).json({ error: "La notation doit être comprise entre 1 et 5." });
+        }
+
+        // Vérifier si l'utilisateur existe
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ error: "Utilisateur introuvable." });
+        }
+ 
+        // Vérifier si l'événement existe
+        const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+        if (eventCheck.rowCount === 0) {
+            return res.status(404).json({ error: "Événement introuvable." });
+        }
+
+        // Insérer le commentaire dans la base de données
+        const result = await pool.query(
+            'INSERT INTO commentairesEvents (notation, description, idUser, idEvent) VALUES ($1, $2, $3, $4) RETURNING *',
+            [notation, description, userId, eventId]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error("Erreur lors de l'ajout du commentaire:", err);
+        res.status(500).send({ error: "Erreur lors de l'ajout du commentaire." });
+    }
+};
