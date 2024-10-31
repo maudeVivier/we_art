@@ -388,7 +388,7 @@ exports.addUserToEvent = async (req, res) => {
             return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
         }
 
-        // Insérer dans la table de jointure User_Event
+        // Insérer dans la table de jointure participantsevents
         await pool.query(
             'INSERT INTO participantsevents (idUser, idEvent) VALUES ($1, $2) ON CONFLICT DO NOTHING',
             [userId, eventId]
@@ -398,6 +398,88 @@ exports.addUserToEvent = async (req, res) => {
     } catch (err) {
         console.error("Erreur lors de l'ajout de l'utilisateur à l'événement:", err);
         res.status(500).send({ error: "Erreur lors de l'ajout de l'utilisateur à l'événement." });
+    }
+};
+
+
+// DELETE - Désinscrire un utilisateur d'un événement
+/**
+ * @swagger
+ * /events/{eventId}/users/{userId}:
+ *   delete:
+ *     summary: Désinscrire un utilisateur d'un événement
+ *     description: Supprime la participation d'un utilisateur à un événement spécifique.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement dont désinscrire l'utilisateur
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur à désinscrire de l'événement
+ *     responses:
+ *       200:
+ *         description: Utilisateur désinscrit de l'événement avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur désinscrit de l'événement avec succès."
+ *       404:
+ *         description: L'utilisateur n'est pas inscrit à cet événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "L'utilisateur n'est pas inscrit à cet événement."
+ *       500:
+ *         description: Erreur interne lors de la désinscription de l'utilisateur de l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la désinscription de l'utilisateur de l'événement."
+ */
+exports.removeUserFromEvent = async (req, res) => {
+    const { eventId, userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur est actuellement inscrit à l'événement
+        const participationCheck = await pool.query(
+            'SELECT * FROM participantsevents WHERE idUser = $1 AND idEvent = $2',
+            [userId, eventId]
+        );
+
+        if (participationCheck.rowCount === 0) {
+            // L'utilisateur n'est pas inscrit à l'événement
+            return res.status(404).json({ message: "L'utilisateur n'est pas inscrit à cet événement." });
+        }
+
+        // Supprimer l'enregistrement dans la table de jointure participantsevents
+        await pool.query(
+            'DELETE FROM participantsevents WHERE idUser = $1 AND idEvent = $2',
+            [userId, eventId]
+        );
+
+        res.status(200).json({ message: "Utilisateur désinscrit de l'événement avec succès." });
+    } catch (err) {
+        console.error("Erreur lors de la désinscription de l'utilisateur de l'événement:", err);
+        res.status(500).send({ error: "Erreur lors de la désinscription de l'utilisateur de l'événement." });
     }
 };
 
