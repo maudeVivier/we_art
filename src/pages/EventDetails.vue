@@ -58,8 +58,8 @@
       async fetchEventDetails(id) {
         try {
           console.log(id);
-          //const response = await axios.get(`http://localhost:3000/events/${id}`);
-          const response = await axios.get('https://we-art.onrender.com/events/${id}');
+          //const response = await axios.get(`http://localhost:3000/eventDetails/${id}`);
+          const response = await axios.get('https://we-art.onrender.com/eventDetails/${id}');
           this.event = response.data[0]; // Récupérer le premier élément du tableau
         } catch (error) {
           console.error('Erreur lors de la récupération des détails de l\'événement:', error);

@@ -230,7 +230,7 @@ exports.createEvent = async (req, res) => {
 // GET - Récupérer un evenement en particulier
 /**
  * @swagger
- * /events/{id}:
+ * /eventDetails/{id}:
  *   get:
  *     summary: Récupérer un événement par ID
  *     description: Renvoie les détails d'un événement spécifique à partir de son ID.
