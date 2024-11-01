@@ -6,7 +6,17 @@
         </v-app-bar>
   
         <v-container>
-          <v-card>
+           <!-- Loading Spinner -->
+           <v-col v-if="loading" cols="12" class="text-center">
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                size="60"
+              ></v-progress-circular>
+              <p>Chargement des événements...</p>
+            </v-col>
+            
+          <v-card v-else>
             <v-card-title>
               <h1>{{ event.name }}</h1>
             </v-card-title>
@@ -45,6 +55,7 @@
   export default {
     data() {
       return {
+        loading: false, // Loading state
         event: {},
         photo_default: require('@/assets/evenementiel.jpg'), // Image par défaut
       };
@@ -56,13 +67,17 @@
     },
     methods: {
       async fetchEventDetails(id) {
+        this.loading = true; // Start loading
         try {
           console.log(id);
-          //const response = await axios.get(`http://localhost:3000/eventDetails/${id}`);
-          const response = await axios.get('https://we-art.onrender.com/eventDetails/${id}');
+          //const response = await axios.get(`http://localhost:3000/events/${id}`);
+          const response = await axios.get(`https://we-art.onrender.com/events/${id}`);
           this.event = response.data[0]; // Récupérer le premier élément du tableau
+          console.log(response);
         } catch (error) {
           console.error('Erreur lors de la récupération des détails de l\'événement:', error);
+        }finally {
+        this.loading = false; // End loading
         }
       },
       goBack() {
