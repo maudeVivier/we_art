@@ -66,6 +66,16 @@ v-bottom-navigation {
   left: 0;
   width: 100%;
   z-index: 10;
+  height: 50px;
+}
+
+.v-app-bar {
+  z-index: 1000; /* Barre d'application toujours au-dessus de la carte */
+  position: fixed; /* Assurez-vous que la barre est fixe en haut */
+  top: 0; /* Collé en haut */
+  left: 0; /* Aligné à gauche */
+  width: 100%; /* Prend toute la largeur */
+  height: 56 px;
 }
 /* Appliquer la police aux titres */
 h1, h2, h3, h4, h5, h6 {

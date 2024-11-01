@@ -280,12 +280,15 @@
                   required
                 />
               </div>
+              <!-- Ajoutez cet élément pour afficher les messages d'erreur -->
+              <div v-if="verificationCodeError" class="error-message">
+                {{ verificationCodeError }}
+              </div>
               <br>
               <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="editField('email')" class="link">demander un autre e-mail de vérification.</a></small>
             </div>
-
-
-
+            <br>
+            <v-btn @click="validateVerificationCode" v-if="currentStep === 6" color="primary">Valider</v-btn>
           </v-card-text>
   
           <v-card-actions>
@@ -304,11 +307,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      currentStep: 1,
+      currentStep: 6,//1,
       steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
       name: '',
       firstName: '',
-      email: '',
+      email: 'finaritralft@gmail.com',//'',
       password: '',
       showPassword: false,
       passwordConfirm: '', // Nouvel état pour la confirmation du mot de passe
@@ -566,12 +569,56 @@ export default {
       }
     },
 
-    validateVerificationCode() {
+    async validateVerificationCode() {
+      // Convertir le tableau verificationCode en une chaîne de chiffres
+      var verificationCodeString = this.verificationCode.join('');
+    
+      // Nettoyage de l'entrée en supprimant les espaces
+      verificationCodeString = verificationCodeString.trim();
       // Vérifie que le code de vérification est un nombre à 4 chiffres
       const codeRegex = /^[0-9]{4}$/;
-      this.verificationCodeError = codeRegex.test(this.verificationCode) ? '' : 'Veuillez entrer un code de 4 chiffres valide.';
+      this.verificationCodeError = codeRegex.test(verificationCodeString) ? '' : 'Veuillez entrer un code de 4 chiffres valide.';      // Si le code est valide, procéder à la requête
+      if (!this.verificationCodeError) {
+        console.log("token : ",verificationCodeString,"mail : ", this.email);  
+        try {
+              const response = await axios.get('https://we-art.onrender.com/verify-code', {
+                body: {  
+                token: "1126", // Le code de vérification
+                  email: "fina@gmail.com" // L'email de l'utilisateur
+                  },
+                  headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                  }
+              });
+              // Vérification du code selon le code de réponse
+              if (response.status === 200) {
+                  console.log(response.data.message); // "Email vérifié avec succès"
+                  return true; // Validation réussie
+              } else {
+                  this.verificationCodeError = 'Une erreur est survenue, veuillez réessayer.'; // Gestion d'autres codes d'erreur
+                  console.log(response.data.message);
+              }
+          } catch (error) {
+              // Gestion des erreurs lors de l'appel à l'API
+              if (error.response) {
+                  // L'erreur est une réponse de l'API
+                  if (error.response.status === 500) {
+                      this.verificationCodeError = "Une erreur est survenue lors de la vérification de l'email.";
+                  }else if (error.response.status === 400) {
+                  this.verificationCodeError = 'Code invalide'; // Message d'erreur si le token est invalide
+                  }
+              } else {
+                  // Erreur autre (réseau, etc.)
+                  this.verificationCodeError = "Erreur de connexion. Veuillez réessayer.";
+              }
+          }
+      }
+
+      // Retourne faux si il y a une erreur
       return !this.verificationCodeError;
-    },
+  },
+
 
 
     closeDialog() {
@@ -614,6 +661,7 @@ export default {
 <style scoped>
   .error-message {
     color: red; /* Customize this as needed */
+    font-size: 0.7rem;
   }
 
   /* Add this style to align the recap information to the left */
