@@ -23,48 +23,45 @@
           </v-toolbar>
 
           <v-row>
-            <!-- Loop through the events and create a card for each -->
-            <v-col
-              v-for="event in filteredEvents"
-              :key="event.id"
-              cols="12"
-              md="4"
-            >
-              <v-card class="mx-auto" max-width="400">
-                <v-img
-                  :src="photo_default_catalogue"
-                  alt="Image de l'événement"
-                  height="200px"
-                ></v-img>
+  <v-col
+    v-for="event in filteredEvents"
+    :key="event.id"
+    cols="12"
+    md="4"
+  >
+    <v-card
+      class="mx-auto"
+      max-width="400"
+      @click="showDetails(event)"
+      hover
+    >
+      <v-img
+        :src="photo_default_catalogue"
+        alt="Image de l'événement"
+        height="200px"
+      ></v-img>
 
-                <v-card-title class="title">{{ event.name }}</v-card-title>
+      <v-card-title class="title">{{ event.name }}</v-card-title>
+      <v-card-text>
+        <p>
+          <v-icon color="primary" class="mr-2">mdi-map-marker</v-icon>
+          {{ event.street }}, {{ event.city }}
+        </p>
+      </v-card-text>
+    </v-card>
+  </v-col>
 
-                <v-card-text>
-                  <p><strong>Description :</strong> {{ event.description }}</p>
-                  <p><strong>Lieu :</strong> {{ event.street }}, {{ event.city }}</p>
-                  <p>
-                    <strong>Date :</strong> 
-                    {{ new Date(event.start_date).toLocaleDateString() }} -
-                    {{ event.end_date ? new Date(event.end_date).toLocaleDateString() : 'N/A' }}
-                  </p>
-                </v-card-text>
+  <!-- Loading Spinner -->
+  <v-col v-if="loading" cols="12" class="text-center">
+    <v-progress-circular
+      indeterminate
+      color="primary"
+      size="60"
+    ></v-progress-circular>
+    <p>Chargement des événements...</p>
+  </v-col>
+</v-row>
 
-                <v-card-actions>
-                  <v-btn color="primary" @click="showDetails(event)">Voir</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-
-            <!-- Loading Spinner -->
-            <v-col v-if="loading" cols="12" class="text-center">
-              <v-progress-circular
-                indeterminate
-                color="primary"
-                size="60"
-              ></v-progress-circular>
-              <p>Chargement des événements...</p>
-            </v-col>
-          </v-row>
 
           <!-- Bouton Ajouter un Événement -->
           <v-row>
