@@ -7,43 +7,34 @@
     <v-main>
       <v-container fluid class="text-center my-5">
         <!-- Section Logos -->
-        <div class="logo-container">
-          <v-row justify="center" no-gutters>
-            <!-- Logo React qui tourne -->
-            <v-col cols="12" class="d-flex justify-center"> 
-              <v-img :src="reactLogo" class="logo react rotating-logo" alt="React logo" />
-            </v-col>
-            <!-- Logo Map superposé -->
-            <v-col cols="12" class="d-flex justify-center overlay-logo"> 
-              <v-img :src="mapLogo" class="map-logo" alt="Map logo" />
-            </v-col>
-          </v-row>
-        </div>
+        <div class="logo" justify="center"  >
+                    <v-img
+                      :src="Logo"
+                      alt="Map logo"
+                    ></v-img>
+                  </div>
 
-        <!-- Titre principal -->
-        <v-row class="my-5">
-          <v-col>
-            <p>Créons ensemble!</p>
-          </v-col>
-        </v-row>
-
-        <!-- Section bouton "Like" -->
+        <!-- Section bouton Se connecter -->
         <v-row justify="center">
           <v-col cols="12" md="8">
-            <v-card class="pa-5" outlined>
-              <v-btn to="/login" color="primary" block>
+            <div class="pa-5" outlined>
+              <v-btn to="/login" color="primary">
                 Se connecter
               </v-btn>
-            </v-card>
+            </div>
           </v-col>
         </v-row>
 
         <!-- Lien vers l'inscription -->
         <v-row justify="center">
-          <v-col cols="12">
-            <p>
-              <router-link to="/signup">Pas encore de compte ? Inscrivez-vous ici</router-link>
-            </p>
+          <v-col cols="12" >
+            <div class="pa-5" outlined>
+              <v-btn to="/signup" color="grey" >
+                <span class="v-btn__content" color="grey">
+                S'inscrire
+              </span>
+              </v-btn>
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -53,88 +44,76 @@
 
 <script>
 // Importation des images
-import reactLogo from '@/assets/round.png'; // Utilise le chemin correct pour ton logo
-import mapLogo from '@/assets/map.png'; // Chemin relatif vers ton logo situé dans le même dossier
+import Logo from '@/assets/WE ART.png'; // Chemin relatif vers ton logo situé dans le même dossier
 
 export default {
   data() {
     return {
-      reactLogo,
-      mapLogo,
+      Logo,
     };
   },
 };
 </script>
 
 <style scoped>
-/* Styles personnalisés, adaptés depuis App.css et Connect.css */
-.logo-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 5px;
-}
+  /* Styles personnalisés, adaptés depuis App.css et Connect.css */
+  .logo {
+    max-width: 100%; /* Ensure the image is responsive */
+    height: auto;    /* Maintain aspect ratio */
+    width: 300px;    /* Set a fixed width */
+    display: block;  /* Ensure it behaves like a block element */
+    margin: 0 auto;  /* Center horizontally */
+  }
 
-.logo {
-  max-width: 80px; /* Ajuste selon la taille souhaitée pour mobile */
-  height: auto;
-}
+  .v-btn {
+    color: white;
+    background-color: #ff4081;
+    border-radius: 20px;
+    width: 200px; /* Réduire la largeur, ajustez selon vos besoins */
+    max-width: 90%; /* S'assure que le bouton ne déborde pas */
+  }
 
-.overlay-logo {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
+  .router-link {
+    text-decoration: none;
+    color: #F2992C;
+    font-weight: bold;
+  }
 
-.map-logo {
-  max-width: 30px; /* Ajuste selon la taille souhaitée pour mobile */
-  height: auto;
-}
+  .v-card {
+    text-align: center;
+  }
 
-.v-btn {
-  color: white;
-  background-color: #ff4081;
-}
+  /* Ajout d'un style pour empêcher le débordement horizontal */
+  .v-app {
+    overflow-x: hidden; /* Empêche le défilement horizontal */
+  }
 
-.router-link {
-  text-decoration: none;
-  color: #F2992C;
-  font-weight: bold;
-}
+  .v-container {
+    padding: 0; /* Supprime le padding interne du conteneur */
+    margin: 0; /* Supprime les marges */
+  }
 
-.v-card {
-  text-align: center;
-}
+  /* Assure que la hauteur du contenu remplit l'écran sans déborder */
+  .v-main {
+    min-height: 100vh;
+    padding-bottom: 0; /* Supprime le padding en bas */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centre verticalement le contenu */
+  }
 
-/* Ajout d'un style pour empêcher le débordement horizontal */
-.v-app {
-  overflow-x: hidden; /* Empêche le défilement horizontal */
-}
+  /* Désactive les marges dans le row pour éviter le débordement */
+  .v-row {
+    margin: 0;
+  }
 
-.v-container {
-  padding: 0; /* Supprime le padding interne du conteneur */
-  margin: 0; /* Supprime les marges */
-}
+  /* Pour centrer correctement et ajuster la taille des colonnes */
+  .v-col {
+    max-width: 100%; /* S'assure que les colonnes ne débordent pas horizontalement */
+    flex-grow: 1;
+  }
 
-/* Assure que la hauteur du contenu remplit l'écran sans déborder */
-.v-main {
-  min-height: 100vh;
-  padding-bottom: 0; /* Supprime le padding en bas */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centre verticalement le contenu */
-}
-
-/* Désactive les marges dans le row pour éviter le débordement */
-.v-row {
-  margin: 0;
-}
-
-/* Pour centrer correctement et ajuster la taille des colonnes */
-.v-col {
-  max-width: 100%; /* S'assure que les colonnes ne débordent pas horizontalement */
-  flex-grow: 1;
-}
+  .v-btn__content{
+    color: white; 
+  }
 </style>
