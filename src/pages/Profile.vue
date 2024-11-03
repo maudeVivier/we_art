@@ -16,7 +16,7 @@
           <!-- Ajoutez d'autres informations utilisateur ici -->
         </v-card-text>
         <v-card-actions>
-          <v-btn color="primary" @click="logout">Déconnexion</v-btn>
+          <v-btn color="primary" @click="handleLogout">Déconnexion</v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -38,7 +38,8 @@
       };
     },
     methods: {
-      ...mapActions(['logout']),
+      ...mapActions(['logout']), // Importation de l'action logout de Vuex
+  
       async fetchUserDetails() {
         try {
           // Appel API pour récupérer les informations de l'utilisateur
@@ -49,6 +50,16 @@
           console.error('Erreur lors de la récupération des informations utilisateur :', error);
         }
       },
+  
+      handleLogout() {
+        // Exécute l'action de déconnexion de Vuex
+        this.logout();
+        // Supprime les informations de l'utilisateur du localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('idUser');
+        // Rafraîchit la page pour réinitialiser l'état de l'application
+        window.location.reload();
+      }
     },
     created() {
       // Récupérez l'ID utilisateur à partir de Vuex ou de localStorage
@@ -59,4 +70,5 @@
     },
   };
   </script>
+  
   
