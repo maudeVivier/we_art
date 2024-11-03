@@ -17,16 +17,19 @@ import ListEvents from '../pages/ListEvents.vue'
 import MapView from '../pages/MapView.vue'
 import EventDetails from '../pages/EventDetails.vue'; // Page de détails
 import AddFakeData from '../pages/AddFakeData.vue'
+import UserProfile from '../pages/Profile.vue'; // Import du composant Profile
+import store from '../store.js';
 
-Vue.use(Router)
+Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
       path: '/',
       name: 'Home',
-      component: HomePage
+      component: HomePage,
+      //meta: { requiresAuth: true }, // pour dire que ça necessite une authentification
     },
     {
       path: '/login',
@@ -63,6 +66,30 @@ export default new Router({
       path: '/addFakeData',
       name: 'addFakeData',
       component: AddFakeData
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: UserProfile,
+      meta: { requiresAuth: true }, // Nécessite l'authentification
     }
   ]
-})
+});
+
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!store.getters.isAuthenticated) {
+      // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
+      next('/login');
+    } else {
+      next(); // Laisser passer si l'utilisateur est authentifié
+    }
+  } else {
+    next(); // Laisser passer si l'authentification n'est pas requise
+  }
+});
+
+
+export default router;
+

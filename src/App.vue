@@ -32,11 +32,10 @@
         <v-icon>mdi-map</v-icon> <!-- Changer ici -->
       </v-btn>
 
-      <v-btn
-        :to="{ name: 'Login' }"
-      >
-        <span>Connexion</span>
-        <v-icon>mdi-account</v-icon>
+      <!-- Changer dynamiquement Connexion en Profil -->
+      <v-btn :to="isAuthenticated ? { name: 'Profile' } : { name: 'Login' }">
+        <span>{{ isAuthenticated ? 'Profil' : 'Connexion' }}</span>
+        <v-icon>{{ isAuthenticated ? 'mdi-account-circle' : 'mdi-account' }}</v-icon>
       </v-btn>
 
       <!-- Ajoute plus de boutons ici pour d'autres pages -->
@@ -46,13 +45,17 @@
 
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
   data() {
     return {
       active: null, // Gère l'état actif du bottom navigation
-    }
-  }
-}
+    };
+  },
+  computed: {
+    ...mapGetters(['isAuthenticated', 'getUser']),
+  },
+};
 </script>
 
 <style>
