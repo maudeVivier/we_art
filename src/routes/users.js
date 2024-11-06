@@ -8,7 +8,7 @@ router.post('/users', createUser);
 router.patch('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.post('/users/login', loginUser);
-router.get('/verify-code', verifyEmail);
+router.post('/verify-code', verifyEmail);
 router.get('/users/:userId/events', getUserEvents);
 router.get('/users/:id', getUserById);
 

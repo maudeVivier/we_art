@@ -72,7 +72,7 @@ exports.getUsers = async (req, res) => {
     }
 };
 
-
+// GET - Récupérer un utilisateurs
 /**
  * @swagger
  * /users/{id}:
@@ -594,11 +594,11 @@ exports.loginUser = async (req, res) => { // Utilise POST au lieu de GET pour le
     }
 };
 
-// GET - Vérifier l'email d'un utilisateur
+// POST - Vérifier l'email d'un utilisateur
 /**
  * @swagger
  * /verify-code:
- *   get:
+ *   post:
  *     summary: Vérifier l'e-mail d'un utilisateur
  *     description: Vérifie l'e-mail d'un utilisateur en utilisant un code de vérification envoyé par e-mail.
  *     tags: [Users]
