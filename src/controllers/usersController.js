@@ -64,7 +64,7 @@ const transporter = nodemailer.createTransport({
  */
 exports.getUsers = async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM users');
+        const result = await pool.query('SELECT id, firstname, lastname, birthday, sex, phone, email, type FROM users');
         res.json(result.rows);
     } catch (err) {
         console.error('Erreur lors de la récupération des utilisateurs:', err);
