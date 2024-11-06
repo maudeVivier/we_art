@@ -72,6 +72,80 @@ exports.getUsers = async (req, res) => {
     }
 };
 
+
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Récupérer un utilisateur par ID
+ *     description: Retourne un utilisateur spécifique dans la base de données.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID de l'utilisateur
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Détails de l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 firstName:
+ *                   type: string
+ *                   example: John
+ *                 lastName:
+ *                   type: string
+ *                   example: Doe
+ *                 birthday:
+ *                   type: string
+ *                   example: "2000-12-01"
+ *                 sex:
+ *                   type: string
+ *                   enum: [Man, Woman, Non-binary, Not Specified]
+ *                   example: "Man"
+ *                 phone:
+ *                   type: string
+ *                   example: "0612345678"
+ *                 email:
+ *                   type: string
+ *                   example: "john.doe@example.com"
+ *                 type:
+ *                   type: string
+ *                   enum: [Organizer, Participant]
+ *                   example: "Organizer"
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+exports.getUserById = async (req, res) => {
+    const userId = parseInt(req.params.id, 10); // Conversion de l'identifiant en entier
+    try {
+        const result = await pool.query(
+            'SELECT id, firstname, lastname, birthday, sex, phone, email, type FROM users WHERE id = $1',
+            [userId]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('Erreur lors de la récupération de l\'utilisateur:', err);
+        res.status(500).send({ error: 'Erreur lors de la récupération de l\'utilisateur' });
+    }
+};
+
+
 // POST - Créer un nouvel utilisateur
 /**
  * @swagger
