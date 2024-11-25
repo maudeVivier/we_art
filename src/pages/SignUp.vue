@@ -237,11 +237,9 @@
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
-                  <v-btn @click="createUser" v-if="currentStep === 5" color="primary">S'inscrire</v-btn>
                 </v-card-text>
               </v-card>
             </div>
-
             <div v-if="currentStep === 6">
               <br><h2>C'est bientôt fini !</h2><br>
               <p>Veuillez vérifier votre boîte de réception. Nous venons d'envoyer un message à l'adresse <strong>{{ this.email }}</strong> pour vérifier votre adresse e-mail. Vous devez insérer le code à 4 chiffres de cet e-mail pour terminer l'inscription.</p>
@@ -293,7 +291,7 @@
   
           <v-card-actions>
             <v-btn @click="prevStep" :disabled="currentStep === 1">Précédent</v-btn>
-            <v-btn @click="nextStep" :disabled="currentStep === 6">Suivant</v-btn>
+            <v-btn @click="currentStep === 5 ? (createUser()) : nextStep()" :disabled="currentStep === 6">Suivant</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -307,11 +305,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      currentStep: 6,//1,
+      currentStep: 1,
       steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
       name: '',
       firstName: '',
-      email: 'finaritralft@gmail.com',//'',
+      email: '',
       password: '',
       showPassword: false,
       passwordConfirm: '', // Nouvel état pour la confirmation du mot de passe
@@ -525,8 +523,8 @@ export default {
         return;
       }
       try {
-        const response = await axios.post('http://localhost:3000/users', {
-        //const response = await axios.post('https://we-art.onrender.com/users', {
+        //const response = await axios.post('http://localhost:3000/users', {
+        const response = await axios.post('https://we-art.onrender.com/users', {
           firstName: this.firstName,
           lastName: this.name,
           email: this.email,
@@ -540,8 +538,9 @@ export default {
         // Set success message and open dialog
         this.successMessage = 'Nous avons bien créé votre compte.';
         this.errorMessage = ''; 
-        this.dialog = true;  // Open the dialog for success
-        this.resetForm();
+        this.nextStep();
+        //this.dialog = true;  // Open the dialog for success
+        //this.resetForm();
       } catch (error) {
         // Handle error cases
         if (error.response) {
@@ -581,10 +580,10 @@ export default {
       if (!this.verificationCodeError) {
         console.log("token : ",verificationCodeString,"mail : ", this.email);  
         try {
-              const response = await axios.get('https://we-art.onrender.com/verify-code', {
-                body: {  
-                token: "1126", // Le code de vérification
-                  email: "fina@gmail.com" // L'email de l'utilisateur
+              const response = await axios.post('https://we-art.onrender.com/verify-code', {
+                body: {
+                token: verificationCodeString, // Le code de vérification
+                email: this.email // L'email de l'utilisateur
                   },
                   headers: {
                       'Accept': 'application/json',
