@@ -13,7 +13,16 @@ const eventsRoutes = require('./src/routes/events');
 // Création d'une instance d'application Express
 const app = express();
 
-app.use(cors());
+// Configurer CORS pour autoriser les requêtes de localhost:8001
+const corsOptions = {
+    origin: '*', // Remplacez par l'URL de votre frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  };
+  
+// Utiliser CORS avec les options spécifiées
+app.use(cors(corsOptions));
+  
 app.use(express.json());
 app.use(serveStatic(path.join(__dirname, 'dist')));
 

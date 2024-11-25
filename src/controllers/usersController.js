@@ -257,7 +257,6 @@ exports.getUserById = async (req, res) => {
  */
 exports.createUser = async (req, res) => {
     const { firstName, lastName, email, password, birthday, sex, type, phone } = req.body;  // Modifications pour correspondre aux colonnes
-    console.log(req.body)
     const bcrypt = require('bcrypt');
     const saltRounds = 10;
     const hash = bcrypt.hashSync(password, saltRounds);
@@ -293,45 +292,58 @@ exports.createUser = async (req, res) => {
     }
 
     try {
-        let verificationToken = Math.floor(1000 + Math.random() * 9000);
+        const verificationToken = Math.floor(1000 + Math.random() * 9000);
+
+        // Insertion dans la base de données
         const result = await pool.query(
-            'INSERT INTO users (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+            `INSERT INTO users 
+            (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+            RETURNING *`,
             [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone, verificationToken, false]
         );
 
         const newUser = result.rows[0];
-        console.log(newUser);
+        console.log('Nouvel utilisateur inséré :', newUser);
 
-        const mailOptions = {
-            from: process.env.EMAIL_GMAIL,
-            to: newUser.email,
-            subject: 'Vérification de votre email',
-            html: `<p>Bonjour ${newUser.firstname} ${newUser.lastname},</p>
-                   <p>Merci de vous être inscrit. Veuillez cliquer sur le lien ci-dessous pour vérifier votre email :</p>
-                   <p>Le code de verification est : ${verificationToken}</p>`
-        };
+        // Envoi de l'email de vérification
+        await sendVerificationEmail(email, firstName, lastName, verificationToken);
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('Erreur lors de l\'envoi de l\'email de vérification:', error);
-                return res.status(500).json({ message: 'Une erreur est survenue lors de l\'envoi de l\'email de vérification.' });
+        res.status(200).json({
+            message: 'Utilisateur créé avec succès. Un email de vérification a été envoyé.',
+            user: {
+                id: newUser.id,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email
             }
-            console.log('Email de vérification envoyé:', info.response);
-            res.status(201).json({ message: 'Utilisateur créé. Un email de vérification a été envoyé.', user: newUser });
         });
-
-        res.status(201).json(newUser);
-    } catch (error) {
-        if (error.code === '23505') { // Violation de contrainte UNIQUE
-            console.error('Cet email est déjà utilisé:', error);
-            res.status(409).json({ message: 'Cet email est déjà utilisé.' });
-        } else {
-            console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
-            res.status(500).json({ message: 'Une erreur interne est survenue.' });
-        }
+    }catch (error) {
+        console.error('Erreur lors de la création de l\'utilisateur:', error);
+        res.status(500).json({ message: 'Une erreur interne est survenue.' });
     }
 };
 
+// Fonction pour envoyer le mail de verification quand on crée un compte
+const sendVerificationEmail = async (email, firstName, lastName, verificationToken) => {
+    const mailOptions = {
+        from: process.env.EMAIL_GMAIL,
+        to: email,
+        subject: 'Vérification de votre email',
+        html: `<p>Bonjour ${firstName} ${lastName},</p>
+               <p>Merci de vous être inscrit. Veuillez utiliser le code suivant pour vérifier votre email :</p>
+               <p>Code : ${verificationToken}</p>`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log("E-mail envoyé avec succès à :", email);
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi de l\'email :', error);
+        throw new Error('Erreur lors de l\'envoi de l\'email');
+    }
+};
+  
 // DELETE - Supprimer un utilisateur
 /**
  * @swagger
@@ -493,11 +505,11 @@ exports.deleteUser = async (req, res) => {
  */
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { firstName, lastName, email, birthday, sex, type } = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstName, lastName, email, password, birthday, sex, type, phone } = req.body;  // Modifications pour correspondre aux colonnes
     try {
         const result = await pool.query(
-            'UPDATE users SET firstName = $1, lastName = $2, email = $3, birthday = $4, sex = $5, type = $6 WHERE id = $7 RETURNING *',
-            [firstName, lastName, email, birthday, sex, type, id]
+            'UPDATE users SET firstName = $1, lastName = $2, email = $3, password = $4, birthday = $5, sex = $6, type = $7, phone = $8 WHERE id = $7 RETURNING *',
+            [firstName, lastName, email, password, birthday, sex, type, phone, id]
         );
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });

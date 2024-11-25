@@ -523,7 +523,7 @@ export default {
         return;
       }
       try {
-        //const response = await axios.post('http://localhost:3000/users', {
+        //const response = await axios.post(`http://localhost:8000/users`, {
         const response = await axios.post('https://we-art.onrender.com/users', {
           firstName: this.firstName,
           lastName: this.name,
@@ -535,6 +535,12 @@ export default {
           type: this.userType
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
+        // Déstructuration des données
+        const { message, user } = response.data;
+
+      // Affichage des logs
+      console.log('Message du serveur :', message);
+      console.log('Utilisateur créé :', user);
         // Set success message and open dialog
         this.successMessage = 'Nous avons bien créé votre compte.';
         this.errorMessage = ''; 
