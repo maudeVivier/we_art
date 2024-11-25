@@ -61,8 +61,6 @@
     methods: {
       ...mapActions(['login']), // Importer l'action login de Vuex
       async submitLogin() {
-        console.log("Email:", this.email);
-        console.log("Password:", this.password);
         try {
           //const response = await axios.post('http://localhost:3000/users/login', {
           const response = await axios.post('https://we-art.onrender.com/users/login', {
@@ -70,12 +68,9 @@
             password: this.password,
           });
           if (response.data.msg == "connecte"){
-            console.log("Connecté!")
             // Récupérer le token et l'utilisateur depuis la réponse
             const idUser = response.data.idUser;
             const email = this.email;
-            console.log("idUser", idUser);
-            console.log("Email", email);
             // Appeler l'action login pour mettre à jour Vuex et localStorage
             this.login({ idUser, email });
             // Rediriger après succès

@@ -8,12 +8,11 @@
       <v-card>
         <v-card-title>Profil de l'utilisateur</v-card-title>
         <v-card-text>
-          <p><strong>IdUser :</strong> {{ user.id }}</p>
           <p><strong>Prénom :</strong> {{ user.firstname }}</p>
           <p><strong>Nom :</strong> {{ user.lastname }}</p>
+          <p><strong>Type :</strong> {{ user.type }}</p>
           <p><strong>Email :</strong> {{ user.email }}</p>
           <p><strong>Téléphone :</strong> {{ user.phone }}</p>
-          <!-- Ajoutez d'autres informations utilisateur ici -->
         </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="handleLogout">Déconnexion</v-btn>
@@ -43,9 +42,8 @@
       async fetchUserDetails() {
         try {
           // Appel API pour récupérer les informations de l'utilisateur
-          const response = await axios.get(`https://we-art.onrender.com/users/`);
-          console.log(this.userId);
-          this.user = response.data[this.userId]; // Remplissez l'objet utilisateur avec les données de la réponse
+          const response = await axios.get(`https://we-art.onrender.com/users/${this.userId}`);
+          this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
         } catch (error) {
           console.error('Erreur lors de la récupération des informations utilisateur :', error);
         }
