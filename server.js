@@ -33,7 +33,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/', usersRoutes);
 app.use('/', eventsRoutes);
 
-module.exports = app;
+// Rediriger toutes les autres routes vers index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 const PORT = process.env.PORT || 3000;
 
