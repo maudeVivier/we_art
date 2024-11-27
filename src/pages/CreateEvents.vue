@@ -304,8 +304,8 @@ export default {
         const apiKey = process.env.VUE_APP_IMGBB_API_KEY;
         const response_image = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData);
 
-        const response = await axios.post('http://localhost:3000/events', {
-        //const response = await axios.post('https://we-art.onrender.com/events', {
+        //const response = await axios.post('http://localhost:3000/events', {
+        const response = await axios.post('https://we-art.onrender.com/events', {
           name: this.name,
           description: this.description,
           street: this.street,
