@@ -290,8 +290,8 @@
           </v-card-text>
   
           <v-card-actions>
-            <v-btn @click="prevStep" :disabled="currentStep === 1">Précédent</v-btn>
-            <v-btn @click="currentStep === 5 ? (createUser()) : nextStep()" :disabled="currentStep === 6">Suivant</v-btn>
+            <v-btn @click="prevStep" :disabled="currentStep === 1 || currentStep === 6">Précédent</v-btn>
+            <v-btn @click="nextStep()">Suivant</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -305,7 +305,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      currentStep: 1,
+      currentStep: 2,
       steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
       name: '',
       firstName: '',
@@ -384,7 +384,9 @@ export default {
         case 5:
           return true; // Aucune validation pour le récapitulatif
         case 6:
-          return this.validateVerificationCode(); // Validation pour l'étape 6
+          // Création d'un utilisateur, une fois toutes ses informations verifiées
+          // Puis verification du code pour valider le compte
+          return this.createUser() && this.validateVerificationCode();
         default:
           return true;
       }
@@ -499,7 +501,19 @@ export default {
     },
 
     validateBirthDate() {
-      this.birthDateError = this.birthDate ? '' : 'Veuillez remplir le champ.';
+      const today = new Date();
+      const birthDate = new Date(this.birthDate);
+
+      if (!this.birthDate) {
+        this.birthDateError = 'Veuillez remplir le champ.';
+      }
+      else if (birthDate > today) {
+        this.birthDateError = 'Veuillez saisir une date de naissance valide.La date ne peut pas être dans le futur.';
+      }
+      else {
+        this.birthDateError = '';
+      }
+
       return !this.birthDateError;
     },
 
@@ -514,7 +528,18 @@ export default {
     },
 
     validatePhoneNumber() {
-      this.phoneNumberError = this.phoneNumber ? '' : 'Veuillez remplir le champ.';
+      const phoneRegex = /^[0-9]{10}$/; // Expression régulière pour un numéro à 10 chiffres (exemple pour la France)
+      
+      if (!this.phoneNumber) {
+        this.phoneNumberError = 'Veuillez remplir le champ.';
+      }
+      else if (!phoneRegex.test(this.phoneNumber)) {
+        this.phoneNumberError = 'Le numéro de téléphone n\'est pas valide. Exemple: 0123456789';
+      }
+      else {
+        this.phoneNumberError = '';
+      }
+
       return !this.phoneNumberError;
     },
 
@@ -523,7 +548,7 @@ export default {
         return;
       }
       try {
-        //const response = await axios.post(`http://localhost:8000/users`, {
+        //const response = await axios.post(`http://localhost:3000/users`, {
         const response = await axios.post('https://we-art.onrender.com/users', {
           firstName: this.firstName,
           lastName: this.name,
