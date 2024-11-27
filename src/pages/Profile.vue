@@ -62,6 +62,8 @@ export default {
       this.logout(); // Déclenche la mutation Vuex
       localStorage.removeItem('token');
       localStorage.removeItem('idUser');
+      localStorage.removeItem('isAuthenticated'); // Supprimer l'indicateur d'authentification
+      this.$router.push('/login');
     },
   },
   created() {

@@ -46,7 +46,7 @@
   <script>
   import axios from 'axios'
   import Logo from '@/assets/WE ART.png'; // Chemin relatif vers ton logo situé dans le même dossier
-  import { mapActions } from 'vuex';
+  import { mapActions, mapGetters } from 'vuex';
 
   export default {
     name: 'LoginPage',
@@ -58,65 +58,69 @@
         errorMessage: ''
       }
     },
+    computed: {
+    ...mapGetters(['isAuthenticated']), // Assure-toi que le getter est bien configuré
+    },
     methods: {
       ...mapActions(['login']), // Importer l'action login de Vuex
       async submitLogin() {
-        try {
-          //const response = await axios.post('http://localhost:3000/users/login', {
-          const response = await axios.post('https://we-art.onrender.com/users/login', {
-            email: this.email,
-            password: this.password,
-          });
-          if (response.data.msg == "connecte"){
-            // Récupérer le token et l'utilisateur depuis la réponse
-            const idUser = response.data.idUser;
-            const email = this.email;
-            // Enregistrer les informations dans localStorage
-            localStorage.setItem('userId', idUser);
-            localStorage.setItem('userEmail', email);
-            // Appeler l'action login pour mettre à jour Vuex et localStorage
-            this.login({ idUser, email });
-            // Logique d'authentification
-            this.$store.dispatch('login', this.credentials).then(() => {
-              if (this.$store.getters.isAuthenticated) {
-                this.$router.push({ name: 'Profile' }); // Assure-toi que cela se produit une seule fois
-              }
-            });
-          }else{
-            //Afficher une erreur sur la page
-            console.log("pas connecter car email ou mot de passe incorrect")
-            this.errorMessage = "Email ou mot de passe incorrect.";
-          }
-        } catch (error) {
-          if (error.response) {
-            switch (error.response.status) {
-              case 400:
-                this.errorMessage = 'Veuillez vérifier les informations fournies.';
-                break;
-              case 409:
-                this.errorMessage = 'Cet email est déjà utilisé. Veuillez en choisir un autre.';
-                break;
-              case 500:
-                this.errorMessage = 'Une erreur interne est survenue. Veuillez réessayer plus tard icicic.';
-                break;
-              default:
-                this.errorMessage = 'bla Une erreur est survenue. Veuillez réessayer.';
-            }
-          } else {
-            console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
-            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-          }
-        }
-      },
+  try {
+    const response = await axios.post('https://we-art.onrender.com/users/login', {
+      email: this.email,
+      password: this.password,
+    });
+    if (response.data.msg === "connecte") {
+      const idUser = response.data.idUser;
+      const email = this.email;
+      const token = response.data.idUser;
+      const user = response.data.idUser;
+
+      localStorage.setItem('idUser', idUser);
+      localStorage.setItem('email', email);
+      localStorage.setItem('token', token);
+      localStorage.setItem('isAuthenticated', 'true');
+
+      await this.login({ idUser, email, token, user });
+
+      // Vérifie immédiatement si l'utilisateur est authentifié après avoir mis à jour Vuex
+      if (this.isAuthenticated) {
+        this.$router.push({ name: 'Profile' });
+      } else {
+        this.errorMessage = 'Problème de connexion. Veuillez réessayer.';
+      }
+    } else {
+      this.errorMessage = 'Email ou mot de passe incorrect.';
+    }
+  } catch (error) {
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          this.errorMessage = 'Veuillez vérifier les informations fournies.';
+          break;
+        case 409:
+          this.errorMessage = 'Cet email est déjà utilisé. Veuillez en choisir un autre.';
+          break;
+        case 500:
+          this.errorMessage = 'Une erreur interne est survenue. Veuillez réessayer plus tard.';
+          break;
+        default:
+          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+      }
+    } else {
+      console.error('Erreur lors de la connexion de l\'utilisateur:', error);
+      this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+    }
+  }
+},
+
     },
 
     mounted() {
-    const idUser = localStorage.getItem('userId');
-    const email = localStorage.getItem('userEmail');
-    if (this.$store.getters.isAuthenticated) {
-      // Appeler l'action Vuex pour restaurer l'état de connexion
-      this.login({ idUser, email });
-      this.$router.replace({ name: 'Profile' });
+    const idUser = localStorage.getItem('idUser');
+    const email = localStorage.getItem('email');
+    if (idUser && email && this.$store.getters.isAuthenticated) {
+    // Appeler l'action Vuex pour restaurer l'état de connexion
+    this.login({ idUser, email });
     }
   }
   }
