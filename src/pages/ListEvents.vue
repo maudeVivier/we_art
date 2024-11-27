@@ -21,47 +21,69 @@
               hide-details
             ></v-text-field>
           </v-toolbar>
-
           <v-row>
-  <v-col
-    v-for="event in filteredEvents"
-    :key="event.id"
-    cols="12"
-    md="4"
-  >
-    <v-card
-      class="mx-auto"
-      max-width="400"
-      @click="showDetails(event)"
-      hover
-    >
-      <v-img
-        :src="photo_default_catalogue"
-        alt="Image de l'événement"
-        height="200px"
-      ></v-img>
+            <v-col
+              v-for="event in filteredEvents"
+              :key="event.id"
+              cols="12"
+              md="6"
+              lg="4"
+            >
+              <v-card
+                class="d-flex flex-row"
+                max-width="100%"
+                @click="showDetails(event)"
+                hover
+              >
+                <v-card-text class="flex-grow-1">
+                  <!-- Titre de l'événement -->
+                  <v-card-title class="title">{{ event.name }}</v-card-title>
 
-      <v-card-title class="title">{{ event.name }}</v-card-title>
-      <v-card-text>
-        <p>
-          <v-icon color="primary" class="mr-2">mdi-map-marker</v-icon>
-          {{ event.street }}, {{ event.city }}
-        </p>
-      </v-card-text>
-    </v-card>
-  </v-col>
+                  <!-- Date et heure -->
+                  <p>
+                    <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
+                    {{ formatDate(event.start_date) }}
+                    <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
+                    {{ formatTime(event.start_date) }}
+                  </p>
 
-  <!-- Loading Spinner -->
-  <v-col v-if="loading" cols="12" class="text-center">
-    <v-progress-circular
-      indeterminate
-      color="primary"
-      size="60"
-    ></v-progress-circular>
-    <p>Chargement des événements...</p>
-  </v-col>
-</v-row>
+                  <!-- Adresse -->
+                  <p>
+                    <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+                    {{ event.street }}, {{ event.city }}
+                  </p>
 
+                  <!-- Prix -->
+                  <p :class="[ event.prix === 0 ? 'free-price' : 'paid-price', 'price-container']">
+                    <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                    {{ event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                  </p>
+
+                  <!-- Nombre de participants -->
+                  <p>
+                    <v-icon class="mr-2">mdi-account-group</v-icon>
+                    {{ event.participants }} participants
+                  </p>
+                </v-card-text>
+
+                  <!-- Image -->
+                <v-img
+                  :src="photo_default_catalogue"
+                  alt="Image de l'événement"
+                  class="event-image"
+                  width="35%"
+                ></v-img>
+              </v-card>
+            </v-col>
+            <v-row>
+          </v-row>
+
+            <!-- Loading Spinner -->
+            <v-col v-if="loading" cols="12" class="text-center">
+              <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
+              <p>Chargement des événements...</p>
+            </v-col>
+          </v-row>
 
           <!-- Bouton Ajouter un Événement -->
           <v-row>
@@ -75,12 +97,9 @@
               >
                 <v-icon left>mdi-plus</v-icon>
                 Ajouter un événement
-              </v-btn>
-
-              
+              </v-btn>   
             </v-col>
           </v-row>
-
         </v-card>
       </v-container>
     </v-main>
@@ -113,6 +132,20 @@ export default {
     this.fetchEvents();
   },
   methods: {
+    formatDate(dateTime) {
+      const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+        dateStyle: 'long',
+      });
+      return dateFormatter.format(new Date(dateTime));
+    },
+    formatTime(dateTime) {
+      const time = new Date(dateTime).toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false, // Format 24 heures
+      });
+      return time.replace(':', 'h'); // Remplace ':' par 'h'
+    },
     async fetchEvents() {
       this.loading = true; // Start loading
       try {
@@ -130,7 +163,11 @@ export default {
       this.$router.push({ path: `/eventDetails/${event.id}` });
     },
     goToCreateEvent() {
-      this.$router.push('/createEvents');
+      if(this.$store.getters.isAuthenticated){
+        this.$router.push('/createEvents');
+      }else{
+        this.$router.push('/login');
+      }
       this.$nextTick(() => {
         window.scrollTo(0, 0);
       });
@@ -140,29 +177,35 @@ export default {
 </script>
 
 <style scoped>
-.v-card {
-  margin-bottom: 20px;
-  border: 1px solid #e0e0e0;
-}
-
 .v-card-title {
-  font-size: 24px;
+  font-size: 20%;
   font-weight: bold;
-  text-align: center;
-  color: #3f51b5;
 }
 
-.v-card-text p {
+p {
   margin: 0;
-  padding: 0;
-  line-height: 1.6;
+  padding: 5px 0;
+}
+.price-container {
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: inline-block;
 }
 
-.v-btn {
-  margin-left: auto;
+.free-price {
+  color: white;
+  font-weight: bold;
+  border: 2px solid;
+  background-color: rgb(185, 184, 184);
 }
 
-.v-img {
-  border-bottom: 1px solid #eee;
+.paid-price {
+  color: white;
+  border: 2px solid;
+  background-color: rgb(151, 210, 151);
+}
+
+.d-flex {
+  display: flex;
 }
 </style>

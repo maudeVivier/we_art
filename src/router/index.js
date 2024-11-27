@@ -49,10 +49,8 @@ const router = new Router({
     },
     {
       path: '/createEvents',
-      name: 'CreateEvents',
-      component: CreateEvents,
-      meta: { requiresAuth: true } // Route protégée
-
+      name: 'createEvents',
+      component: CreateEvents,   
     },
     {
       path: '/map',
