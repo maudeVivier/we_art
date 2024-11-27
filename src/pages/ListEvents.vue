@@ -131,6 +131,9 @@ export default {
     },
     goToCreateEvent() {
       this.$router.push('/createEvents');
+      this.$nextTick(() => {
+        window.scrollTo(0, 0);
+      });
     },
   },
 };

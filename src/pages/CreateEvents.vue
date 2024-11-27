@@ -34,67 +34,94 @@
                 rows="4"
               ></v-textarea>
 
+              <!-- Discipline -->
+              <v-text-field
+                v-model="discipline"
+                label="Discipline *"
+                required
+                outlined
+                dense
+              ></v-text-field>
+
+              <!-- Niveau -->
+              <v-text-field
+                v-model="niveau"
+                label="Niveau *"
+                required
+                outlined
+                dense
+              ></v-text-field>
+
+              <!-- Nombre de participants max -->
+              <v-text-field
+                v-model="nombre_de_participants_max"
+                label="Nombre de participants maximum *"
+                required
+                outlined
+                dense
+                type="number"
+              ></v-text-field>
+
+              <!-- Date et Heure de la deadline -->
+              <v-text-field
+                v-model="deadlineDateTime"
+                label="Date et Heure maximum pour s'inscrire"
+                readonly
+                prepend-icon="mdi-calendar-clock"
+                @click:prepend="deadlineOpenDateTime"
+              ></v-text-field>
+
+              <v-dialog v-model="deadlineFormatted" persistent max-width="290px">
+                <v-date-picker v-model="deadlineDate" @input="deadlineSaveDateTime"></v-date-picker>
+                <v-time-picker v-model="deadlineTime" format="24hr" @input="deadlineSaveDateTime"></v-time-picker>
+
+                <v-btn text @click="deadlineFormatted = false">Annuler</v-btn>
+                <v-btn text @click="deadlineSaveDateTime">OK</v-btn>
+              </v-dialog>
+
+              <!-- Prix -->
+              <v-text-field
+                v-model="prix"
+                label="Prix *"
+                required
+                outlined
+                dense
+                type="number"
+              ></v-text-field>
+
               <!-- Date et Heure de Début -->
-              <v-menu
-                v-model="startDateMenu"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="formattedStartDate"
-                    label="Date et Heure de Début *"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    outlined
-                    dense
-                  ></v-text-field>
-                </template>
-                <v-card>
-                  <v-date-picker v-model="start_date" @input="onStartDateSelected"></v-date-picker>
-                  <v-divider></v-divider>
-                  <v-time-picker v-model="start_time" @input="onStartTimeSelected"></v-time-picker>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text @click="startDateMenu = false">OK</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-menu>
+              <v-text-field
+                v-model="debutDateTime"
+                label="Date et Heure de Début"
+                readonly
+                prepend-icon="mdi-calendar-clock"
+                @click:prepend="debutOpenDateTime"
+              ></v-text-field>
+
+              <v-dialog v-model="debutFormatted" persistent max-width="290px">
+                <v-date-picker v-model="debutDate" @input="debutSaveDateTime"></v-date-picker>
+                <v-time-picker v-model="debutTime" format="24hr" @input="debutSaveDateTime"></v-time-picker>
+
+                <v-btn text @click="debutFormatted = false">Annuler</v-btn>
+                <v-btn text @click="debutSaveDateTime">OK</v-btn>
+              </v-dialog>
 
               <!-- Date et Heure de Fin -->
-              <v-menu
-                v-model="endDateMenu"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                transition="scale-transition"
-                offset-y
-                min-width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="formattedEndDate"
-                    label="Date et Heure de Fin *"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    outlined
-                    dense
-                  ></v-text-field>
-                </template>
-                <v-card>
-                  <v-date-picker v-model="end_date" @input="onEndDateSelected"></v-date-picker>
-                  <v-divider></v-divider>
-                  <v-time-picker v-model="end_time" @input="onEndTimeSelected"></v-time-picker>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text @click="endDateMenu = false">OK</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-menu>
+              <v-text-field
+                v-model="finDateTime"
+                label="Date et Heure de Fin"
+                readonly
+                prepend-icon="mdi-calendar-clock"
+                @click:prepend="finOpenDateTime"
+              ></v-text-field>
+
+              <v-dialog v-model="finFormatted" persistent max-width="290px">
+                <v-date-picker v-model="finDate" @input="finSaveDateTime"></v-date-picker>
+                <v-time-picker v-model="finTime" format="24hr" @input="finSaveDateTime"></v-time-picker>
+
+                <v-btn text @click="finFormatted = false">Annuler</v-btn>
+                <v-btn text @click="finSaveDateTime">OK</v-btn>
+              </v-dialog>
 
               <!-- Nom de la Rue -->
               <v-text-field
@@ -166,61 +193,103 @@
 
 <script>
 import axios from 'axios';
-import moment from 'moment';
+// import moment from 'moment';
 
 export default {
   data() {
     return {
       name: '',
+      discipline: '',
+      niveau: '',
+      prix:0,
       description: '',
-      postal_code: '',  // Nouveau champ ajouté
+      nombre_de_participants_max: 0,
+      postal_code: '',
       street: '', 
-      city: '',         // Nouveau champ ajouté
-      country: '',      // Nouveau champ ajouté
-      start_date: null, // Date seulement
-      start_time: null, // Heure seulement
-      end_date: null,   // Date seulement
-      end_time: null,   // Heure seulement
-      startDateMenu: false, // Contrôle du menu de date de début
-      endDateMenu: false,   // Contrôle du menu de date de fin
+      city: '',
+      country: '', 
+      deadlineDateTime: '',
+      deadlineDate: '',
+      deadlineTime: '',
+      deadlineFormatted: false,
+      debutDateTime: '',
+      debutDate: '',
+      debutTime: '',
+      debutFormatted: false,
+      finDateTime: '',
+      finDate: '',
+      finTime: '',
+      finFormatted: false,
       errorMessage: null,
       successMessage: false, // Nouveau champ pour le message de succès
       loading: false, // Ajout de l'état de chargement
     };
   },
-  computed: {
-    // Formate la date et l'heure de début pour l'affichage
-    formattedStartDate() {
-      if (this.start_date && this.start_time) {
-        return moment(`${this.start_date} ${this.start_time}`).format('YYYY-MM-DD HH:mm');
-      }
-      return '';
-    },
-    // Formate la date et l'heure de fin pour l'affichage
-    formattedEndDate() {
-      if (this.end_date && this.end_time) {
-        return moment(`${this.end_date} ${this.end_time}`).format('YYYY-MM-DD HH:mm');
-      }
-      return '';
-    },
-  },
   methods: {
+    deadlineOpenDateTime() {
+      this.deadlineFormatted = true;
+    },
+    deadlineSaveDateTime() {
+      if (this.deadlineDate && this.deadlineTime) {
+        this.deadlineDateTime = `${this.deadlineDate} ${this.deadlineTime}`;
+        this.deadlineFormatted = false;
+      }
+    },
+    debutOpenDateTime() {
+      this.debutFormatted = true;
+    },
+    debutSaveDateTime() {
+      if (this.debutDate && this.debutTime) {
+        this.debutDateTime = `${this.debutDate} ${this.debutTime}`;
+        this.debutFormatted = false;
+      }
+    },
+    finOpenDateTime() {
+      this.finFormatted = true;
+    },
+    finSaveDateTime() {
+      if (this.finDate && this.finTime) {
+        this.finDateTime = `${this.finDate} ${this.finTime}`;
+        this.finFormatted = false;
+      }
+    },
+    validateDates() {
+      const startDate = new Date(this.debutDateTime);
+      const endDate = new Date(this.finDateTime);
+      const deadline = new Date(this.deadlineDateTime);
+
+      if (startDate < deadline) {
+        this.errorMessage = 'La date de début ne peut pas être antérieure à la date limite d\'inscription.';
+        return false;
+      }
+      if (endDate < startDate) {
+        this.errorMessage = 'La date de fin ne peut pas être antérieure à la date de début.';
+        return false;
+      }
+      return true;
+    },
     async createEvent() {
+      if (!this.validateDates()) {
+        return;
+      }
       this.loading = true; // Démarre le chargement
       try {
-        const formattedStartDateTime = moment(`${this.start_date} ${this.start_time}`).format('YYYY-MM-DD HH:mm:ss');
-        const formattedEndDateTime = moment(`${this.end_date} ${this.end_time}`).format('YYYY-MM-DD HH:mm:ss');
-
         //const response = await axios.post('http://localhost:3000/events', {
         const response = await axios.post('https://we-art.onrender.com/events', {
           name: this.name,
           description: this.description,
-          street: this.street,        // Ajout du champ Rue
-          postal_code: this.postal_code, // Ajout du champ Code Postal
-          city: this.city,               // Ajout du champ Ville
-          country: this.country,         // Ajout du champ Pays
-          start_date: formattedStartDateTime,
-          end_date: formattedEndDateTime,
+          street: this.street,
+          postal_code: this.postal_code,
+          city: this.city,
+          country: this.country,
+          start_date: this.debutDateTime,
+          end_date: this.finDateTime,
+          discipline: this.discipline,
+          niveau: this.niveau,
+          prix: this.prix,
+          nombre_de_participants_max : this.nombre_de_participants_max,
+          deadline: this.deadlineDateTime,
+          id_organisateur: 140,
         });
 
         console.log('Événement ajouté:', response.data);
@@ -230,7 +299,7 @@ export default {
       } catch (error) {
         console.error('Erreur lors de l\'ajout de l\'événement', error);
         this.errorMessage = 'Une erreur est survenue lors de la création de l\'événement. Veuillez réessayer.';
-        this.successMessage = false; // Assurez-vous de cacher le message de succès en cas d'erreur
+        this.successMessage = false; 
       } finally {
         this.loading = false; // Terminer le chargement
       }
@@ -238,26 +307,17 @@ export default {
     resetForm() {
       this.name = '';
       this.description = '';
+      this.discipline = '';
+      this.niveau = '';
+      this.nombre_de_participants_max = 0;
+      this.deadlineDateTime = '';
+      this.prix = 0;
+      this.debutDateTime = '';
+      this.finDateTime = '';
       this.street = '';
-      this.postal_code = ''; // Réinitialisation du champ Code Postal
-      this.city = '';        // Réinitialisation du champ Ville
-      this.country = '';     // Réinitialisation du champ Pays
-      this.start_date = null; // Réinitialisation
-      this.start_time = null; // Réinitialisation
-      this.end_date = null;   // Réinitialisation
-      this.end_time = null;   // Réinitialisation
-    },
-    onStartDateSelected() {
-      this.startDateMenu = false; // Ferme le menu après la sélection
-    },
-    onStartTimeSelected() {
-      this.startDateMenu = false; // Ferme le menu après la sélection
-    },
-    onEndDateSelected() {
-      this.endDateMenu = false; // Ferme le menu après la sélection
-    },
-    onEndTimeSelected() {
-      this.endDateMenu = false; // Ferme le menu après la sélection
+      this.postal_code = '';
+      this.city = '';
+      this.country = '';
     },
   },
 };
