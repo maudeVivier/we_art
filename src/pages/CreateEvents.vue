@@ -15,6 +15,16 @@
 
           <v-card-text>
             <form @submit.prevent="createEvent">
+              <!-- Image de l'Événement -->
+              <v-file-input
+                v-model="imageEvent"
+                label="Télécharger une image *"
+                accept="image/*"
+                outlined
+                dense
+                required
+              ></v-file-input>
+
               <!-- Nom de l'Événement -->
               <v-text-field
                 v-model="name"
@@ -67,6 +77,7 @@
                 v-model="deadlineDateTime"
                 label="Date et Heure maximum pour s'inscrire"
                 readonly
+                outlined
                 prepend-icon="mdi-calendar-clock"
                 @click:prepend="deadlineOpenDateTime"
               ></v-text-field>
@@ -94,6 +105,7 @@
                 v-model="debutDateTime"
                 label="Date et Heure de Début"
                 readonly
+                outlined
                 prepend-icon="mdi-calendar-clock"
                 @click:prepend="debutOpenDateTime"
               ></v-text-field>
@@ -111,6 +123,7 @@
                 v-model="finDateTime"
                 label="Date et Heure de Fin"
                 readonly
+                outlined
                 prepend-icon="mdi-calendar-clock"
                 @click:prepend="finOpenDateTime"
               ></v-text-field>
@@ -197,16 +210,17 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      name: 'm',
-      discipline: 'm',
-      niveau: 'm',
+      imageEvent: null,
+      name: '',
+      discipline: '',
+      niveau: '',
       prix:0,
-      description: 'm',
+      description: '',
       nombre_de_participants_max: 0,
-      postal_code: 'm',
-      street: 'm', 
-      city: 'm',
-      country: 'm', 
+      postal_code: '',
+      street: '', 
+      city: '',
+      country: '', 
       deadlineDateTime: '',
       deadlineDate: '',
       deadlineTime: '',
@@ -276,14 +290,22 @@ export default {
       }
       return true;
     },
+
+
+
     async createEvent() {
       if (!this.validateDates()) {
         return;
       }
       this.loading = true; // Démarre le chargement
+      const formData = new FormData();
+      formData.append("image", this.imageEvent);
       try {
-        //const response = await axios.post('http://localhost:3000/events', {
-        const response = await axios.post('https://we-art.onrender.com/events', {
+        const apiKey = process.env.VUE_APP_IMGBB_API_KEY;
+        const response_image = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData);
+
+        const response = await axios.post('http://localhost:3000/events', {
+        //const response = await axios.post('https://we-art.onrender.com/events', {
           name: this.name,
           description: this.description,
           street: this.street,
@@ -298,6 +320,7 @@ export default {
           nombre_de_participants_max : this.nombre_de_participants_max,
           deadline: this.deadlineDateTime,
           id_organisateur: this.userConnected.idUser,
+          image_url: response_image.data.data.url,
         });
 
         console.log('Événement ajouté:', response.data);
@@ -313,6 +336,7 @@ export default {
       }
     },
     resetForm() {
+      this.imageEvent = null,
       this.name = '';
       this.description = '';
       this.discipline = '';

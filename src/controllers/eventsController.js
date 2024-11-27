@@ -260,13 +260,12 @@ exports.getAllEvents = async (req, res) => {
  *                   example: "Une erreur interne est survenue."
  */
 exports.createEvent = async (req, res) => {
-    const { name, description, street, postal_code, city, country, start_date, end_date, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur } = req.body;  // Modifications pour correspondre aux colonnes
-    console.log('(server.js)' + req.body)
-    console.log('(server.js) post : ' + name + ' ' + description + ' ' + start_date + ' ' + end_date)
+    const { name, description, street, postal_code, city, country, start_date, end_date, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur, image_url } = req.body;
+    console.log('(server.js) POST : ' + name + ' ' + description + ' ' + start_date + ' ' + end_date);
+
     try {
-        // Géocode l'adresse pour obtenir la latitude et la longitude
+        // Géocodage de l'adresse pour obtenir latitude et longitude
         const address = `${street}, ${postal_code} ${city}`;
-        console.log(address);
 
         const data = await opencage.geocode({ q: address, key: process.env.OPENCAGE_API_KEY });
 
@@ -275,26 +274,29 @@ exports.createEvent = async (req, res) => {
             const latitude = place.geometry.lat;
             const longitude = place.geometry.lng;
 
+            // Vérification si l'organisateur existe
             const resultGetOrganisateur = await pool.query('SELECT * FROM users WHERE id = $1', [id_organisateur]);
             if (resultGetOrganisateur.rowCount === 0) {
                 return res.status(400).json({ message: 'Organisateur non trouvé' });
             }
 
+            // Insertion de l'événement dans la base de données
             const result = await pool.query(
-                'INSERT INTO events (name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *',
-                [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur]
+                'INSERT INTO events (name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur, image_event_url) ' +
+                'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *',
+                [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur, image_url]
             );
+
             const newEvent = result.rows[0];
-            console.log('(server.js)' + newEvent);
+            console.log('(server.js) New Event:', newEvent);
 
             res.status(201).json(newEvent);
-        }
-        else {
+        } else {
             res.status(400).json({ message: 'Adresse non trouvée' });
-          }
+        }
     } catch (error) {
-        console.error('Erreur lors de l\'ajout de l\'evenement server.js', error);
-        res.status(500).json({ message: 'Une erreur interne est survenue. server.js'});
+        console.error('Erreur lors de l\'ajout de l\'événement :', error);
+        res.status(500).json({ message: 'Une erreur interne est survenue' });
     }
 };
 

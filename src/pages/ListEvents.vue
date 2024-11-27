@@ -67,12 +67,11 @@
                 </v-card-text>
 
                   <!-- Image -->
-                <v-img
-                  :src="photo_default_catalogue"
-                  alt="Image de l'événement"
-                  class="event-image"
-                  width="35%"
-                ></v-img>
+                  <v-img
+                    :src="event.image_event_url"
+                    alt="Image de l'événement"
+                    class="event-image"
+                  ></v-img>
               </v-card>
             </v-col>
             <v-row>
@@ -132,11 +131,15 @@ export default {
     this.fetchEvents();
   },
   methods: {
-    formatDate(dateTime) {
-      const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
-        dateStyle: 'long',
-      });
-      return dateFormatter.format(new Date(dateTime));
+    formatDate(date) {
+      if (!date || isNaN(new Date(date).getTime())) {
+        return '';
+      }
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(date));
     },
     formatTime(dateTime) {
       const time = new Date(dateTime).toLocaleTimeString('fr-FR', {
@@ -177,6 +180,13 @@ export default {
 </script>
 
 <style scoped>
+.event-image {
+  width: 40%;
+  height: 100%; /* Hauteur de l'image */
+  object-fit: contain; /* Maintient le ratio de l'image */
+  border-radius: 8px; /* Bordures arrondies */
+}
+
 .v-card-title {
   font-size: 20%;
   font-weight: bold;
