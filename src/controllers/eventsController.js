@@ -62,6 +62,24 @@ const opencage = require('opencage-api-client');
  *                   longitude:
  *                     type: string
  *                     example: "4.869387"
+ *                   discipline:
+ *                     type: string
+ *                     example: "Informatique"
+ *                   niveau:
+ *                     type: string
+ *                     example: "Débutant"
+ *                   prix:
+ *                     type: integer
+ *                     example: 0
+ *                   nombre_de_participants_max:
+ *                     type: integer
+ *                     example: 100
+ *                   deadline:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   id_organisateur:
+ *                     type: integer
+ *                     example: 1
  *                   
  *       500:
  *         description: Erreur interne lors de la récupération des événements.
@@ -125,6 +143,40 @@ exports.getAllEvents = async (req, res) => {
  *                 type: string
  *                 format: date-time
  *                 example: "2024-10-16T23:10:00.000Z"
+ *               discipline:
+ *                 type: string
+ *                 example: "Informatique"
+ *               niveau:
+ *                 type: string
+ *                 example: "Débutant"
+ *               prix:
+ *                 type: integer
+ *                 example: 0
+ *               nombre_de_participants_max:
+ *                 type: integer
+ *                 example: 100
+ *               deadline:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2024-10-16T23:10:00.000Z"
+ *               id_organisateur:
+ *                 type: integer
+ *                 example: 1
+ *     required:
+ *       - name
+ *       - description
+ *       - street
+ *       - city
+ *       - postal_code
+ *       - country
+ *       - start_date
+ *       - end_date
+ *       - discipline
+ *       - niveau
+ *       - prix
+ *       - nombre_de_participants_max
+ *       - deadline
+ *       - id_organisateur
  *     responses:
  *       201:
  *         description: Événement créé avec succès.
@@ -162,16 +214,30 @@ exports.getAllEvents = async (req, res) => {
  *                   type: string
  *                   format: date-time
  *                   example: "2024-10-16T23:10:00.000Z"
- *                 created_date:
- *                   type: string
- *                   format: date-time
- *                   example: "2024-10-16T23:10:00.000Z"
  *                 latitude:
  *                   type: string
  *                   example: "45.754205"
  *                 longitude:
  *                   type: string
  *                   example: "4.869387"
+ *                 discipline:
+ *                   type: string
+ *                   example: "Informatique"
+ *                 niveau:
+ *                   type: string
+ *                   example: "Débutant"
+ *                 prix:
+ *                   type: integer
+ *                   example: 0
+ *                 nombre_de_participants_max:
+ *                   type: integer
+ *                   example: 100
+ *                 deadline:
+ *                   type: string
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 id_organisateur:
+ *                   type: integer
+ *                   example: 1
  *       400:
  *         description: Adresse non trouvée.
  *         content:
@@ -194,7 +260,7 @@ exports.getAllEvents = async (req, res) => {
  *                   example: "Une erreur interne est survenue."
  */
 exports.createEvent = async (req, res) => {
-    const { name, description, street, postal_code, city, country, start_date, end_date } = req.body;  // Modifications pour correspondre aux colonnes
+    const { name, description, street, postal_code, city, country, start_date, end_date, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur } = req.body;  // Modifications pour correspondre aux colonnes
     console.log('(server.js)' + req.body)
     console.log('(server.js) post : ' + name + ' ' + description + ' ' + start_date + ' ' + end_date)
     try {
@@ -209,9 +275,14 @@ exports.createEvent = async (req, res) => {
             const latitude = place.geometry.lat;
             const longitude = place.geometry.lng;
 
+            const resultGetOrganisateur = await pool.query('SELECT * FROM users WHERE id = $1', [id_organisateur]);
+            if (resultGetOrganisateur.rowCount === 0) {
+                return res.status(400).json({ message: 'Organisateur non trouvé' });
+            }
+
             const result = await pool.query(
-                'INSERT INTO events (name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
-                [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude]
+                'INSERT INTO events (name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING *',
+                [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur]
             );
             const newEvent = result.rows[0];
             console.log('(server.js)' + newEvent);
@@ -251,22 +322,59 @@ exports.createEvent = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+*                 id:
  *                   type: integer
  *                   example: 1
  *                 name:
  *                   type: string
  *                   example: "Conférence Tech"
- *                 date:
- *                   type: string
- *                   format: date
- *                   example: "2024-10-20"
- *                 location:
- *                   type: string
- *                   example: "Paris, France"
  *                 description:
  *                   type: string
  *                   example: "Une conférence sur les nouvelles technologies."
+ *                 street:
+ *                   type: string
+ *                   example: "3 rue de la métallurgie"
+ *                 city:
+ *                   type: string
+ *                   example: "Lyon"
+ *                 postal_code:
+ *                   type: string
+ *                   example: "69003"
+ *                 country:
+ *                   type: string
+ *                   example: "France"
+ *                 start_date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 end_date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 latitude:
+ *                   type: string
+ *                   example: "45.754205"
+ *                 longitude:
+ *                   type: string
+ *                   example: "4.869387"
+ *                 discipline:
+ *                   type: string
+ *                   example: "Informatique"
+ *                 niveau:
+ *                   type: string
+ *                   example: "Débutant"
+ *                 prix:
+ *                   type: integer
+ *                   example: 0
+ *                 nombre_de_participants_max:
+ *                   type: integer
+ *                   example: 100
+ *                 deadline:
+ *                   type: string
+ *                   example: "2024-10-16T23:10:00.000Z"
+ *                 id_organisateur:
+ *                   type: integer
+ *                   example: 1
  *       404:
  *         description: Événement non trouvé.
  *         content:
@@ -292,6 +400,10 @@ exports.getEventById = async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('SELECT * FROM events WHERE id = $1', [id]);
+        
+        if (result.rowCount === 0) {
+            return res.status(400).json({ message: 'Événement non trouvé' });
+        }
         res.json(result.rows);
     } catch (err) {
         console.error('Erreur lors de la récupération de l\'evenement:', err);
