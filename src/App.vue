@@ -55,6 +55,11 @@ export default {
   computed: {
     ...mapGetters(['isAuthenticated', 'getUser']),
   },
+  watch: {
+    isAuthenticated(newValue) {
+      console.log("isAuthenticated a changé : ", newValue);
+    }
+  }
 };
 </script>
 

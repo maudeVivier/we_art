@@ -78,17 +78,28 @@ const router = new Router({
 
 
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!store.getters.isAuthenticated) {
-      // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
-      next('/login');
-    } else {
-      next(); // Laisser passer si l'utilisateur est authentifié
-    }
+  const isAuthenticated = store.getters.isAuthenticated;
+
+  if (to.name === 'Login' && isAuthenticated) {
+    console.log('Déjà connecté, redirection vers Profile');
+    next({ name: 'Profile' }); 
+  } else if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
+    console.log('Non authentifié, redirection vers Login');
+    next({ name: 'Login' });
   } else {
-    next(); // Laisser passer si l'authentification n'est pas requise
+    console.log('Navigation autorisée');
+    next(); // Permet la navigation normale si aucune des conditions précédentes n'est remplie.
   }
 });
+
+
+router.onError((error) => {
+  if (/Redirected when going/.test(error.message)) {
+    console.warn('Erreur de redirection capturée:', error.message);
+  }
+});
+
+
 
 
 export default router;

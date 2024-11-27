@@ -23,5 +23,17 @@ new Vue({
   store,
   router,
   render: h => h(App),
+  created() {
+    const token = localStorage.getItem('token');
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (localStorage.getItem('token')) {
+      store.commit('login', { token: localStorage.getItem('token'), user: {} });
+    }    
+    if (token && isAuthenticated) {
+      this.$store.commit('login', { token });
+    } else {
+      this.$store.commit('logout');
+    }
+  },
 }).$mount('#app')
   

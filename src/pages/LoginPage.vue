@@ -71,10 +71,17 @@
             // Récupérer le token et l'utilisateur depuis la réponse
             const idUser = response.data.idUser;
             const email = this.email;
+            // Enregistrer les informations dans localStorage
+            localStorage.setItem('userId', idUser);
+            localStorage.setItem('userEmail', email);
             // Appeler l'action login pour mettre à jour Vuex et localStorage
             this.login({ idUser, email });
-            // Rediriger après succès
-            this.$router.push('/profile');
+            // Logique d'authentification
+            this.$store.dispatch('login', this.credentials).then(() => {
+              if (this.$store.getters.isAuthenticated) {
+                this.$router.push({ name: 'Profile' }); // Assure-toi que cela se produit une seule fois
+              }
+            });
           }else{
             //Afficher une erreur sur la page
             console.log("pas connecter car email ou mot de passe incorrect")
@@ -93,7 +100,7 @@
                 this.errorMessage = 'Une erreur interne est survenue. Veuillez réessayer plus tard icicic.';
                 break;
               default:
-                this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+                this.errorMessage = 'bla Une erreur est survenue. Veuillez réessayer.';
             }
           } else {
             console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
@@ -101,7 +108,17 @@
           }
         }
       },
+    },
+
+    mounted() {
+    const idUser = localStorage.getItem('userId');
+    const email = localStorage.getItem('userEmail');
+    if (this.$store.getters.isAuthenticated) {
+      // Appeler l'action Vuex pour restaurer l'état de connexion
+      this.login({ idUser, email });
+      this.$router.replace({ name: 'Profile' });
     }
+  }
   }
   </script>
 
