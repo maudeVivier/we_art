@@ -16,24 +16,14 @@ import router from './router/index'
 import vuetify from './plugins/vuetify' // Importez le fichier de configuration de Vuetify
 import store from './store';
 
+store.dispatch('initializeUser');
+
 Vue.config.productionTip = false
-  
+
 new Vue({
   vuetify,
   store,
   router,
   render: h => h(App),
-  created() {
-    const token = localStorage.getItem('token');
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    if (localStorage.getItem('token')) {
-      store.commit('login', { token: localStorage.getItem('token'), user: {} });
-    }    
-    if (token && isAuthenticated) {
-      this.$store.commit('login', { token });
-    } else {
-      this.$store.commit('logout');
-    }
-  },
 }).$mount('#app')
   

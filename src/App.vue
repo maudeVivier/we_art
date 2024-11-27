@@ -33,7 +33,7 @@
       </v-btn>
 
       <!-- Changer dynamiquement Connexion en Profil -->
-      <v-btn :to="isAuthenticated ? { name: 'Profile' } : { name: 'Login' }">
+      <v-btn :to="isAuthenticated ? { name: 'UserProfile' } : { name: 'Login' }">
         <span>{{ isAuthenticated ? 'Profil' : 'Connexion' }}</span>
         <v-icon>{{ isAuthenticated ? 'mdi-account-circle' : 'mdi-account' }}</v-icon>
       </v-btn>
@@ -55,11 +55,6 @@ export default {
   computed: {
     ...mapGetters(['isAuthenticated', 'getUser']),
   },
-  watch: {
-    isAuthenticated(newValue) {
-      console.log("isAuthenticated a changé : ", newValue);
-    }
-  }
 };
 </script>
 

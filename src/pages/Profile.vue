@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -33,43 +33,42 @@ export default {
   data() {
     return {
       userId: null, // ID de l'utilisateur
-      user: {}, // Objet pour stocker les informations de l'utilisateur
+      user: {},     // Objet pour stocker les informations de l'utilisateur
     };
   },
+
   computed: {
-    ...mapState(['isAuthenticated']), // Surveiller l'état d'authentification
-  },
-  watch: {
-    isAuthenticated(value) {
-      if (!value) {
-        this.$router.push('/login'); // Redirection si l'utilisateur est déconnecté
-      }
+    userConnected() {
+      return this.$store.getters.user;
     },
   },
   methods: {
+    
     ...mapActions(['logout']), // Importation de l'action logout de Vuex
 
     async fetchUserDetails() {
       try {
-        const response = await axios.get(`https://we-art.onrender.com/users/${this.userId}`);
-        this.user = response.data;
+        // Appel API pour récupérer les informations de l'utilisateur
+        const response = await axios.get(`https://we-art.onrender.com/users/${this.userConnected.idUser}`);
+        this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
       }
     },
 
     handleLogout() {
-      this.logout(); // Déclenche la mutation Vuex
+      // Exécute l'action de déconnexion de Vuex
+      this.logout();
+      // Supprime les informations de l'utilisateur du localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('idUser');
-      localStorage.removeItem('isAuthenticated'); // Supprimer l'indicateur d'authentification
-      this.$router.push('/login');
-    },
+      // Rafraîchit la page pour réinitialiser l'état de l'application
+      window.location.reload();
+    }
   },
   created() {
-    this.userId = localStorage.getItem('idUser');
-    if (this.userId) {
-      this.fetchUserDetails();
+    if (this.userConnected) {
+      this.fetchUserDetails(); // Appelez la fonction pour récupérer les détails utilisateur
     }
   },
 };

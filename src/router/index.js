@@ -29,12 +29,13 @@ const router = new Router({
       path: '/',
       name: 'Home',
       component: HomePage,
-      //meta: { requiresAuth: true }, // pour dire que ça necessite une authentification
     },
     {
       path: '/login',
       name: 'Login',
-      component: LoginPage
+      component: LoginPage,
+      meta: { requiresAuth: false }
+
     },
     {
       path: '/signup',
@@ -49,7 +50,9 @@ const router = new Router({
     {
       path: '/createEvents',
       name: 'CreateEvents',
-      component: CreateEvents
+      component: CreateEvents,
+      meta: { requiresAuth: true } // Route protégée
+
     },
     {
       path: '/map',
@@ -69,9 +72,9 @@ const router = new Router({
     },
     {
       path: '/profile',
-      name: 'Profile',
+      name: 'UserProfile',
       component: UserProfile,
-      meta: { requiresAuth: true }, // Nécessite l'authentification
+      meta: { requiresAuth: true } // Route protégée
     }
   ]
 });
@@ -80,27 +83,16 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = store.getters.isAuthenticated;
 
-  if (to.name === 'Login' && isAuthenticated) {
-    console.log('Déjà connecté, redirection vers Profile');
-    next({ name: 'Profile' }); 
-  } else if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    console.log('Non authentifié, redirection vers Login');
-    next({ name: 'Login' });
+  // Si une route nécessite une authentification
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next('/login'); // Redirige vers login si non authentifié
+    } else {
+      next(); // Continue vers la page demandée
+    }
   } else {
-    console.log('Navigation autorisée');
-    next(); // Permet la navigation normale si aucune des conditions précédentes n'est remplie.
+    next(); // Continue pour les routes publiques
   }
 });
-
-
-router.onError((error) => {
-  if (/Redirected when going/.test(error.message)) {
-    console.warn('Erreur de redirection capturée:', error.message);
-  }
-});
-
-
-
 
 export default router;
-
