@@ -193,21 +193,20 @@
 
 <script>
 import axios from 'axios';
-// import moment from 'moment';
 
 export default {
   data() {
     return {
-      name: '',
-      discipline: '',
-      niveau: '',
+      name: 'm',
+      discipline: 'm',
+      niveau: 'm',
       prix:0,
-      description: '',
+      description: 'm',
       nombre_de_participants_max: 0,
-      postal_code: '',
-      street: '', 
-      city: '',
-      country: '', 
+      postal_code: 'm',
+      street: 'm', 
+      city: 'm',
+      country: 'm', 
       deadlineDateTime: '',
       deadlineDate: '',
       deadlineTime: '',
@@ -224,6 +223,11 @@ export default {
       successMessage: false, // Nouveau champ pour le message de succès
       loading: false, // Ajout de l'état de chargement
     };
+  },
+  computed: {
+    userConnected() {
+      return this.$store.getters.user;
+    },
   },
   methods: {
     deadlineOpenDateTime() {
@@ -258,12 +262,16 @@ export default {
       const endDate = new Date(this.finDateTime);
       const deadline = new Date(this.deadlineDateTime);
 
-      if (startDate < deadline) {
-        this.errorMessage = 'La date de début ne peut pas être antérieure à la date limite d\'inscription.';
+      if (endDate < deadline) {
+        this.errorMessage = 'La date limite d\'inscription ne peut pas être après à la date de fin.';
+        return false;
+      }
+      if (deadline < startDate) {
+        this.errorMessage = 'La date limite d\'inscription ne peut pas être avant à la date de début.';
         return false;
       }
       if (endDate < startDate) {
-        this.errorMessage = 'La date de fin ne peut pas être antérieure à la date de début.';
+        this.errorMessage = 'La date de fin ne peut pas être avant à la date de début.';
         return false;
       }
       return true;
@@ -289,7 +297,7 @@ export default {
           prix: this.prix,
           nombre_de_participants_max : this.nombre_de_participants_max,
           deadline: this.deadlineDateTime,
-          id_organisateur: 140,
+          id_organisateur: this.userConnected.idUser,
         });
 
         console.log('Événement ajouté:', response.data);
