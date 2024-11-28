@@ -645,7 +645,6 @@ exports.removeUserFromEvent = async (req, res) => {
     const { eventId, userId } = req.params;
 
     try {
-        console/log("avant requete eventsController")
         // Vérifier si l'utilisateur est actuellement inscrit à l'événement
         const participationCheck = await pool.query(
             'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
