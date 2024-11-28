@@ -77,9 +77,22 @@
               </v-card-text>
             </v-col>
           </v-row>
+
+          <v-btn color="info" @click="shareEvent">
+            <v-icon left>mdi-share-variant</v-icon>
+            Partager l'événement
+          </v-btn>
+          <v-snackbar v-model="shareSuccessMessage" timeout="3000">
+            Lien copié dans le presse-papier !
+            <template v-slot:action="{ attrs }">
+              <v-btn text v-bind="attrs" @click="shareSuccessMessage = false">Fermer</v-btn>
+            </template>
+          </v-snackbar>
+
         </v-card>
       </v-container>
 
+      
       <!-- Bouton pour retourner à la liste des événements -->
       <v-card-actions>
         <v-btn color="primary" @click="goBack">Retour à la liste</v-btn>
@@ -115,6 +128,7 @@ export default {
       successMessageParticipe: false, // Nouveau champ pour le message de succès
       successMessageDesinscire: false, // Nouveau champ pour le message de succès
       alreadyParticipating : false,
+      shareSuccessMessage: false,
     };
   },
   mounted() {
@@ -213,8 +227,34 @@ export default {
       }else{ // si non connecte, on redirige vers la page pour se connecter
         this.$router.push('/login');
       }
-    }
+    },
+    async shareEvent() {
+      const eventUrl = `${window.location.origin}/eventDetails/${this.event.id}`; // Génère l'URL de l'événement
+
+      if (navigator.share) {
+        // Si l'API de partage Web est disponible
+        try {
+          await navigator.share({
+            title: this.event.name,
+            text: 'Découvrez cet événement incroyable !',
+            url: eventUrl,
+          });
+        } catch (error) {
+          console.error('Erreur lors du partage via l\'API Web Share:', error);
+        }
+      } else {
+        // Si l'API n'est pas disponible, copier le lien dans le presse-papier
+        try {
+          await navigator.clipboard.writeText(eventUrl);
+          this.shareSuccessMessage = true; // Afficher un message de succès
+        } catch (error) {
+          console.error('Erreur lors de la copie dans le presse-papier:', error);
+        }
+      }
+    },
   },
+  
+
 };
 </script>
 
