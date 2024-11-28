@@ -49,7 +49,8 @@ export default {
     async fetchUserDetails() {
       try {
         // Appel API pour récupérer les informations de l'utilisateur
-        const response = await axios.get(`https://we-art.onrender.com/users/${this.userConnected.idUser}`);
+        //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
+        const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);

@@ -548,8 +548,8 @@ export default {
         return;
       }
       try {
-        //const response = await axios.post(`http://localhost:3000/users`, {
-        const response = await axios.post('https://we-art.onrender.com/users', {
+        //const response = await axios.post(`http://localhost:3000/api/users`, {
+        const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
           email: this.email,
@@ -611,7 +611,9 @@ export default {
       if (!this.verificationCodeError) {
         console.log("token : ",verificationCodeString,"mail : ", this.email);  
         try {
-              const response = await axios.post('https://we-art.onrender.com/verify-code', {
+              //const response = await axios.post(`http://localhost:3000/api/verify-code`, {
+
+              const response = await axios.post('https://we-art.onrender.com/api/verify-code', {
                 body: {
                 token: verificationCodeString, // Le code de vérification
                 email: this.email // L'email de l'utilisateur

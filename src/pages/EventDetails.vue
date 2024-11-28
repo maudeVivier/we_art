@@ -144,7 +144,8 @@ export default {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        const response = await axios.get(`https://we-art.onrender.com/eventDetails/${id}`);
+        //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
+        const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data[0];
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
@@ -178,8 +179,8 @@ export default {
     async checkParticipation() { // fonction pour afficher le bouton Participer ou se désinscire à un évènement
       if (this.userConnected) {
         try {
-          //const response = await axios.get(`http://localhost:3000/events/${this.event.id}/users/${this.userConnected.idUser}`);
-          const response = await axios.get(`https://we-art.onrender.com/events/${this.event.id}/users/${this.userConnected.idUser}`);
+          //const response = await axios.get(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
+          const response = await axios.get(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
           
           this.alreadyParticipating = response.data.participating;
         } catch (error) {
@@ -190,8 +191,8 @@ export default {
     async participateEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          //const response = await axios.post(`http://localhost:3000/events/${this.event.id}/users/${this.userConnected.idUser}`, {
-          const response = await axios.post(`https://we-art.onrender.com/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+          //const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+          const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
             id_event: this.event.id,
             id_user: this.userConnected.idUser,
           });
@@ -211,8 +212,8 @@ export default {
     async unregisterFromEvent() { // fonction pour se desincrire d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            //const response = await axios.delete(`http://localhost:3000/events/${this.event.id}/users/${this.userConnected.idUser}`, {
-            const response = await axios.delete(`https://we-art.onrender.com/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+            //const response = await axios.delete(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+            const response = await axios.delete(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
               id_event: this.event.id,
               id_user: this.userConnected.idUser,
             });

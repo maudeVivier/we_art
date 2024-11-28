@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 // GET - Récupérer tous les utilisateurs
 /**
  * @swagger
- * /users:
+ * /api/users:
  *   get:
  *     summary: Récupérer tous les utilisateurs
  *     description: Retourne la liste de tous les utilisateurs dans la base de données.
@@ -75,7 +75,7 @@ exports.getUsers = async (req, res) => {
 // GET - Récupérer un utilisateurs
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *   get:
  *     summary: Récupérer un utilisateur par ID
  *     description: Retourne un utilisateur spécifique dans la base de données.
@@ -149,7 +149,7 @@ exports.getUserById = async (req, res) => {
 // POST - Créer un nouvel utilisateur
 /**
  * @swagger
- * /users:
+ * /api/users:
  *   post:
  *     summary: Créer un nouvel utilisateur
  *     description: Crée un nouvel utilisateur dans la base de données.
@@ -347,7 +347,7 @@ const sendVerificationEmail = async (email, firstName, lastName, verificationTok
 // DELETE - Supprimer un utilisateur
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *   delete:
  *     summary: Supprimer un utilisateur
  *     description: Supprime un utilisateur de la base de données à partir de son ID.
@@ -409,7 +409,7 @@ exports.deleteUser = async (req, res) => {
 // PATCH - Mettre à jour un utilisateur
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *   patch:
  *     summary: Mettre à jour un utilisateur
  *     description: Met à jour les informations d'un utilisateur existant dans la base de données.
@@ -524,7 +524,7 @@ exports.updateUser = async (req, res) => {
 // POST - Rechercher un utilisateur (Connexion)
 /**
  * @swagger
- * /users/login:
+ * /api/users/login:
  *   post:
  *     summary: Connexion d'un utilisateur
  *     description: Permet à un utilisateur de se connecter en fournissant son email et son mot de passe.
@@ -609,7 +609,7 @@ exports.loginUser = async (req, res) => { // Utilise POST au lieu de GET pour le
 // POST - Vérifier l'email d'un utilisateur
 /**
  * @swagger
- * /verify-code:
+ * /api/verify-code:
  *   post:
  *     summary: Vérifier l'e-mail d'un utilisateur
  *     description: Vérifie l'e-mail d'un utilisateur en utilisant un code de vérification envoyé par e-mail.
@@ -686,7 +686,7 @@ exports.verifyEmail = async (req, res) => {
 // GET - Récupérer tous les événements d'un utilisateur
 /**
  * @swagger
- * /users/{userId}/events:
+ * /api/users/{userId}/events:
  *   get:
  *     summary: Récupérer tous les événements d'un utilisateur
  *     description: Retourne la liste de tous les événements auxquels un utilisateur spécifique participe.

@@ -172,8 +172,8 @@ export default {
     async sendUsers() {
   try {
     const promises = this.generatedUsers.map(async (user) => {
-      //const response = await fetch('http://localhost:3000/users', {
-      const response = await fetch('https://we-art.onrender.com/users', {
+      //const response = await fetch('http://localhost:3000/api/users', {
+      const response = await fetch('https://we-art.onrender.com/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

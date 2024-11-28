@@ -138,8 +138,8 @@ export default {
     async fetchEvents() {
       this.loading = true; // Start loading
       try {
-        //const response = await axios.get(`http://localhost:3000/users/${this.userConnected.idUser}/events`);
-        const response = await axios.get(`https://we-art.onrender.com/users/${this.userConnected.idUser}/events`);
+        //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/events`);
+        const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);

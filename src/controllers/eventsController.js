@@ -11,7 +11,7 @@ const opencage = require('opencage-api-client');
 // GET - Récupérer tous les evenements
 /**
  * @swagger
- * /events:
+ * /api/events:
  *   get:
  *     summary: Récupérer tous les événements
  *     description: Retourne la liste de tous les événements dans la base de données.
@@ -105,7 +105,7 @@ exports.getAllEvents = async (req, res) => {
 // POST - Créer un nouvel evenement
 /**
  * @swagger
- * /events:
+ * /api/events:
  *   post:
  *     summary: Créer un nouvel événement
  *     description: Permet de créer un nouvel événement dans la base de données.
@@ -303,7 +303,7 @@ exports.createEvent = async (req, res) => {
 // GET - Récupérer un evenement en particulier
 /**
  * @swagger
- * /eventDetails/{id}:
+ * /api/eventDetails/{id}:
  *   get:
  *     summary: Récupérer un événement par ID
  *     description: Renvoie les détails d'un événement spécifique à partir de son ID.
@@ -416,7 +416,7 @@ exports.getEventById = async (req, res) => {
 // GET - Voir si un utilisateur est inscrit à un évènement
 /**
  * @swagger
- * /events/{eventId}/users/{userId}:
+ * /api/events/{eventId}/users/{userId}:
  *   get:
  *     summary: Vérifier la participation d'un utilisateur à un événement
  *     description: Vérifie si un utilisateur spécifique est inscrit à un événement donné.
@@ -490,7 +490,7 @@ exports.checkUserParticipation = async (req, res) => {
 // POST - Participer à un evenement
 /**
  * @swagger
- * /events/{eventId}/users/{userId}:
+ * /api/events/{eventId}/users/{userId}:
  *   post:
  *     summary: Ajouter un utilisateur à un événement
  *     description: Ajoute un utilisateur spécifique à un événement spécifique.
@@ -591,7 +591,7 @@ exports.addUserToEvent = async (req, res) => {
 // DELETE - Désinscrire un utilisateur d'un événement
 /**
  * @swagger
- * /events/{eventId}/users/{userId}:
+ * /api/events/{eventId}/users/{userId}:
  *   delete:
  *     summary: Désinscrire un utilisateur d'un événement
  *     description: Supprime la participation d'un utilisateur à un événement spécifique.
@@ -672,7 +672,7 @@ exports.removeUserFromEvent = async (req, res) => {
 // POST - Ajouter un commentaire à un événement
 /**
  * @swagger
- * /events/{eventId}/comments:
+ * /api/events/{eventId}/comments:
  *   post:
  *     summary: Ajouter un commentaire à un événement
  *     description: Ajoute un commentaire avec une notation à un événement spécifique.

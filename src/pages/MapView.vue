@@ -118,7 +118,8 @@ export default {
   methods: {
     async fetchEvents() {
       try {
-        const response = await axios.get('https://we-art.onrender.com/events');
+        //const response = await axios.get('http://localhost:3000/api/events');
+        const response = await axios.get('https://we-art.onrender.com/api/events');
         this.events = response.data;
         this.loading = false; // Mettre à jour l'état de chargement
         

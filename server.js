@@ -30,8 +30,8 @@ app.use(serveStatic(path.join(__dirname, 'dist')));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
-app.use('/', usersRoutes);
-app.use('/', eventsRoutes);
+app.use('/api', usersRoutes);
+app.use('/api', eventsRoutes);
 
 // Rediriger toutes les autres routes vers index.html
 app.get('*', (req, res) => {
