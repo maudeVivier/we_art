@@ -51,7 +51,8 @@ const router = new Router({
     {
       path: '/myEvents',
       name: 'MyEvents',
-      component: MyEvents
+      component: MyEvents,
+      meta: { requiresAuth: true }
     },
     {
       path: '/createEvents',

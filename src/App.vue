@@ -26,6 +26,7 @@
       </v-btn>
 
       <v-btn
+        v-if="isAuthenticated" 
         :to="{ name: 'MyEvents' }"
       >
         <span>Mes ateliers</span>
