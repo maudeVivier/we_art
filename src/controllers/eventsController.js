@@ -413,7 +413,79 @@ exports.getEventById = async (req, res) => {
     }
 };
 
+// GET - Voir si un utilisateur est inscrit à un évènement
+/**
+ * @swagger
+ * /events/{eventId}/users/{userId}:
+ *   get:
+ *     summary: Vérifier la participation d'un utilisateur à un événement
+ *     description: Vérifie si un utilisateur spécifique est inscrit à un événement donné.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         description: ID de l'événement à vérifier
+ *         schema:
+ *           type: integer
+ *           example: 23
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: ID de l'utilisateur à vérifier
+ *         schema:
+ *           type: integer
+ *           example: 140
+ *     responses:
+ *       200:
+ *         description: Indique si l'utilisateur participe à l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 participating:
+ *                   type: boolean
+ *                   example: true
+ *       404:
+ *         description: Événement ou utilisateur non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur ou événement non trouvé."
+ *       500:
+ *         description: Erreur interne lors de la vérification de la participation.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la vérification de la participation."
+ */
+exports.checkUserParticipation = async (req, res) => {
+    const { eventId, userId } = req.params;
 
+    try {
+      const result = await pool.query(
+        'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
+        [userId, eventId]
+      );
+      if (result.rows.length > 0) {
+        res.json({ participating: true });
+      } else {
+        res.json({ participating: false });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification de la participation :', error);
+      res.status(500).json({ error: 'Erreur lors de la vérification de la participation.' });
+    }
+};
 
 // POST - Participer à un evenement
 /**
@@ -490,24 +562,24 @@ exports.addUserToEvent = async (req, res) => {
             return res.status(400).json({ error: "Utilisateur ou événement introuvable." });
         }
 
-
         // Vérifier si l'utilisateur participe déjà à l'événement
         const participationCheck = await pool.query(
-            'SELECT * FROM participantsevents WHERE idUser = $1 AND idEvent = $2',
+            'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
             [userId, eventId]
         );
 
         if (participationCheck.rowCount > 0) {
             // L'utilisateur participe déjà à l'événement
+            console.log("L'utilisateur participe déjà à cet événement.");
             return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
         }
 
         // Insérer dans la table de jointure participantsevents
         await pool.query(
-            'INSERT INTO participantsevents (idUser, idEvent) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            'INSERT INTO participantsevents (id_user, id_event) VALUES ($1, $2) ON CONFLICT DO NOTHING',
             [userId, eventId]
         );
-
+        console.log("utilisateur ajoute a l evenement avec succes")
         res.status(201).json({ message: "Utilisateur ajouté à l'événement avec succès." });
     } catch (err) {
         console.error("Erreur lors de l'ajout de l'utilisateur à l'événement:", err);
@@ -575,10 +647,10 @@ exports.removeUserFromEvent = async (req, res) => {
     try {
         // Vérifier si l'utilisateur est actuellement inscrit à l'événement
         const participationCheck = await pool.query(
-            'SELECT * FROM participantsevents WHERE idUser = $1 AND idEvent = $2',
+            'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
             [userId, eventId]
         );
-
+        console.log(participationCheck.rowCount)
         if (participationCheck.rowCount === 0) {
             // L'utilisateur n'est pas inscrit à l'événement
             return res.status(404).json({ message: "L'utilisateur n'est pas inscrit à cet événement." });
@@ -586,7 +658,7 @@ exports.removeUserFromEvent = async (req, res) => {
 
         // Supprimer l'enregistrement dans la table de jointure participantsevents
         await pool.query(
-            'DELETE FROM participantsevents WHERE idUser = $1 AND idEvent = $2',
+            'DELETE FROM participantsevents WHERE id_user = $1 AND id_event = $2',
             [userId, eventId]
         );
 
@@ -597,7 +669,6 @@ exports.removeUserFromEvent = async (req, res) => {
     }
 };
 
-// POST - Ajouter un commentaire à un événement
 // POST - Ajouter un commentaire à un événement
 /**
  * @swagger
@@ -646,10 +717,10 @@ exports.removeUserFromEvent = async (req, res) => {
  *                 description:
  *                   type: string
  *                   example: "Événement exceptionnel!"
- *                 idUser:
+ *                 id_user:
  *                   type: integer
  *                   example: 1
- *                 idEvent:
+ *                 id_event:
  *                   type: integer
  *                   example: 1
  *                 created_at:

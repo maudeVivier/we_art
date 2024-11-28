@@ -778,8 +778,8 @@ exports.getUserEvents = async (req, res) => {
         // Récupérer tous les événements auxquels l'utilisateur participe
         const result = await pool.query(
             `SELECT e.* FROM events e
-            INNER JOIN participantsevents pe ON e.id = pe.idEvent
-            WHERE pe.idUser = $1`,
+            INNER JOIN participantsevents pe ON e.id = pe.id_event
+            WHERE pe.id_user = $1`,
             [userId]
         );
 
