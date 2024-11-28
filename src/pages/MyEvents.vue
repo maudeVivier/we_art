@@ -21,9 +21,24 @@
               hide-details
             ></v-text-field>
           </v-toolbar>
+
           <v-row>
+            <v-col cols="12">
+              <h2 class="sub-title">Je suis inscrit</h2>
+            </v-col>
+          </v-row>
+
+          <!-- A venir -->
+          <v-row>
+            <v-col cols="12">
+              <h2 class="sub-title">À venir</h2>
+            </v-col>
+          </v-row>
+          <v-row v-if="numberUpcomingEvents > 0 && upcomingEvents.length > 0" >
+
+           
             <v-col
-              v-for="event in filteredEvents"
+              v-for="event in upcomingEvents"
               :key="event.id"
               cols="12"
               md="6"
@@ -66,23 +81,95 @@
                   </p>
                 </v-card-text>
 
-                  <!-- Image -->
-                  <v-img
-                    :src="event.image_event_url"
-                    alt="Image de l'événement"
-                    class="event-image"
-                  ></v-img>
+                <!-- Image -->
+                <v-img
+                  :src="event.image_event_url"
+                  alt="Image de l'événement"
+                  class="event-image"
+                ></v-img>
               </v-card>
             </v-col>
-            <v-row>
           </v-row>
-
-            <!-- Loading Spinner -->
-            <v-col v-if="loading" cols="12" class="text-center">
-              <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
-              <p>Chargement des ateliers...</p>
+          <v-row v-else>
+            <v-col cols="12" class="text-center">
+              <p v-if="numberUpcomingEvents <= 0">Aucun événements à venir</p>
+              <p v-else>Aucun événements ne correspond à votre recherche</p>
             </v-col>
           </v-row>
+
+          
+
+          <!-- Passé -->
+          <v-row>
+            <v-col cols="12">
+              <h2 class="sub-title">Passé</h2>
+            </v-col>
+          </v-row>
+          <v-row v-if="numberPastEvents > 0 && pastEvents >0">
+            <v-col
+              v-for="event in pastEvents"
+              :key="event.id"
+              cols="12"
+              md="6"
+              lg="4"
+            >
+              <v-card
+                class="d-flex flex-row"
+                max-width="100%"
+                @click="showDetails(event)"
+                hover
+              >
+                <v-card-text class="flex-grow-1">
+                  <!-- Titre de l'événement -->
+                  <v-card-title class="title">{{ event.name }}</v-card-title>
+
+                  <!-- Date et heure -->
+                  <p>
+                    <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
+                    {{ formatDate(event.start_date) }}
+                    <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
+                    {{ formatTime(event.start_date) }}
+                  </p>
+
+                  <!-- Adresse -->
+                  <p>
+                    <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+                    {{ event.street }}, {{ event.city }}
+                  </p>
+
+                  <!-- Prix -->
+                  <p :class="[ event.prix === 0 ? 'free-price' : 'paid-price', 'price-container']">
+                    <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                    {{ event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                  </p>
+
+                  <!-- Nombre de participants -->
+                  <p>
+                    <v-icon class="mr-2">mdi-account-group</v-icon>
+                    {{ event.participants }} participants
+                  </p>
+                </v-card-text>
+
+                <!-- Image -->
+                <v-img
+                  :src="event.image_event_url"
+                  alt="Image de l'événement"
+                  class="event-image"
+                ></v-img>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-row v-else>
+            <v-col cols="12" class="text-center">
+              <p v-if="numberPastEvents <= 0">Vous n'avez participé à aucun événement</p>
+              <p v-else>Aucun événements ne correspond à votre recherche</p>
+            </v-col>
+          </v-row>
+          <!-- Loading Spinner -->
+          <v-col v-if="loading" cols="12" class="text-center">
+            <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
+            <p>Chargement des ateliers...</p>
+          </v-col>
         </v-card>
       </v-container>
     </v-main>
@@ -99,18 +186,40 @@ export default {
       events: [],
       loading: false, // Loading state
       photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
-      userId: null, // ID de l'utilisateur
     };
   },
   computed: {
-    filteredEvents() {
-      // Filter events based on search input
+    upcomingEvents() {
+      const now = new Date();
       return this.events.filter((event) =>
-        event.name.toLowerCase().includes(this.search.toLowerCase()) ||
+        (event.name.toLowerCase().includes(this.search.toLowerCase()) ||
         event.city.toLowerCase().includes(this.search.toLowerCase()) ||
-        event.description.toLowerCase().includes(this.search.toLowerCase())
+        event.description.toLowerCase().includes(this.search.toLowerCase())) &&
+        new Date(event.start_date) > now
+      );
+
+    },
+    pastEvents() {
+      const now = new Date();
+      console.log(this.events)
+      return this.events.filter((event) =>
+        (event.name.toLowerCase().includes(this.search.toLowerCase()) ||
+        event.city.toLowerCase().includes(this.search.toLowerCase()) ||
+        event.description.toLowerCase().includes(this.search.toLowerCase())) &&
+        new Date(event.start_date) <= now
       );
     },
+
+    numberUpcomingEvents() {
+      const now = new Date();
+      return this.events.filter((event) => new Date(event.start_date) > now).length;
+    },
+
+    numberPastEvents() {
+      const now = new Date();
+      return this.events.filter((event) => new Date(event.start_date) <= now).length;
+    },
+
 
     userConnected() {
       return this.$store.getters.user;

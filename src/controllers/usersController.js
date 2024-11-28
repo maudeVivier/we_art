@@ -543,6 +543,9 @@ exports.updateUser = async (req, res) => {
  *                 type: string
  *                 format: password
  *                 example: "MotDePasse123"
+ *               type:
+ *                 type: string
+ *                 example: "Organizer"
  *     responses:
  *       200:
  *         description: Utilisateur connecté avec succès.
@@ -595,7 +598,8 @@ exports.loginUser = async (req, res) => { // Utilise POST au lieu de GET pour le
         if (isMatch) {
             res.json({
                 'msg' : "connecte",
-                'idUser' : user.id
+                'idUser' : user.id,
+                'type' : user.type
             });
         } else {
             res.status(401).json("non connecte");
