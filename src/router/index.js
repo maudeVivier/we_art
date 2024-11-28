@@ -19,6 +19,7 @@ import EventDetails from '../pages/EventDetails.vue'; // Page de détails
 import AddFakeData from '../pages/AddFakeData.vue'
 import UserProfile from '../pages/Profile.vue'; // Import du composant Profile
 import store from '../store.js';
+import MyEvents from '../pages/MyEvents.vue'
 
 Vue.use(Router);
 
@@ -46,6 +47,11 @@ const router = new Router({
       path: '/listEvents',
       name: 'ListEvents',
       component: ListEvents
+    },
+    {
+      path: '/myEvents',
+      name: 'MyEvents',
+      component: MyEvents
     },
     {
       path: '/createEvents',
