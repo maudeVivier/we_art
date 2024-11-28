@@ -57,11 +57,15 @@
                   {{ event.street }}, {{ event.city }}, {{ event.country }}
                 </v-col>
 
-                <v-col cols="auto">
-                  <v-btn color="primary" @click="participate">Participer</v-btn>
-                </v-col>
+                <template v-if="alreadyParticipating">
+                  <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
+                </template>
+                <template v-else>
+                  <v-btn color="primary" @click="participateEvent">Participer</v-btn>
+                </template>
               </v-row>
             </v-col>
+
 
             <!-- Détails de l'événement -->
             <v-col cols="12">
@@ -80,6 +84,21 @@
       <v-card-actions>
         <v-btn color="primary" @click="goBack">Retour à la liste</v-btn>
       </v-card-actions>
+
+      <!-- Snackbar pour le message de succès -->
+      <v-snackbar v-model="successMessageParticipe" timeout="3000">
+        Nous avons bien enregistré votre participation pour cet évènement!
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="successMessageParticipe = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
+
+      <v-snackbar v-model="successMessageDesinscire" timeout="3000">
+        Nous avons bien enregistré votre désinsciption pour cet évènement!
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="successMessageDesinscire = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -93,18 +112,28 @@ export default {
       loading: false,
       event: {},
       photo_default: require('@/assets/evenementiel.jpg'),
+      successMessageParticipe: false, // Nouveau champ pour le message de succès
+      successMessageDesinscire: false, // Nouveau champ pour le message de succès
+      alreadyParticipating : false,
     };
   },
   mounted() {
     const eventId = this.$route.params.id;
     this.fetchEventDetails(eventId);
   },
+  computed: {
+    userConnected() {
+        return this.$store.getters.user;
+      },
+    },
   methods: {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
         const response = await axios.get(`https://we-art.onrender.com/eventDetails/${id}`);
         this.event = response.data[0];
+        // Vérification de la participation après avoir récupéré l'événement
+        await this.checkParticipation();
       } catch (error) {
         console.error("Erreur lors de la récupération des détails de l'événement:", error);
       } finally {
@@ -132,9 +161,59 @@ export default {
     goBack() {
       this.$router.push('/listEvents');
     },
-    participate() {
-      alert("Participation enregistrée !");
+    async checkParticipation() { // fonction pour afficher le bouton Participer ou se désinscire à un évènement
+      if (this.userConnected) {
+        try {
+          //const response = await axios.get(`http://localhost:3000/events/${this.event.id}/users/${this.userConnected.idUser}`);
+          const response = await axios.get(`https://we-art.onrender.com/events/${this.event.id}/users/${this.userConnected.idUser}`);
+          
+          this.alreadyParticipating = response.data.participating;
+        } catch (error) {
+          console.error('Erreur lors de la vérification de la participation', error);
+        }
+      }
     },
+    async participateEvent() {
+      if(this.userConnected){ // utilisateur connecté
+        try {
+          //const response = await axios.post(`http://localhost:3000/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+          const response = await axios.post(`https://we-art.onrender.com/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+            id_event: this.event.id,
+            id_user: this.userConnected.idUser,
+          });
+
+          console.log('utilisateur ajouté a l evenement :', response.data);
+          this.successMessageParticipe = true; // Affiche le message de succès
+          this.alreadyParticipating = true;
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout de l\'utilisateur à l\'évènement', error);
+          this.successMessageParticipe = false; // Affiche le message de succès
+        } 
+    }
+    else{ // si non connecte, on redirige vers la page pour se connecter
+      this.$router.push('/login');
+    }
+    },
+    async unregisterFromEvent() { // fonction pour se desincrire d'un evenement
+      if(this.userConnected){ // utilisateur connecté
+          try {
+            //const response = await axios.delete(`http://localhost:3000/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+            const response = await axios.delete(`https://we-art.onrender.com/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+              id_event: this.event.id,
+              id_user: this.userConnected.idUser,
+            });
+
+            console.log('utilisateur supprimer a l evenement :', response.data);
+            this.successMessageDesinscire = true; // Affiche le message de succès
+            this.alreadyParticipating = false;
+          } catch (error) {
+            console.error('Erreur lors de la suppression de l\'utilisateur à l\'évènement', error);
+            this.successMessageDesinscire = false; // Affiche le message de succès
+          } 
+      }else{ // si non connecte, on redirige vers la page pour se connecter
+        this.$router.push('/login');
+      }
+    }
   },
 };
 </script>
