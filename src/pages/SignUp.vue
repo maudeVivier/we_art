@@ -406,9 +406,9 @@ export default {
           return isPasswordValid && isPasswordConfirmValid;
         }
         case 5:
-          return true; // Aucune validation pour le récapitulatif
+          this.currentStep = 6;
+          return this.createUser(); // Création d'un utilisateur, une fois toutes ses informations verifiées
         case 6:
-          // Création d'un utilisateur, une fois toutes ses informations verifiées
           // Puis verification du code pour valider le compte
           return this.validateVerificationCode();
         default:
@@ -446,10 +446,7 @@ export default {
       return !this.firstNameError;
     },
     validateImage() {
-      console.log("verifacteImage")
-      console.log(this.imageUser)
       this.imageError = this.imageUser ? '' : 'Veuillez ajouter une photo de profil.';
-      console.log(this.imageError)
       return !this.imageError;
     },
     validateEmail() {
@@ -569,7 +566,6 @@ export default {
       if (!this.validateCurrentStep()) {
         return;
       }
-      console.log("icicici")
       const formData = new FormData();
       formData.append("file", this.imageUser);
       formData.append("upload_preset", process.env.VUE_APP_PRESET);
@@ -579,8 +575,6 @@ export default {
           `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
           formData
         );
-        console.log(response_image.data.secure_url);
-        alert("Image uploadée avec succès !");
         //const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
@@ -594,12 +588,7 @@ export default {
           image_url: response_image.data.secure_url,
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
-        // Déstructuration des données
-        const { message, user } = response.data;
 
-      // Affichage des logs
-      console.log('Message du serveur :', message);
-      console.log('Utilisateur créé :', user);
         // Set success message and open dialog
         this.successMessage = 'Nous avons bien créé votre compte.';
         this.errorMessage = ''; 

@@ -291,20 +291,23 @@ export default {
       return true;
     },
 
-
-
     async createEvent() {
       if (!this.validateDates()) {
         return;
       }
-      this.loading = true; // Démarre le chargement
       const formData = new FormData();
-      formData.append("image", this.imageEvent);
+      formData.append("file", this.imageEvent);
+      formData.append("upload_preset", process.env.VUE_APP_PRESET);
+      
+      this.loading = true;
+      
       try {
-        const apiKey = process.env.VUE_APP_IMGBB_API_KEY;
-        const response_image = await axios.post(`https://api.imgbb.com/1/upload?key=${apiKey}`, formData);
-
-        //const response = await axios.post('http://localhost:3000/api/events', {
+        const response_image = await axios.post(
+          `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
+          formData
+        );
+        const imageUrl = response_image.data.secure_url;
+        // const response = await axios.post('http://localhost:3000/api/events', {
         const response = await axios.post('https://we-art.onrender.com/api/events', {
           name: this.name,
           description: this.description,
@@ -320,22 +323,22 @@ export default {
           nombre_de_participants_max : this.nombre_de_participants_max,
           deadline: this.deadlineDateTime,
           id_organisateur: this.userConnected.idUser,
-          image_url: response_image.data.data.url,
+          image_url: imageUrl,
         });
 
         console.log('Événement ajouté:', response.data);
         this.resetForm();
         this.errorMessage = null;
         this.successMessage = true; // Affiche le message de succès
+        this.successMessage = true;
       } catch (error) {
-        console.error('Erreur lors de l\'ajout de l\'événement', error);
-        this.errorMessage = 'Une erreur est survenue lors de la création de l\'événement. Veuillez réessayer.';
-        this.successMessage = false; 
+        console.error('Erreur lors de l\'upload Cloudinary :', error);
+        this.errorMessage = 'Échec de l\'upload de l\'image, veuillez réessayer.';
       } finally {
-        this.loading = false; // Terminer le chargement
+        this.loading = false;
       }
     },
-    resetForm() {
+  resetForm() {
       this.imageEvent = null,
       this.name = '';
       this.description = '';
