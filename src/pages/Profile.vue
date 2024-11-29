@@ -8,6 +8,7 @@
     <v-card>
       <v-card-title>Profil de l'utilisateur</v-card-title>
       <v-card-text>
+        <img :src="user.image_user" alt="User Image" style="width: 200px; height: 200px; object-fit: cover;" />
         <p><strong>Prénom :</strong> {{ user.firstname }}</p>
         <p><strong>Nom :</strong> {{ user.lastname }}</p>
         <p><strong>Type :</strong> {{ user.type }}</p>

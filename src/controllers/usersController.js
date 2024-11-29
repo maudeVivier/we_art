@@ -130,7 +130,7 @@ exports.getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10); // Conversion de l'identifiant en entier
     try {
         const result = await pool.query(
-            'SELECT id, firstname, lastname, birthday, sex, phone, email, type FROM users WHERE id = $1',
+            'SELECT id, firstname, lastname, birthday, sex, phone, email, type, image_user FROM users WHERE id = $1',
             [userId]
         );
         
@@ -297,7 +297,7 @@ exports.createUser = async (req, res) => {
         // Insertion dans la base de données
         const result = await pool.query(
             `INSERT INTO users 
-            (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified, image_user_url) 
+            (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified, image_user) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
             RETURNING *`,
             [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone, verificationToken, false, image_url]
