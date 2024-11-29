@@ -21,9 +21,6 @@
       </v-card>
     </v-dialog>
 
-
-
-
     <v-main>
       <v-app-bar app color="primary" dark>
         <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
@@ -51,6 +48,17 @@
                 :error-messages="firstNameError"
                 @blur="validateFirstName"
               ></v-text-field>
+              <v-file-input
+                v-model="imageUser"
+                label="Ajouter une photo *"
+                accept="image/*"
+                outlined
+                dense
+                required
+                @change="onFileChange"
+                :error-messages="imageError"
+                @blur="validateImage"
+              ></v-file-input>
             </div>
   
             <div v-if="currentStep === 2">
@@ -141,6 +149,17 @@
                 </v-card-title>
                 <v-card-text>
                   <v-list>
+                    <v-list-item>
+                      <v-list-item-content>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                          <span style="font-weight: bold;">Modifier photo de profil</span>
+                          <v-btn icon @click="editField('photo')" class="icon-pencil">
+                            <v-icon>mdi-pencil</v-icon>
+                          </v-btn>
+                        </div>
+                      </v-list-item-content>
+                    </v-list-item>
+
                     <v-list-item>
                       <v-list-item-content>
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -240,6 +259,7 @@
                 </v-card-text>
               </v-card>
             </div>
+
             <div v-if="currentStep === 6">
               <br><h2>C'est bientôt fini !</h2><br>
               <p>Veuillez vérifier votre boîte de réception. Nous venons d'envoyer un message à l'adresse <strong>{{ this.email }}</strong> pour vérifier votre adresse e-mail. Vous devez insérer le code à 4 chiffres de cet e-mail pour terminer l'inscription.</p>
@@ -290,8 +310,8 @@
           </v-card-text>
   
           <v-card-actions>
-            <v-btn @click="prevStep" :disabled="currentStep === 1 || currentStep === 6">Précédent</v-btn>
-            <v-btn @click="nextStep()">Suivant</v-btn>
+            <v-btn @click="prevStep" v-if="currentStep !== 6" :disabled="currentStep === 1 || currentStep === 6">Précédent</v-btn>
+            <v-btn @click="nextStep()" v-if="currentStep !== 6" >Suivant</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>
@@ -305,10 +325,12 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      currentStep: 2,
+      loading: false,
+      currentStep: 1,
       steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
       name: '',
       firstName: '',
+      imageUser: null,
       email: '',
       password: '',
       showPassword: false,
@@ -322,6 +344,7 @@ export default {
       // Erreurs de validation
       nameError: '',
       firstNameError: '',
+      imageError: '',
       emailError: '',
       passwordError: '',
       passwordConfirmError: '', // Erreur de confirmation du mot de passe
@@ -341,6 +364,9 @@ export default {
   },
   
   methods: {
+    onFileChange(event) {
+      this.imageUser = event.target.files[0];
+    },
     focusNext(index) {
       // Check if the current input is filled and if there is a next input to focus
       if (this.verificationCode[index] && index < 3) {
@@ -358,7 +384,6 @@ export default {
         }
       }
     },
-
     handleAction() {
       if (this.successMessage) {
         this.$router.push('/login'); // Rediriger vers la page de connexion en cas de succès
@@ -366,11 +391,10 @@ export default {
         this.closeDialog(); // Fermer simplement la boîte de dialogue en cas d'erreur
       }
     },
-
-    validateCurrentStep() {
+    async validateCurrentStep() {
       switch (this.currentStep) {
         case 1:
-          return this.validateName() && this.validateFirstName();
+          return this.validateName() && this.validateFirstName() && this.validateImage();
         case 2:
           return this.validateBirthDate() && this.validateGender();
         case 3:
@@ -386,7 +410,7 @@ export default {
         case 6:
           // Création d'un utilisateur, une fois toutes ses informations verifiées
           // Puis verification du code pour valider le compte
-          return this.createUser() && this.validateVerificationCode();
+          return this.validateVerificationCode();
         default:
           return true;
       }
@@ -396,6 +420,7 @@ export default {
       switch (fieldName) {
         case 'name':
         case 'firstName':
+        case 'photo':
           this.currentStep = 1; // Étape pour les informations personnelles
           break;
         case 'birthDate':
@@ -416,18 +441,22 @@ export default {
       this.nameError = this.name ? '' : 'Veuillez remplir le champ.';
       return !this.nameError;
     },
-
     validateFirstName() {
       this.firstNameError = this.firstName ? '' : 'Veuillez remplir le champ.';
       return !this.firstNameError;
     },
-
+    validateImage() {
+      console.log("verifacteImage")
+      console.log(this.imageUser)
+      this.imageError = this.imageUser ? '' : 'Veuillez ajouter une photo de profil.';
+      console.log(this.imageError)
+      return !this.imageError;
+    },
     validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       this.emailError = emailRegex.test(this.email) ? '' : 'Veuillez entrer un email valide.';
       return !this.emailError;
     },
-
     validatePassword(showErrors = false) {
       if (!this.password) {
         this.passwordError = showErrors ? 'Veuillez remplir le champ.' : '';
@@ -456,7 +485,6 @@ export default {
 
       return !this.passwordError;
     },
-
      // Validation de la confirmation du mot de passe
      validatePasswordConfirm() {
       if (this.passwordConfirm !== this.password) {
@@ -466,8 +494,6 @@ export default {
       }
       return !this.passwordConfirmError;
     },
-
-
     // Méthode pour afficher la force du mot de passe sans déclencher d'erreurs
     checkPasswordStrength() {
       const minLength = 8;
@@ -499,7 +525,6 @@ export default {
         this.strengthColor = 'blue';
       }
     },
-
     validateBirthDate() {
       const today = new Date();
       const birthDate = new Date(this.birthDate);
@@ -516,17 +541,14 @@ export default {
 
       return !this.birthDateError;
     },
-
     validateUserType() {
       this.userTypeError = this.userType ? '' : 'Veuillez sélectionner un type d\'utilisateur.';
       return !this.userTypeError;
     },
-
     validateGender() {
       this.genderError = this.gender ? '' : 'Veuillez remplir le champ.';
       return !this.genderError;
     },
-
     validatePhoneNumber() {
       const phoneRegex = /^[0-9]{10}$/; // Expression régulière pour un numéro à 10 chiffres (exemple pour la France)
       
@@ -547,7 +569,18 @@ export default {
       if (!this.validateCurrentStep()) {
         return;
       }
+      console.log("icicici")
+      const formData = new FormData();
+      formData.append("file", this.imageUser);
+      formData.append("upload_preset", process.env.VUE_APP_PRESET);
+      this.loading = true
       try {
+        const response_image = await axios.post(
+          `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
+          formData
+        );
+        console.log(response_image.data.secure_url);
+        alert("Image uploadée avec succès !");
         //const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
@@ -557,7 +590,8 @@ export default {
           phone: this.phoneNumber,
           birthday: this.birthDate,
           sex: this.gender,
-          type: this.userType
+          type: this.userType,
+          image_url: response_image.data.secure_url,
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
         // Déstructuration des données
@@ -571,7 +605,7 @@ export default {
         this.errorMessage = ''; 
         this.nextStep();
         //this.dialog = true;  // Open the dialog for success
-        //this.resetForm();
+        this.resetForm();
       } catch (error) {
         // Handle error cases
         if (error.response) {
@@ -596,6 +630,8 @@ export default {
         // Clear success message and open the dialog with error message
         this.successMessage = '';
         this.dialog = true; // Open the dialog even if there's an error
+      }finally {
+        this.loading = false;
       }
     },
 
@@ -669,6 +705,7 @@ export default {
     resetForm() {
       this.firstName = '';
       this.name = '';
+      this.imageUser = null;
       this.email = '';
       this.password = '';
       this.passwordConfirm = ''; // Réinitialiser la confirmation du mot de passe
@@ -678,6 +715,7 @@ export default {
       this.userType = '';
       this.nameError = '';
       this.firstNameError = '';
+      this.imageError = '';
       this.emailError = '';
       this.passwordError = '';
       this.passwordConfirmError = ''; // Réinitialiser l'erreur de confirmation
