@@ -326,7 +326,7 @@ export default {
   data() {
     return {
       loading: false,
-      currentStep: 1,
+      currentStep: 3,
       steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
       name: '',
       firstName: '',
@@ -398,7 +398,7 @@ export default {
         case 2:
           return this.validateBirthDate() && this.validateGender();
         case 3:
-          return this.validateEmail() && this.validateUserType()  && this.validatePhoneNumber();
+          return await this.validateEmail() && this.validateUserType()  && this.validatePhoneNumber();
         case 4:{
           // Appel de validatePassword() et validatePasswordConfirm() avec `showErrors = true` pour afficher les messages
           const isPasswordValid = this.validatePassword(true);
@@ -459,11 +459,30 @@ export default {
       this.imageError = this.imageUser ? '' : 'Veuillez ajouter une photo de profil.';
       return !this.imageError;
     },
-    validateEmail() {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      this.emailError = emailRegex.test(this.email) ? '' : 'Veuillez entrer un email valide.';
-      return !this.emailError;
-    },
+    async validateEmail() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.emailError = 'Veuillez entrer un email valide.';
+      return false;
+    }
+    
+    // Vérification dans la base de données via une requête API
+    try {
+      const response = await axios.get(`http://localhost:3000/api/users/${this.email}`);
+      console.log("apres requete")
+      if (response.data.exists) {
+        this.emailError = 'Cet email est déjà utilisé.';
+        return false;
+      } else {
+        this.emailError = ''; // Pas d'erreur
+        return true;
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification de l\'email:', error);
+      this.emailError = 'Une erreur est survenue, veuillez réessayer.';
+      return false;
+    }
+  },
     validatePassword(showErrors = false) {
       if (!this.password) {
         this.passwordError = showErrors ? 'Veuillez remplir le champ.' : '';

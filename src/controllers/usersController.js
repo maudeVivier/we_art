@@ -343,6 +343,63 @@ const sendVerificationEmail = async (email, firstName, lastName, verificationTok
         throw new Error('Erreur lors de l\'envoi de l\'email');
     }
 };
+
+ // Fonction pour vérifier si l'email existe déjà
+  /**
+   * @swagger
+   * /api/users/{email}:
+   *   get:
+   *     summary: Vérifier si un email est déjà utilisé
+   *     description: Cette route permet de vérifier si l'email fourni est déjà utilisé par un utilisateur existant.
+   *     tags: [Users] 
+   *     parameters:
+   *       - name: email
+   *         in: path
+   *         description: L'email à vérifier
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: email
+   *     responses:
+   *       200:
+   *         description: Email trouvé ou non trouvé
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 exists:
+   *                   type: boolean
+   *                   description: Indique si l'email existe déjà dans la base de données.
+   *       500:
+   *         description: Erreur lors de la vérification de l'email
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 error:
+   *                   type: string
+   *                   description: Détails de l'erreur
+   */
+  exports.checkEmail = async (req, res) => {
+    const email = req.params.email; 
+    try {
+        const result = await pool.query(
+            'SELECT id FROM users WHERE email = $1', 
+            [email]
+        );
+
+        if (result.rows.length > 0) {
+            return res.json({ exists: true });
+        } else {
+            return res.json({ exists: false });
+        }
+    } catch (err) {
+        console.error('Erreur lors de la vérification de l\'email:', err);
+        res.status(500).send({ error: 'Erreur lors de la vérification de l\'email' });
+    }
+};
   
 // DELETE - Supprimer un utilisateur
 /**
