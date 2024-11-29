@@ -377,8 +377,8 @@ export default {
         }
       }
     },
-    nextStep() {
-      if (this.validateCurrentStep()) {
+    async nextStep() {
+      if (await this.validateCurrentStep()) {
         if (this.currentStep < this.steps.length) {
           this.currentStep++;
         }
@@ -438,12 +438,22 @@ export default {
       }
     },
     validateName() {
-      this.nameError = this.name ? '' : 'Veuillez remplir le champ.';
-      return !this.nameError;
+      if (this.name && this.name.trim() !== '') { //non vide et ne contient pas que des espaces
+        this.nameError = '';
+        return true;
+      } else {
+        this.nameError = 'Veuillez remplir le champ.'; // Message d'erreur si le champ est vide
+        return false;
+      }
     },
     validateFirstName() {
-      this.firstNameError = this.firstName ? '' : 'Veuillez remplir le champ.';
-      return !this.firstNameError;
+      if (this.firstName && this.firstName.trim() !== '') { //non vide et ne contient pas que des espaces
+        this.firstNameError = '';
+        return true;
+      } else {
+        this.firstNameError = 'Veuillez remplir le champ.'; // Message d'erreur si le champ est vide
+        return false;
+      }
     },
     validateImage() {
       this.imageError = this.imageUser ? '' : 'Veuillez ajouter une photo de profil.';
@@ -675,22 +685,16 @@ export default {
       // Retourne faux si il y a une erreur
       return !this.verificationCodeError;
   },
-
-
-
     closeDialog() {
       this.dialog = false; // Ferme le dialog
       this.successMessage = ''; // Réinitialiser les messages après fermeture
       this.errorMessage = ''; 
     },
-
-
     prevStep() {
       if (this.currentStep > 1) {
         this.currentStep--;
       }
     },
-
     resetForm() {
       this.firstName = '';
       this.name = '';
