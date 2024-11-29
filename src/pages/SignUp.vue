@@ -326,7 +326,7 @@ export default {
   data() {
     return {
       loading: false,
-      currentStep: 3,
+      currentStep: 1,
       steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
       name: '',
       firstName: '',
@@ -469,7 +469,6 @@ export default {
     // Vérification dans la base de données via une requête API
     try {
       const response = await axios.get(`http://localhost:3000/api/users/${this.email}`);
-      console.log("apres requete")
       if (response.data.exists) {
         this.emailError = 'Cet email est déjà utilisé.';
         return false;
