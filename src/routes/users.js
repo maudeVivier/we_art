@@ -11,6 +11,6 @@ router.post('/users/login', loginUser);
 router.post('/verify-code', verifyEmail);
 router.get('/users/:userId/events', getUserEvents);
 router.get('/users/:id', getUserById);
-router.get('/users/:email', checkEmail);
+router.get('/users/email/:email', checkEmail);
 
 module.exports = router;

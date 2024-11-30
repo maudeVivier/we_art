@@ -460,28 +460,29 @@ export default {
       return !this.imageError;
     },
     async validateEmail() {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.email)) {
-      this.emailError = 'Veuillez entrer un email valide.';
-      return false;
-    }
-    
-    // Vérification dans la base de données via une requête API
-    try {
-      const response = await axios.get(`http://localhost:3000/api/users/${this.email}`);
-      if (response.data.exists) {
-        this.emailError = 'Cet email est déjà utilisé.';
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.email)) {
+        this.emailError = 'Veuillez entrer un email valide.';
         return false;
-      } else {
-        this.emailError = ''; // Pas d'erreur
-        return true;
       }
-    } catch (error) {
-      console.error('Erreur lors de la vérification de l\'email:', error);
-      this.emailError = 'Une erreur est survenue, veuillez réessayer.';
-      return false;
-    }
-  },
+      
+      // Vérification dans la base de données si l'email n'est pas déjà utilisé
+      try {
+        //const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
+        const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
+        if (response.data.exists) {
+          this.emailError = 'Cet email est déjà utilisé.';
+          return false;
+        } else {
+          this.emailError = '';
+          return true;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification de l\'email:', error);
+        this.emailError = 'Une erreur est survenue, veuillez réessayer.';
+        return false;
+      }
+    },
     validatePassword(showErrors = false) {
       if (!this.password) {
         this.passwordError = showErrors ? 'Veuillez remplir le champ.' : '';
