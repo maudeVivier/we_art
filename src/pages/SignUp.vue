@@ -3,7 +3,8 @@
     <v-dialog v-model="dialog" max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline">Information</span>
+          <span class="headline" v-if="errorMessage">Information</span>
+          <span class="headline" v-if="successMessage">Bienvenue</span>
         </v-card-title>
         <v-card-text>
           <!-- Show success or error message based on the outcome -->
@@ -600,10 +601,10 @@ export default {
       formData.append("upload_preset", process.env.VUE_APP_PRESET);
       this.loading = true
       try {
-        const response_image = await axios.post(
-          `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
-          formData
-        );
+        //const response_image = await axios.post(
+          //`https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
+          //formData
+        //);
         //const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
@@ -614,16 +615,16 @@ export default {
           birthday: this.birthDate,
           sex: this.gender,
           type: this.userType,
-          image_url: response_image.data.secure_url,
+          //image_url: response_image.data.secure_url,
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
 
         // Set success message and open dialog
         this.successMessage = 'Nous avons bien créé votre compte.';
-        this.errorMessage = ''; 
-        this.nextStep();
+        this.errorMessage = '';
         //this.dialog = true;  // Open the dialog for success
-        this.resetForm();
+        //this.resetForm();
+        this.nextStep();
       } catch (error) {
         // Handle error cases
         if (error.response) {
@@ -668,18 +669,18 @@ export default {
               //const response = await axios.post(`http://localhost:3000/api/verify-code`, {
 
               const response = await axios.post('https://we-art.onrender.com/api/verify-code', {
-                body: {
                 token: verificationCodeString, // Le code de vérification
                 email: this.email // L'email de l'utilisateur
-                  },
-                  headers: {
-                      'Accept': 'application/json',
-                      'Content-Type': 'application/json'
-                  }
               });
               // Vérification du code selon le code de réponse
               if (response.status === 200) {
                   console.log(response.data.message); // "Email vérifié avec succès"
+                  // Set success message and open dialog
+                  this.successMessage = 'Nous avons bien créé votre compte.';
+                  this.errorMessage = '';
+                  this.dialog = true;  // Open the dialog for success
+                  this.resetForm();
+                  //this.nextStep();
                   return true; // Validation réussie
               } else {
                   this.verificationCodeError = 'Une erreur est survenue, veuillez réessayer.'; // Gestion d'autres codes d'erreur
