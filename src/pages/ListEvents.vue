@@ -62,7 +62,7 @@
                   <!-- Nombre de participants -->
                   <p>
                     <v-icon class="mr-2">mdi-account-group</v-icon>
-                    {{ event.participants }} participants
+                    {{ event.participant_count }} participants
                   </p>
                 </v-card-text>
 

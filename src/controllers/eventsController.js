@@ -8,17 +8,17 @@ const opencage = require('opencage-api-client');
  *     description: Gestion des évènements
  */
 
-// GET - Récupérer tous les evenements
+// GET - Récupérer tous les événements
 /**
  * @swagger
  * /api/events:
  *   get:
  *     summary: Récupérer tous les événements
- *     description: Retourne la liste de tous les événements dans la base de données.
+ *     description: Retourne la liste de tous les événements dans la base de données avec le nombre de participants pour chaque événement.
  *     tags: [Events]
  *     responses:
  *       200:
- *         description: Liste des événements.
+ *         description: Liste des événements avec le nombre de participants.
  *         content:
  *           application/json:
  *             schema:
@@ -49,12 +49,15 @@ const opencage = require('opencage-api-client');
  *                     example: "France"
  *                   start_date:
  *                     type: string
+ *                     format: date-time
  *                     example: "2024-10-16T23:10:00.000Z"
  *                   end_date:
  *                     type: string
+ *                     format: date-time
  *                     example: "2024-10-16T23:10:00.000Z"
  *                   created_date:
  *                     type: string
+ *                     format: date-time
  *                     example: "2024-10-16T23:10:00.000Z"
  *                   latitude:
  *                     type: string
@@ -76,11 +79,14 @@ const opencage = require('opencage-api-client');
  *                     example: 100
  *                   deadline:
  *                     type: string
+ *                     format: date-time
  *                     example: "2024-10-16T23:10:00.000Z"
  *                   id_organisateur:
  *                     type: integer
  *                     example: 1
- *                   
+ *                   participant_count:
+ *                     type: integer
+ *                     example: 42
  *       500:
  *         description: Erreur interne lors de la récupération des événements.
  *         content:
@@ -94,7 +100,11 @@ const opencage = require('opencage-api-client');
  */
 exports.getAllEvents = async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM events');
+        const result = await pool.query(`
+            SELECT e.*, COUNT(pe.id_user) AS participant_count
+            FROM events e
+            LEFT JOIN participantsevents pe ON e.id = pe.id_event
+            GROUP BY e.id`)
         res.json(result.rows);
     } catch (err) {
         console.error('Erreur lors de la récupération des évènements:', err);
