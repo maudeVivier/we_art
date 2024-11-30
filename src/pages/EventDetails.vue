@@ -57,11 +57,19 @@
                   {{ event.street }}, {{ event.city }}, {{ event.country }}
                 </v-col>
 
-                <template v-if="alreadyParticipating">
-                  <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
-                </template>
-                <template v-else>
-                  <v-btn color="primary" @click="participateEvent">Participer</v-btn>
+                <template v-if="event">
+                  <template v-if="!event.is_deadline_valid">
+                    <p class="text-info">Il est trop tard pour s'inscrire à cet événement.</p>
+                  </template>
+                  <template v-else-if="!event.is_participant_limit_valid">
+                    <p class="text-info">Le nombre maximal de participants a été atteint.</p>
+                  </template>
+                  <template v-else-if="alreadyParticipating">
+                    <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
+                  </template>
+                  <template v-else>
+                    <v-btn color="primary" @click="participateEvent">Participer</v-btn>
+                  </template>
                 </template>
               </v-row>
             </v-col>
@@ -146,7 +154,7 @@ export default {
       try {
         //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
         const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
-        this.event = response.data[0];
+        this.event = response.data;
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
       } catch (error) {
@@ -181,7 +189,6 @@ export default {
         try {
           //const response = await axios.get(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.get(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
-          
           this.alreadyParticipating = response.data.participating;
         } catch (error) {
           console.error('Erreur lors de la vérification de la participation', error);
@@ -296,5 +303,10 @@ export default {
 
 .v-btn {
   margin-top: 20px;
+}
+
+.text-info {
+  color: rgb(120, 189, 68);
+  font-weight: bold;
 }
 </style>

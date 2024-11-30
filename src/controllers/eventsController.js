@@ -310,22 +310,29 @@ exports.createEvent = async (req, res) => {
     }
 };
 
-// GET - Récupérer un evenement en particulier
+// GET - Récupérer un événement en particulier
 /**
  * @swagger
  * /api/eventDetails/{id}:
  *   get:
  *     summary: Récupérer un événement par ID
- *     description: Renvoie les détails d'un événement spécifique à partir de son ID.
+ *     description: Renvoie les détails d'un événement spécifique à partir de son ID, y compris le nombre de participants, la validation de la deadline, et la disponibilité des places.
  *     tags: [Events]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID de l'événement à récupérer
+ *         description: ID de l'événement à récupérer.
  *         schema:
  *           type: integer
  *           example: 1
+ *       - in: query
+ *         name: userId
+ *         required: false
+ *         description: ID de l'utilisateur pour vérifier sa participation.
+ *         schema:
+ *           type: integer
+ *           example: 10
  *     responses:
  *       200:
  *         description: Détails de l'événement.
@@ -334,7 +341,7 @@ exports.createEvent = async (req, res) => {
  *             schema:
  *               type: object
  *               properties:
-*                 id:
+ *                 id:
  *                   type: integer
  *                   example: 1
  *                 name:
@@ -383,10 +390,23 @@ exports.createEvent = async (req, res) => {
  *                   example: 100
  *                 deadline:
  *                   type: string
+ *                   format: date-time
  *                   example: "2024-10-16T23:10:00.000Z"
  *                 id_organisateur:
  *                   type: integer
  *                   example: 1
+ *                 participant_count:
+ *                   type: integer
+ *                   example: 25
+ *                 is_deadline_valid:
+ *                   type: boolean
+ *                   example: true
+ *                 is_participant_limit_valid:
+ *                   type: boolean
+ *                   example: true
+ *                 already_participating:
+ *                   type: boolean
+ *                   example: false
  *       404:
  *         description: Événement non trouvé.
  *         content:
@@ -411,12 +431,20 @@ exports.createEvent = async (req, res) => {
 exports.getEventById = async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await pool.query('SELECT * FROM events WHERE id = $1', [id]);
-        
+        const result = await pool.query(
+            `SELECT e.*, 
+                COUNT(pe.id_user) AS participant_count, 
+                e.deadline > NOW() AS is_deadline_valid,
+                e.nombre_de_participants_max > COUNT(pe.id_user) AS is_participant_limit_valid
+            FROM events e
+            LEFT JOIN participantsevents pe ON e.id = pe.id_event
+            WHERE e.id = $1
+            GROUP BY e.id `, [id]);
+
         if (result.rowCount === 0) {
-            return res.status(400).json({ message: 'Événement non trouvé' });
+            return res.status(404).json({ message: 'Événement non trouvé' });
         }
-        res.json(result.rows);
+        res.json(result.rows[0]);
     } catch (err) {
         console.error('Erreur lors de la récupération de l\'evenement:', err);
         res.status(500).send({ error: 'Erreur lors de la récupération de l\'evenement' });
@@ -480,6 +508,7 @@ exports.getEventById = async (req, res) => {
  */
 exports.checkUserParticipation = async (req, res) => {
     const { eventId, userId } = req.params;
+    console.log("ici, ", eventId, userId)
 
     try {
       const result = await pool.query(
