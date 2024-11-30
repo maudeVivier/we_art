@@ -92,10 +92,9 @@
                 dark
                 @click="goToCreateEvent"
                 large
-                class="mt-4"
+                class="mt-4 fixed-button"
               >
-                <v-icon left>mdi-plus</v-icon>
-                Ajouter un événement
+                <v-icon >mdi-plus</v-icon>
               </v-btn>   
             </v-col>
           </v-row>
@@ -180,6 +179,14 @@ export default {
 </script>
 
 <style scoped>
+
+.fixed-button {
+  position: fixed;
+  bottom: 70px; /* Ajuste cette valeur selon la hauteur de ta barre de navigation */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; /* S'assure que le bouton est au-dessus des autres éléments */
+}
 .event-image {
   width: 40%;
   height: 100%; /* Hauteur de l'image */

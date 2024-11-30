@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           <span class="headline" v-if="errorMessage">Information</span>
-          <span class="headline" v-if="successMessage">Bienvenue</span>
+          <span class="headline" v-if="successMessage">Bienvenue !</span>
         </v-card-title>
         <v-card-text>
           <!-- Show success or error message based on the outcome -->
@@ -15,7 +15,7 @@
         </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="handleAction">
-            <span v-if="successMessage">Se connecter</span>
+            <span v-if="successMessage">Continuer</span>
             <span v-else>OK</span>
           </v-btn>
         </v-card-actions>
@@ -620,7 +620,7 @@ export default {
         console.log('Utilisateur ajouté avec succès:', response.data);
 
         // Set success message and open dialog
-        this.successMessage = 'Nous avons bien créé votre compte.';
+        this.successMessage = 'Créons ensemble !';
         this.errorMessage = '';
         //this.dialog = true;  // Open the dialog for success
         //this.resetForm();
