@@ -22,22 +22,26 @@
       </v-card>
     </v-dialog>
 
-    <v-main>
-      <v-app-bar app color="primary" dark>
-        <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
-      </v-app-bar>
-      <v-container>
-        <v-card>
-          <v-card-title>
-            <h1>Inscription</h1>
-          </v-card-title>
-
+    <div class="row-container">
+        <a 
+          @click.prevent="prevStep" 
+          v-if="currentStep !== 6" 
+          :class="{ 'disabled-link': currentStep === 1 || currentStep === 6 }"
+        >
+            <v-icon>mdi-arrow-left</v-icon>
+        </a>
+        <span class="centered-text">
+          <b>Inscription</b>
+        </span>
+      </div>
+    <v-main class="vertical-center">
           <v-card-text>
+      <div>
             <!-- Affichage du formulaire en fonction de l'étape -->
             <div v-if="currentStep === 1">
               <v-text-field 
                 v-model="name" 
-                label="Nom *" 
+                label="Nom *"
                 required 
                 :error-messages="nameError"
                 @blur="validateName"
@@ -261,7 +265,7 @@
               </v-card>
             </div>
 
-            <div v-if="currentStep === 6">
+            <div v-if="currentStep === 6" style="text-align: center;">
               <br><h2>C'est bientôt fini !</h2><br>
               <p>Veuillez vérifier votre boîte de réception. Nous venons d'envoyer un message à l'adresse <strong>{{ this.email }}</strong> pour vérifier votre adresse e-mail. Vous devez insérer le code à 4 chiffres de cet e-mail pour terminer l'inscription.</p>
               <br>
@@ -305,17 +309,17 @@
               </div>
               <br>
               <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="editField('email')" class="link">demander un autre e-mail de vérification.</a></small>
+              <br>
+              <v-btn @click="validateVerificationCode" v-if="currentStep === 6" color="primary">Valider</v-btn>
             </div>
-            <br>
-            <v-btn @click="validateVerificationCode" v-if="currentStep === 6" color="primary">Valider</v-btn>
-          </v-card-text>
-  
-          <v-card-actions>
-            <v-btn @click="prevStep" v-if="currentStep !== 6" :disabled="currentStep === 1 || currentStep === 6">Précédent</v-btn>
-            <v-btn @click="nextStep()" v-if="currentStep !== 6" >Suivant</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-container>
+        
+      <div style="text-align: center;">
+        <v-btn   @click="nextStep()" v-if="currentStep !== 6" color="primary">Suivant</v-btn>
+      </div>
+    </div>
+   
+      
+    </v-card-text>
     </v-main>
   </v-app>
 </template>
@@ -792,4 +796,31 @@ export default {
     font-size: 0.65rem;
     color: gray;
   }
+
+  .row-container {
+    padding-top: 1rem;
+    margin-left: 1rem;
+    display: flex;
+    justify-content: center; /* Centrer horizontalement les éléments */
+    align-items: center; /* Centrer verticalement les éléments */
+    opacity: 1;
+  }
+
+.centered-text {
+  flex-grow: 1; /* Permet au texte de prendre l'espace disponible pour le centrer */
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.5;
+  display: none;
+}
+
+.vertical-center{
+  align-items: center;
+  display: flex;
+  height: 100%;
+}
 </style>

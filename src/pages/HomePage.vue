@@ -1,8 +1,5 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <v-toolbar-title><h1>WE ART</h1></v-toolbar-title>
-    </v-app-bar>
 
     <v-main>
       <v-container fluid class="text-center my-5">

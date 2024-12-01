@@ -136,9 +136,9 @@ margin-top: 30%;
 
 .v-btn {
 color: red;
-border-radius: 20px !important;
-padding-left: 10% !important;
-padding-right: 10% !important;
+border-radius: 30px !important;
+padding-left: 13% !important;
+padding-right: 13% !important;
 padding-top: 7% !important;
 padding-bottom: 6% !important;
 
