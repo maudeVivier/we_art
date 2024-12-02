@@ -41,7 +41,7 @@
 
 <script>
 // Importation des images
-import Logo from '@/assets/WE ART.png'; // Chemin relatif vers ton logo situé dans le même dossier
+import Logo from '@/assets/we_art.png'; // Chemin relatif vers ton logo situé dans le même dossier
 
 export default {
   data() {

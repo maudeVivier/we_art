@@ -401,6 +401,9 @@ exports.createEvent = async (req, res) => {
  *                 is_deadline_valid:
  *                   type: boolean
  *                   example: true
+  *                 is_start_date_passed:
+ *                   type: boolean
+ *                   example: true
  *                 is_participant_limit_valid:
  *                   type: boolean
  *                   example: true
@@ -435,6 +438,8 @@ exports.getEventById = async (req, res) => {
             `SELECT e.*, 
                 COUNT(pe.id_user) AS participant_count, 
                 e.deadline > NOW() AS is_deadline_valid,
+                e.start_date AS is_start_date_passed,
+                e.start_date > NOW() AS is_start_date_passed,
                 e.nombre_de_participants_max > COUNT(pe.id_user) AS is_participant_limit_valid
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event

@@ -53,23 +53,22 @@
                   {{ event.street }}, {{ event.city }}, {{ event.country }}
                 </v-col>
 
-                <template v-if="event">
-                  <template v-if="!event.is_deadline_valid">
+                <template v-if="alreadyParticipating && event.is_start_date_passed">
+                    <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
+                </template>
+                <template v-else>
+                  <template v-if="event.is_deadline_valid && event.is_participant_limit_valid">
+                    <v-btn color="primary" @click="participateEvent">S'inscrire</v-btn>
+                  </template>
+                  <template v-else-if="!event.is_deadline_valid">
                     <p class="text-info">Il est trop tard pour s'inscrire à cet événement.</p>
                   </template>
                   <template v-else-if="!event.is_participant_limit_valid">
                     <p class="text-info">Le nombre maximal de participants a été atteint.</p>
                   </template>
-                  <template v-else-if="alreadyParticipating">
-                    <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
-                  </template>
-                  <template v-else>
-                    <v-btn color="primary" @click="participateEvent">Participer</v-btn>
-                  </template>
                 </template>
               </v-row>
             </v-col>
-
 
             <!-- Détails de l'événement -->
             <v-col cols="12">
@@ -129,8 +128,8 @@ export default {
       loading: false,
       event: {},
       photo_default: require('@/assets/evenementiel.jpg'),
-      successMessageParticipe: false, // Nouveau champ pour le message de succès
-      successMessageDesinscire: false, // Nouveau champ pour le message de succès
+      successMessageParticipe: false,
+      successMessageDesinscire: false,
       alreadyParticipating : false,
       shareSuccessMessage: false,
     };
@@ -148,7 +147,7 @@ export default {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
+        // const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
         const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
         // Vérification de la participation après avoir récupéré l'événement

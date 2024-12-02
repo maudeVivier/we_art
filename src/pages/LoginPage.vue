@@ -6,7 +6,7 @@
           <v-col cols="12" md="6">
             <div class = "v-card">
               <v-card-text>
-                <div class="logo" justify="center"  >
+                <div class="logo">
                   <v-img
                     :src="Logo"
                     alt="Map logo"
@@ -49,7 +49,7 @@
 
 <script>
 import axios from 'axios'
-import Logo from '@/assets/WE ART.png'; // Chemin relatif vers ton logo situé dans le même dossier
+import Logo from '@/assets/we_art.png'; // Chemin relatif vers ton logo situé dans le même dossier
 import { mapActions } from 'vuex';
 
 export default {
@@ -126,16 +126,15 @@ export default {
 
 <style>
 .logo {
-max-width: 100%; /* Ensure the image is responsive */
-height: auto;    /* Maintain aspect ratio */
-width: 300px;    /* Set a fixed width */
-display: block;  /* Ensure it behaves like a block element */
+max-width: 70%;
+height: 30%;
+width: 70%; 
+display: block;
 margin: 0 auto;  /* Center horizontally */
-margin-top: 30%;
+margin-top: 10%;
 }
 
 .v-btn {
-color: red;
 border-radius: 30px !important;
 padding-left: 13% !important;
 padding-right: 13% !important;
@@ -145,6 +144,6 @@ padding-bottom: 6% !important;
 }
 
 .formulaire {
-  margin-top: 40% !important;
+  margin-top: 30%;
 }
 </style>
