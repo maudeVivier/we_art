@@ -21,7 +21,7 @@
 
           <v-row>
             <v-col cols="12">
-              <h2 class="sub-title">Je suis inscrit</h2>
+              <h2 class="sub-title">Je suis inscris</h2>
             </v-col>
           </v-row>
 

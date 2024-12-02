@@ -62,20 +62,6 @@ export default {
     margin: 0 auto;  /* Center horizontally */
   }
 
-  .v-btn {
-    color: white;
-    background-color: #ff4081;
-    border-radius: 20px;
-    width: 200px; /* Réduire la largeur, ajustez selon vos besoins */
-    max-width: 90%; /* S'assure que le bouton ne déborde pas */
-  }
-
-  .router-link {
-    text-decoration: none;
-    color: #F2992C;
-    font-weight: bold;
-  }
-
   .v-card {
     text-align: center;
   }

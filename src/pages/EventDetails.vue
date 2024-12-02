@@ -296,10 +296,6 @@ export default {
   line-height: 1.6;
 }
 
-.v-btn {
-  margin-top: 20px;
-}
-
 .text-info {
   color: rgb(120, 189, 68);
   font-weight: bold;

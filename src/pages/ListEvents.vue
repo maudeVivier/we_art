@@ -17,71 +17,69 @@
               hide-details
             ></v-text-field>
           </v-toolbar>
-          <v-row>
-            <v-col
-              v-for="event in filteredEvents"
-              :key="event.id"
-              cols="12"
-              md="6"
-              lg="4"
+          <v-col
+            v-for="event in filteredEvents"
+            :key="event.id"
+            cols="12"
+            md="6"
+            lg="4"
+          >
+            <v-card
+              class="d-flex flex-row"
+              max-width="100%"
+              @click="showDetails(event)"
+              hover
             >
-              <v-card
-                class="d-flex flex-row"
-                max-width="100%"
-                @click="showDetails(event)"
-                hover
-              >
-                <v-card-text class="flex-grow-1">
-                  <!-- Titre de l'événement -->
-                  <v-card-title class="title">{{ event.name }}</v-card-title>
+              <v-card-text class="flex-grow-1">
+                <!-- Titre de l'événement -->
+                <v-card-title class="title">{{ event.name }}</v-card-title>
 
-                  <!-- Date et heure -->
-                  <p>
-                    <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
-                    {{ formatDate(event.start_date) }}
-                    <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
-                    {{ formatTime(event.start_date) }}
-                  </p>
+                <!-- Date et heure -->
+                <p>
+                  <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
+                  {{ formatDate(event.start_date) }}
+                  <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
+                  {{ formatTime(event.start_date) }}
+                </p>
 
-                  <!-- Adresse -->
-                  <p>
-                    <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
-                    {{ event.street }}, {{ event.city }}
-                  </p>
+                <!-- Adresse -->
+                <p>
+                  <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+                  {{ event.street }}, {{ event.city }}
+                </p>
 
-                  <!-- Prix -->
-                  <p :class="[
-                      event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
-                      'price-container'
-                    ]">
-                    <v-icon class="mr-2">mdi-currency-eur</v-icon>
-                    {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
-                  </p>
+                <!-- Prix -->
+                <p :class="[
+                    event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
+                    'price-container'
+                  ]">
+                  <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                  {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                </p>
 
-                  <!-- Nombre de participants -->
-                  <p>
-                    <v-icon class="mr-2">mdi-account-group</v-icon>
-                    {{ event.participant_count }} participants
-                  </p>
-                </v-card-text>
+                <!-- Nombre de participants -->
+                <p>
+                  <v-icon class="mr-2">mdi-account-group</v-icon>
+                  {{ event.participant_count }} participants
+                </p>
+              </v-card-text>
 
-                  <!-- Image -->
-                  <v-img
-                    :src="event.image_event_url"
-                    alt="Image de l'événement"
-                    class="event-image"
-                  ></v-img>
-              </v-card>
-            </v-col>
-            <v-row>
-          </v-row>
+                <!-- Image -->
+                <v-img
+                  :src="event.image_event_url"
+                  alt="Image de l'événement"
+                  class="event-image"
+                ></v-img>
+            </v-card>
+          </v-col>
+          <v-row>
+        </v-row>
 
-            <!-- Loading Spinner -->
-            <v-col v-if="loading" cols="12" class="text-center">
-              <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
-              <p>Chargement des événements...</p>
-            </v-col>
-          </v-row>
+          <!-- Loading Spinner -->
+          <v-col v-if="loading" cols="12" class="text-center">
+            <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
+            <p>Chargement des événements...</p>
+          </v-col>
 
           <!-- Bouton Ajouter un Événement -->
           <v-row>
@@ -178,18 +176,18 @@ export default {
 </script>
 
 <style scoped>
-
 .fixed-button {
   position: fixed;
-  bottom: 70px; /* Ajuste cette valeur selon la hauteur de ta barre de navigation */
+  bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000; /* S'assure que le bouton est au-dessus des autres éléments */
+  z-index: 1000;
 }
+
 .event-image {
   width: 40%;
-  height: 100%; /* Hauteur de l'image */
-  object-fit: contain; /* Maintient le ratio de l'image */
+  height: 200px; /* Hauteur de l'image */
+  object-fit: cover; /* Maintient le ratio de l'image */
   border-radius: 8px; /* Bordures arrondies */
 }
 
@@ -202,6 +200,7 @@ p {
   margin: 0;
   padding: 5px 0;
 }
+
 .price-container {
   padding: 8px 12px;
   border-radius: 8px;

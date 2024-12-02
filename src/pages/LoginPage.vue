@@ -31,7 +31,7 @@
                     @click:append="togglePasswordVisibility"
                   ></v-text-field>
                   <div class="pa-5" outlined>
-                    <v-btn type="submit" color="primary" >
+                    <v-btn type="submit" color="primary">
                       Me connecter
                       <v-icon right>mdi-arrow-right</v-icon>
                     </v-btn>
@@ -124,7 +124,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .logo {
 max-width: 70%;
 height: 30%;
@@ -132,15 +132,6 @@ width: 70%;
 display: block;
 margin: 0 auto;  /* Center horizontally */
 margin-top: 10%;
-}
-
-.v-btn {
-border-radius: 30px !important;
-padding-left: 13% !important;
-padding-right: 13% !important;
-padding-top: 7% !important;
-padding-bottom: 6% !important;
-
 }
 
 .formulaire {

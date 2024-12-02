@@ -1,10 +1,3 @@
-
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
 // Composables
 import Vue from 'vue'
 import Router from 'vue-router'
