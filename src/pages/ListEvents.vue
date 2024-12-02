@@ -50,9 +50,12 @@
                   </p>
 
                   <!-- Prix -->
-                  <p :class="[ event.prix === 0 ? 'free-price' : 'paid-price', 'price-container']">
+                  <p :class="[
+                      event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
+                      'price-container'
+                    ]">
                     <v-icon class="mr-2">mdi-currency-eur</v-icon>
-                    {{ event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                    {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                   </p>
 
                   <!-- Nombre de participants -->
@@ -209,13 +212,19 @@ p {
   color: white;
   font-weight: bold;
   border: 2px solid;
-  background-color: rgb(185, 184, 184);
+  background-color: rgb(185, 184, 184); /* Gris */
 }
 
 .paid-price {
   color: white;
   border: 2px solid;
-  background-color: rgb(151, 210, 151);
+  background-color: rgb(151, 210, 151); /* Vert */
+}
+
+.free-choice-price {
+  color: white;
+  border: 2px solid;
+  background-color: rgb(143, 170, 143); /* Gris-vert */
 }
 
 .d-flex {

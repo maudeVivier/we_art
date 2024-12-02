@@ -85,6 +85,11 @@
               </v-dialog>
 
               <!-- Prix -->
+              <v-checkbox
+                v-model="prixLibre"
+                label="Prix libre ?"
+              ></v-checkbox>
+
               <v-text-field
                 v-model="prix"
                 label="Prix *"
@@ -92,6 +97,7 @@
                 outlined
                 dense
                 type="number"
+                :disabled="prixLibre"
               ></v-text-field>
 
               <!-- Date et Heure de Début -->
@@ -209,6 +215,7 @@ export default {
       discipline: '',
       niveau: '',
       prix:0,
+      prixLibre: false,
       description: '',
       nombre_de_participants_max: 0,
       postal_code: '',
@@ -301,7 +308,11 @@ export default {
           formData
         );
         const imageUrl = response_image.data.secure_url;
-        // const response = await axios.post('http://localhost:3000/api/events', {
+
+        if(this.prixLibre){
+          this.prix = -1;
+        }
+        //const response = await axios.post('http://localhost:3000/api/events', {
         const response = await axios.post('https://we-art.onrender.com/api/events', {
           name: this.name,
           description: this.description,
@@ -341,6 +352,7 @@ export default {
       this.nombre_de_participants_max = 0;
       this.deadlineDateTime = '';
       this.prix = 0;
+      this.prixLibre = false;
       this.debutDateTime = '';
       this.finDateTime = '';
       this.street = '';

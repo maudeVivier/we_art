@@ -605,11 +605,11 @@ export default {
       formData.append("upload_preset", process.env.VUE_APP_PRESET);
       this.loading = true
       try {
-        //const response_image = await axios.post(
-          //`https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
-          //formData
-        //);
-        //const response = await axios.post(`http://localhost:3000/api/users`, {
+        // const response_image = await axios.post(
+        //   `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
+        //   formData
+        // );
+        // const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
@@ -619,6 +619,7 @@ export default {
           birthday: this.birthDate,
           sex: this.gender,
           type: this.userType,
+          image_url: null,
           //image_url: response_image.data.secure_url,
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
