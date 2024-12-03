@@ -82,7 +82,7 @@
           </v-col>
 
           <!-- Bouton Ajouter un Événement -->
-          <v-row>
+          <v-row v-if="this.userConnected && this.$store.getters.user.type === 'Organizer'">
             <v-col cols="12" class="text-center">
               <v-btn
                 color="primary"
@@ -121,6 +121,9 @@ export default {
         event.city.toLowerCase().includes(this.search.toLowerCase()) ||
         event.description.toLowerCase().includes(this.search.toLowerCase())
       );
+    },
+    userConnected() {
+      return this.$store.getters.isAuthenticated;
     },
   },
   mounted() {

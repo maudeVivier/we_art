@@ -87,6 +87,7 @@ export default {
           const user = {
             idUser: response.data.idUser,
             email: this.email,
+            type : response.data.type
           }
 
           await this.login(user);
