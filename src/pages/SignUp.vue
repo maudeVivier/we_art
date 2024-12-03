@@ -91,9 +91,15 @@
                 label="Email *" 
                 required 
                 type="email"
-                :error-messages="emailError"
+                :error="errorEmailExist"
                 @blur="validateEmail"
-              ></v-text-field>
+              > 
+            </v-text-field>
+            <div v-if="errorEmailExist" class="custom-error-message v-messages theme--light error--text">    <div class="v-messages__message">
+                Cet email est déjà utilisé.
+                <router-link to="/login" style="color: blue; text-decoration: underline;">Se connecter</router-link>
+              </div>
+            </div>
               <v-select
                 v-model="userType"
                 :items="userTypes"
@@ -364,7 +370,8 @@ export default {
       successMessage: '', // Pour le message de succès
       errorMessage: '', // Pour le message d'erreur
       verificationCode: ['', '', '', ''], // Code de vérification à 4 chiffres
-    verificationCodeError: '', // Erreur de code de vérification
+      verificationCodeError: '', // Erreur de code de vérification
+      errorEmailExist : false,
     };
   },
   
@@ -479,10 +486,13 @@ export default {
         //const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
         if (response.data.exists) {
-          this.emailError = 'Cet email est déjà utilisé.';
+          this.emailError = `Cet email est déjà utilisé.`;
+          this.errorEmailExist = true;
+          console.log("email existant : ",this.errorEmailExist);
           return false;
         } else {
           this.emailError = '';
+          this.errorEmailExist = false;
           return true;
         }
       } catch (error) {
@@ -826,5 +836,9 @@ export default {
   align-items: center;
   display: flex;
   height: 100%;
+}
+
+.custom-error-message {
+  margin-top: -10px;
 }
 </style>
