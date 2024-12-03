@@ -470,6 +470,9 @@ export default {
         this.emailError = 'Veuillez entrer un email valide.';
         return false;
       }
+      else{
+        this.emailError ='';
+      }
       
       // Vérification dans la base de données si l'email n'est pas déjà utilisé
       try {
@@ -605,11 +608,11 @@ export default {
       formData.append("upload_preset", process.env.VUE_APP_PRESET);
       this.loading = true
       try {
-        // const response_image = await axios.post(
-        //   `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
-        //   formData
-        // );
-        // const response = await axios.post(`http://localhost:3000/api/users`, {
+        /*const response_image = await axios.post(
+          `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
+          formData
+        );*/
+        //const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
