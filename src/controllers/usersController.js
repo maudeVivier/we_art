@@ -324,6 +324,92 @@ exports.createUser = async (req, res) => {
     }
 };
 
+
+// POST - Envoyer le code de vérification
+/**
+ * @swagger
+ * /api/users/sendEmailCode:
+ *   post:
+ *     summary: Envoyer le code de vérification
+ *     description:  Envoyer un mail à l'utilisateur avec le code de vérification
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: "John"
+ *               lastName:
+ *                 type: string
+ *                 example: "Doe"
+ *               email:
+ *                 type: string
+ *                 example: "john.doe@example.com"
+ *     responses:
+ *       201:
+ *         description: Email envoyé avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Email envoyé avec succès"
+ *       404:
+ *         description: Utilisateur introuvable avec cet email.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Utilisateur introuvable avec cet email"
+ *       500:
+ *         description: Erreur interne du serveur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Une erreur interne est survenue."
+ */
+exports.resendCode = async (req, res) => {
+    const { firstName, lastName, email } = req.body;  // Modifications pour correspondre aux colonnes
+   
+
+
+    try {
+        const verificationToken = Math.floor(1000 + Math.random() * 9000);
+
+        // Insertion dans la base de données
+        const result = await pool.query(
+            `UPDATE users SET verification_token=$1 WHERE email=$2 RETURNING *`,
+            [verificationToken, email]
+        );
+
+        console.log("le resultat de la requete = ", result.rows)
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({
+                message: 'Utilisateur introuvable avec cet email.',
+            });
+        }
+        
+        // Envoi de l'email de vérification
+        await sendVerificationEmail(email, firstName, lastName, verificationToken);
+
+        res.status(200).json({
+            message: 'Email envoyé avec succès',
+        });
+    }catch (error) {
+        console.error('Erreur lors de l\'envoie du mail :', error);
+        res.status(500).json({ message: 'Une erreur interne est survenue.' });
+    }
+};
+
+
 // Fonction pour envoyer le mail de verification quand on crée un compte
 const sendVerificationEmail = async (email, firstName, lastName, verificationToken) => {
     const mailOptions = {

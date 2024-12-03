@@ -314,7 +314,7 @@
                 {{ verificationCodeError }}
               </div>
               <br>
-              <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="editField('email')" class="link">demander un autre e-mail de vérification.</a></small>
+              <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="editField('email')" class="link">renvoyer le code.</a></small>
               <br>
               <v-btn @click="validateVerificationCode" v-if="currentStep === 6" color="primary">Valider</v-btn>
             </div>
@@ -501,6 +501,45 @@ export default {
         return false;
       }
     },
+
+    async sendEmail() {
+      try {
+        // Envoi de la requête POST pour envoyer un nouveau code email
+        const responseEmail = await fetch('https://we-art.onrender.com/api/users/sendEmailCode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+          }),
+        });
+
+        // Log pour le débogage (en cas de besoin)
+        console.log("Statut de la réponse:", responseEmail.status);
+
+        // Extraction des données de la réponse
+        const responseData = await responseEmail.json();
+
+        // Vérification si la requête a échoué
+        if (!responseEmail.ok) {
+          console.error(`Erreur pour l'envoi d'un nouveau mail :`, responseData.message || responseData);
+          throw new Error(`Erreur lors de l'envoi d'un nouveau mail : ${responseData.message || 'Erreur inconnue'}`);
+        }
+
+        // Succès : traitement des données si nécessaire
+        console.log("Réponse réussie :", responseData);
+        return responseData; // Optionnel : si vous souhaitez retourner les données pour un traitement ultérieur
+      } catch (error) {
+        // Gestion des erreurs
+        console.error('Erreur dans sendEmail:', error);
+        throw error;
+      }
+    },
+
+    
     validatePassword(showErrors = false) {
       if (!this.password) {
         this.passwordError = showErrors ? 'Veuillez remplir le champ.' : '';
