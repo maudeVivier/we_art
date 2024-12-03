@@ -12,9 +12,6 @@
                     alt="Map logo"
                   ></v-img>
                 </div>
-
-                <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-
                 <v-form class="formulaire" @submit.prevent="submitLogin">
                   <v-text-field
                     v-model="email"
@@ -30,6 +27,9 @@
                     :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                     @click:append="togglePasswordVisibility"
                   ></v-text-field>
+
+                  <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
                   <div class="pa-5" outlined>
                     <v-btn type="submit" color="primary">
                       Me connecter
@@ -93,17 +93,15 @@ export default {
 
           // Rediriger après succès
           this.$router.push('/profile');
-
-        }else{
-          //Afficher une erreur sur la page
-          console.log("pas connecter car email ou mot de passe incorrect")
-          this.errorMessage = "Email ou mot de passe incorrect.";
         }
       } catch (error) {
         if (error.response) {
           switch (error.response.status) {
             case 400:
               this.errorMessage = 'Veuillez vérifier les informations fournies.';
+              break;
+            case 401:
+              this.errorMessage = 'Email ou mot de passe incorrect.';
               break;
             case 409:
               this.errorMessage = 'Cet email est déjà utilisé. Veuillez en choisir un autre.';
@@ -136,5 +134,10 @@ margin-top: 10%;
 
 .formulaire {
   margin-top: 25%;
+}
+
+.error-message {
+  color: red;
+  /* font-size: 0.7rem; */
 }
 </style>
