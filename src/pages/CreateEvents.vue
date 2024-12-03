@@ -39,22 +39,22 @@
               ></v-textarea>
 
               <!-- Discipline -->
-              <v-text-field
+              <v-select
                 v-model="discipline"
+                :items="disciplines"
                 label="Discipline *"
                 required
                 outlined
-                dense
-              ></v-text-field>
+              ></v-select>
 
               <!-- Niveau -->
-              <v-text-field
+              <v-select
                 v-model="niveau"
+                :items="niveaux"
                 label="Niveau *"
                 required
                 outlined
-                dense
-              ></v-text-field>
+              ></v-select>
 
               <!-- Nombre de participants max -->
               <v-text-field
@@ -213,7 +213,9 @@ export default {
       imageEvent: null,
       name: '',
       discipline: '',
+      disciplines: ['Musique', 'Danse', 'Théatre', 'Peinture', 'Dessin', 'Poterie', 'Arts textiles', 'Photographie', 'Création de bijoux', 'Gravure', 'Sculpture'],
       niveau: '',
+      niveaux: ['Débutant', 'Intermédiaire', 'Professionnel', 'Tous niveaux'],
       prix:0,
       prixLibre: false,
       description: '',
@@ -281,7 +283,7 @@ export default {
         this.errorMessage = 'La date limite d\'inscription ne peut pas être après à la date de fin.';
         return false;
       }
-      if (deadline < startDate) {
+      if (startDate < deadline) {
         this.errorMessage = 'La date limite d\'inscription ne peut pas être avant à la date de début.';
         return false;
       }
