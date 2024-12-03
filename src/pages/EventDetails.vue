@@ -150,8 +150,8 @@ export default {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
-        //const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
+        //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
+        const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
