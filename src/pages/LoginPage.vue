@@ -126,7 +126,7 @@ export default {
 
 <style scoped>
 .logo {
-max-width: 40%;
+max-width: 30%;
 height: 30%;
 width: 70%; 
 display: block;
@@ -135,6 +135,6 @@ margin-top: 10%;
 }
 
 .formulaire {
-  margin-top: 30%;
+  margin-top: 25%;
 }
 </style>
