@@ -12,7 +12,7 @@ router.post('/verify-code', verifyEmail);
 router.get('/users/:userId/events', getUserEvents);
 router.get('/users/:id', getUserById);
 router.get('/users/email/:email', checkEmail);
-router.get('/users/sendEmailCode', resendCode);
+router.post('/users/sendEmailCode', resendCode);
 
 
 module.exports = router;
