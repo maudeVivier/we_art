@@ -314,7 +314,7 @@
                 {{ verificationCodeError }}
               </div>
               <br>
-              <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="editField('email')" class="link">renvoyer le code.</a></small>
+              <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="sendEmail()" class="link">renvoyer le code.</a></small>
               <br>
               <v-btn @click="validateVerificationCode" v-if="currentStep === 6" color="primary">Valider</v-btn>
             </div>
