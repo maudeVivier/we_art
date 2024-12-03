@@ -49,7 +49,7 @@
 
 <script>
 import axios from 'axios'
-import Logo from '@/assets/we_art.png'; // Chemin relatif vers ton logo situé dans le même dossier
+import Logo from '@/assets/we_art.svg'; // Chemin relatif vers ton logo situé dans le même dossier
 import { mapActions } from 'vuex';
 
 export default {
@@ -126,7 +126,7 @@ export default {
 
 <style scoped>
 .logo {
-max-width: 70%;
+max-width: 40%;
 height: 30%;
 width: 70%; 
 display: block;

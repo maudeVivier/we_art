@@ -41,7 +41,7 @@
 
 <script>
 // Importation des images
-import Logo from '@/assets/we_art.png'; // Chemin relatif vers ton logo situé dans le même dossier
+import Logo from '@/assets/we_art.svg'; // Chemin relatif vers ton logo situé dans le même dossier
 
 export default {
   data() {
@@ -55,7 +55,7 @@ export default {
 <style scoped>
   /* Styles personnalisés, adaptés depuis App.css et Connect.css */
   .logo {
-    max-width: 100%; /* Ensure the image is responsive */
+    max-width: 50%; /* Ensure the image is responsive */
     height: auto;    /* Maintain aspect ratio */
     width: 300px;    /* Set a fixed width */
     display: block;  /* Ensure it behaves like a block element */
