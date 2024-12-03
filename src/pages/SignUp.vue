@@ -313,6 +313,10 @@
               <div v-if="verificationCodeError" class="error-message">
                 {{ verificationCodeError }}
               </div>
+
+              <div v-if="successResendMail" class="error-message">
+                {{ successResendMail }}
+              </div>
               <br>
               <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="sendEmail()" class="link">renvoyer le code.</a></small>
               <br>
@@ -368,6 +372,7 @@ export default {
       phoneNumberError: '',
       dialog: false, // Pour le popup de confirmation
       successMessage: '', // Pour le message de succès
+      successResendMail:'',
       errorMessage: '', // Pour le message d'erreur
       verificationCode: ['', '', '', ''], // Code de vérification à 4 chiffres
       verificationCodeError: '', // Erreur de code de vérification
@@ -517,8 +522,6 @@ export default {
           }),
         });
 
-        // Log pour le débogage (en cas de besoin)
-        console.log("Statut de la réponse:", responseEmail.status);
 
         // Extraction des données de la réponse
         const responseData = await responseEmail.json();
@@ -530,8 +533,7 @@ export default {
         }
 
         // Succès : traitement des données si nécessaire
-        console.log("Réponse réussie :", responseData);
-        return responseData; // Optionnel : si vous souhaitez retourner les données pour un traitement ultérieur
+        this.successResendMail = responseData.message;
       } catch (error) {
         // Gestion des erreurs
         console.error('Erreur dans sendEmail:', error);
