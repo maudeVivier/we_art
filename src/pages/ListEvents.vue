@@ -98,8 +98,6 @@
             </v-card>
           </v-col>
         </v-row>
-        <v-row>
-      </v-row>
 
         <!-- Loading Spinner -->
         <v-col v-if="loading" cols="12" class="text-center">

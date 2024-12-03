@@ -2,6 +2,113 @@
   <v-app>
     <v-main>
       <v-container>
+        <!-- Titre de l'événement et bouton retour -->
+        <v-row class="my-1 ml-1 align-center justify-space-between">
+          <v-btn @click="goBack" icon class="mr-2">
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
+          <p class="event-title">{{ event.name }}</p>
+          <v-btn @click="shareEvent" icon class="mr-2">
+            <v-icon>mdi-share-variant</v-icon>
+          </v-btn>
+        </v-row>
+
+        <!-- Image de l'événement -->
+        <v-row class="event-info">
+          <v-col cols="12" class="text-center">
+            <v-img :src="event.image_event_url" alt="Image de l'événement" class="event-image"></v-img>
+          </v-col>
+        </v-row>
+
+        <!-- Date et Heure -->
+        <v-row class="event-info">
+          <v-col>
+            <v-icon color="primary" class="mr-1">mdi-calendar-blank-outline</v-icon>
+            {{ formatDate(event.start_date) }}
+          </v-col>
+          <v-col>
+            <v-icon color="primary" class="mr-1">mdi-clock-time-three-outline</v-icon>
+            {{ formatTime(event.start_date) }}
+          </v-col>
+        </v-row>
+
+        <!-- Adresse -->
+        <v-row class="event-info">
+          <v-col>
+            <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+            {{ event.street }}, {{ event.city }}
+          </v-col>
+        </v-row>
+
+        <v-row class="justify-space-between">
+          <!-- Prix -->
+          <v-col :class="[
+              event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
+              'price-container'
+            ]">
+            <v-icon class="mr-2">mdi-currency-eur</v-icon>
+            {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+          </v-col>
+
+            <!-- Bouton d'inscription/désinscription -->
+            <template v-if="alreadyParticipating && event.is_start_date_passed">
+              <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
+            </template>
+            <template v-else>
+              <template v-if="event.is_deadline_valid && event.is_participant_limit_valid">
+                <v-btn color="primary" @click="participateEvent">S'inscrire</v-btn>
+              </template>
+              <template v-else-if="!event.is_deadline_valid">
+                <p class="text-info">Il est trop tard pour s'inscrire à cet événement.</p>
+              </template>
+              <template v-else-if="!event.is_participant_limit_valid">
+                <p class="text-info">Le nombre maximal de participants a été atteint.</p>
+              </template>
+            </template>
+        </v-row>
+
+        <v-row><br></v-row>
+
+        <!-- Description -->
+        <v-row class="event-info">
+          <v-col>
+            <p style="font-size:20px; margin-bottom: 3px">Détails :</p>
+            {{ event.description }}
+          </v-col>
+        </v-row>
+
+        <!-- Participants -->
+        <v-row>
+          <v-col>
+            <p style="font-size:20px; margin-bottom: 3px">Participants :</p>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <!-- Snackbar pour le message d'inscription à l'evenement -->
+      <v-snackbar v-model="successMessageParticipe" timeout="3000">
+        Nous avons bien enregistré votre participation pour cet évènement!
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="successMessageParticipe = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
+
+      <!-- Snackbar pour le message de descinscription à l'evenement -->
+      <v-snackbar v-model="successMessageDesinscire" timeout="3000">
+        Nous avons bien enregistré votre désinsciption pour cet évènement!
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="successMessageDesinscire = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
+
+      <!-- Snackbar pour le message de copie du lien -->
+      <v-snackbar v-model="shareSuccessMessage" timeout="3000">
+        Lien copié dans le presse-papier !
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="shareSuccessMessage = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
+
         <!-- Loading Spinner -->
         <v-col v-if="loading" cols="12" class="text-center">
           <v-progress-circular
@@ -11,110 +118,6 @@
           ></v-progress-circular>
           <p>Chargement des événements...</p>
         </v-col>
-
-        <v-card v-else class="event-card">
-          <v-row>
-            <!-- Titre de l'événement -->
-            <v-col cols="12">
-              <v-card-title class="title-left">
-                <h1>{{ event.name }}</h1>
-              </v-card-title>
-            </v-col>
-
-            <!-- Image de l'événement -->
-            <v-col cols="12">
-              <v-img
-                :src="event.image_event_url || photo_default"
-                alt="Image de l'événement"
-                class="event-image"
-                contain
-              ></v-img>
-            </v-col>
-
-            <!-- Date et Heure -->
-            <v-col cols="12" class="event-details">
-              <v-row justify="space-between">
-                <v-col cols="auto" class="date-time">
-                  <v-icon color="primary" class="mr-1">mdi-calendar-blank-outline</v-icon>
-                  {{ formatDate(event.start_date) }}
-                  <span v-if="event.end_date">
-                    <v-icon color="primary" class="ml-4 mr-1">mdi-clock-time-three-outline</v-icon>
-                    {{ formatTime(event.end_date) }}
-                  </span>
-                </v-col>
-              </v-row>
-            </v-col>
-
-            <!-- Lieu et bouton pour participer -->
-            <v-col cols="12" class="event-details">
-              <v-row justify="space-between">
-                <v-col cols="auto">
-                  <v-icon color="primary" class="mr-1">mdi-map-marker-outline</v-icon>
-                  {{ event.street }}, {{ event.city }}, {{ event.country }}
-                </v-col>
-
-                <template v-if="alreadyParticipating && event.is_start_date_passed">
-                    <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
-                </template>
-                <template v-else>
-                  <template v-if="event.is_deadline_valid && event.is_participant_limit_valid">
-                    <v-btn color="primary" @click="participateEvent">S'inscrire</v-btn>
-                  </template>
-                  <template v-else-if="!event.is_deadline_valid">
-                    <p class="text-info">Il est trop tard pour s'inscrire à cet événement.</p>
-                  </template>
-                  <template v-else-if="!event.is_participant_limit_valid">
-                    <p class="text-info">Le nombre maximal de participants a été atteint.</p>
-                  </template>
-                </template>
-              </v-row>
-            </v-col>
-
-            <!-- Détails de l'événement -->
-            <v-col cols="12">
-              <v-card-text>
-                <p class="description">
-                  <strong>Détails :</strong> <br />
-                  {{ event.description }}
-                </p>
-              </v-card-text>
-            </v-col>
-          </v-row>
-
-          <v-btn color="info" @click="shareEvent">
-            <v-icon left>mdi-share-variant</v-icon>
-            Partager l'événement
-          </v-btn>
-          <v-snackbar v-model="shareSuccessMessage" timeout="3000">
-            Lien copié dans le presse-papier !
-            <template v-slot:action="{ attrs }">
-              <v-btn text v-bind="attrs" @click="shareSuccessMessage = false">Fermer</v-btn>
-            </template>
-          </v-snackbar>
-
-        </v-card>
-      </v-container>
-
-      
-      <!-- Bouton pour retourner à la liste des événements -->
-      <v-card-actions>
-        <v-btn color="primary" @click="goBack">Retour à la liste</v-btn>
-      </v-card-actions>
-
-      <!-- Snackbar pour le message de succès -->
-      <v-snackbar v-model="successMessageParticipe" timeout="3000">
-        Nous avons bien enregistré votre participation pour cet évènement!
-        <template v-slot:action="{ attrs }">
-          <v-btn text v-bind="attrs" @click="successMessageParticipe = false">Fermer</v-btn>
-        </template>
-      </v-snackbar>
-
-      <v-snackbar v-model="successMessageDesinscire" timeout="3000">
-        Nous avons bien enregistré votre désinsciption pour cet évènement!
-        <template v-slot:action="{ attrs }">
-          <v-btn text v-bind="attrs" @click="successMessageDesinscire = false">Fermer</v-btn>
-        </template>
-      </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -147,8 +150,8 @@ export default {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        // const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
-        const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
+        const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
+        //const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
@@ -261,7 +264,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .event-card {
   margin-top: 20px;
   padding: 20px;
@@ -299,5 +302,56 @@ export default {
 .text-info {
   color: rgb(120, 189, 68);
   font-weight: bold;
+}
+</style> -->
+
+<style scoped>
+.event-title {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.col {
+  padding: 8px;
+}
+
+.event-info {
+  font-size: 14px !important;
+}
+
+.event-image {
+  max-width: 100%;
+  max-height: 300px;
+  display: flex;
+  object-fit: contain !important;
+  border-radius: 8px;
+  border: 2px solid #b0b0b0;
+}
+
+.price-container {
+  padding: 2px 4px; 
+  border-radius: 8px;
+  display: inline-flex;
+  max-width: fit-content;
+  align-items: center;
+}
+
+.free-price {
+  color: white;
+  font-weight: bold;
+  border: 2px solid;
+  background-color: rgb(185, 184, 184); /* Gris */
+}
+
+.paid-price {
+  color: white;
+  border: 2px solid;
+  background-color: rgb(151, 210, 151); /* Vert */
+}
+
+.free-choice-price {
+  color: white;
+  border: 2px solid;
+  background-color: rgb(143, 170, 143); /* Gris-vert */
 }
 </style>
