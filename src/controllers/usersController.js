@@ -57,6 +57,15 @@ const transporter = nodemailer.createTransport({
  *                   email:
  *                     type: string
  *                     example: "john.doe@example.com"
+ *                   ville:
+ *                      type: string
+ *                      example: "Lyon"
+ *                   code_postal:
+ *                      type: integer
+ *                      example: 69000
+ *                   pays:
+ *                      type: string
+ *                      example: "France"
  *                   type:
  *                      type: string
  *                      enum: [Organizer, Participant]
@@ -64,7 +73,7 @@ const transporter = nodemailer.createTransport({
  */
 exports.getUsers = async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, firstname, lastname, birthday, sex, phone, email, type FROM users');
+        const result = await pool.query('SELECT id, firstname, lastname, birthday, sex, phone, email, type, ville, pays FROM users');
         res.json(result.rows);
     } catch (err) {
         console.error('Erreur lors de la récupération des utilisateurs:', err);
@@ -121,6 +130,29 @@ exports.getUsers = async (req, res) => {
  *                   type: string
  *                   enum: [Organizer, Participant]
  *                   example: "Organizer"
+ *                 image_url:
+ *                   type: string
+ *                   example: "https://example.com/images/john_doe.jpg"
+ *                 is_verified:
+ *                   type: boolean
+ *                   example: true
+ *                 ville:
+ *                   type: string
+ *                   example: "Lyon"
+ *                 pays:
+ *                   type: string
+ *                   example: "France"
+ *                 latitude:
+ *                   type: number
+ *                   format: float
+ *                   example: 45.764043
+ *                 longitude:
+ *                   type: number
+ *                   format: float
+ *                   example: 4.835659
+ *                 a_propos:
+ *                   type: string
+ *                     example: "Artiste peintre passionné par l'abstrait, exposant régulièrement dans des galeries internationales."
  *       404:
  *         description: Utilisateur non trouvé
  *       500:
@@ -130,7 +162,7 @@ exports.getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10); // Conversion de l'identifiant en entier
     try {
         const result = await pool.query(
-            'SELECT id, firstname, lastname, birthday, sex, phone, email, type, image_user, is_verified FROM users WHERE id = $1',
+            'SELECT id, firstname, lastname, birthday, sex, phone, email, type, image_user, is_verified, ville, pays, latitude, longitude, a_propos FROM users WHERE id = $1',
             [userId]
         );
         
@@ -256,11 +288,11 @@ exports.getUserById = async (req, res) => {
  *                   example: "Une erreur interne est survenue."
  */
 exports.createUser = async (req, res) => {
-    const { firstName, lastName, email, password, birthday, sex, type, phone, image_url } = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstName, lastName, email, password, birthday, sex, type, phone, image_url, ville, code_postal, pays, latitude, longitude, a_propos} = req.body;  // Modifications pour correspondre aux colonnes
     const bcrypt = require('bcrypt');
     const saltRounds = 10;
     const hash = bcrypt.hashSync(password, saltRounds);
-    console.log('post : ' + firstName + ' ' + lastName + ' ' + email + ' ' + type + ' '  + hash);
+
     let sexEnglish = "";
     switch (sex) {
         case "Homme":
@@ -297,10 +329,10 @@ exports.createUser = async (req, res) => {
         // Insertion dans la base de données
         const result = await pool.query(
             `INSERT INTO users 
-            (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified, image_user) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+            (firstName, lastName, email, password, birthday, sex, type, phone, verification_token, is_verified, image_user, ville, code_postal, pays, latitude, longitude, a_propos) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) 
             RETURNING *`,
-            [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone, verificationToken, false, image_url]
+            [firstName, lastName, email, hash, birthday, sexEnglish, typeEnglish, phone, verificationToken, false, image_url, ville, parseInt(code_postal), pays, parseFloat(latitude), parseFloat(longitude), a_propos]
         );
 
         const newUser = result.rows[0];

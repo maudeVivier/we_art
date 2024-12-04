@@ -49,19 +49,20 @@
           </v-col>
           <v-col cols="auto" class="d-flex align-center">
             <v-icon class="mr-2">mdi-map-marker-outline</v-icon>
-            <span>Lyon, France</span>
+            <span>{{ user.ville }}, {{ user.pays }}</span>
           </v-col>
         </v-row>
 
         <v-row class="profile-propos">
           <v-col>
-            <p style="font-size:20px; margin-bottom: 3px; color: #F2992C;">A propos</p>
+            <p style="font-size:26px; margin-bottom: 3px; color: #F2992C;">A propos</p>
+            {{ user.a_propos }}
           </v-col>
         </v-row>
 
         <v-row class="profile-interet">
           <v-col>
-            <p color="primary" style="font-size:20px; margin-bottom: 3px; color: #F2992C;">Interêts</p>
+            <p color="primary" style="font-size:26px; margin-bottom: 3px; color: #F2992C;">Interêts</p>
           </v-col>
         </v-row>
 

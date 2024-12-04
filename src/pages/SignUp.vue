@@ -219,8 +219,8 @@
                 required
               >
               <br>
-                <v-radio label="Amateur (je veux participer à des ateliers)" value="participant"></v-radio>
-                <v-radio label="Pro (je veux créer et participer à des ateliers)" value="organisateur"></v-radio>
+                <v-radio label="Amateur (je veux participer à des ateliers)" value="Participant"></v-radio>
+                <v-radio label="Pro (je veux créer et participer à des ateliers)" value="Organisateur"></v-radio>
               </v-radio-group>
             </div>
 
@@ -316,7 +316,7 @@
                     <v-list-item-content>
                       <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-weight: bold;">Date de naissance:</span>
-                        <span>{{ birthDate }}</span>
+                        <span>{{ formatDate(birthDate) }}</span>
                         <v-btn icon @click="editField('birthDate')" class="icon-pencil">
                           <v-icon >mdi-pencil</v-icon>
                         </v-btn>
@@ -497,18 +497,18 @@ export default {
       loading: false,
       currentStep: 1,
       steps: 7,
-      name: '',
-      firstName: '',
+      name: 'lisa',
+      firstName: 'vivier',
       imageUser: null,
-      email: '',
-      password: '',
+      email: 'maudevivier42@gmail.com',
+      password: 'Maude1234?',
       showPassword: false,
-      passwordConfirm: '', // Nouvel état pour la confirmation du mot de passe
-      birthDate: '',
-      userType: '',
-      gender: '',
+      passwordConfirm: 'Maude1234?', // Nouvel état pour la confirmation du mot de passe
+      birthDate: '2000-10-10',
+      userType: 'Organisateur',
+      gender: 'Femme',
       genders: ['Homme', 'Femme', 'Non binaire', "Ne se prononce pas"],
-      phoneNumber: '',
+      phoneNumber: '0654345678',
       ville: '',
       codePostal: '',
       pays: '',
@@ -574,6 +574,11 @@ export default {
           nextInput.focus();
         }
       }
+    },
+    formatDate(date) {
+    if (!date) return '';
+      const [year, month, day] = date.split('-');
+      return `${day}/${month}/${year}`;
     },
     async nextStep() {
       if (await this.validateCurrentStep()) {
@@ -685,8 +690,8 @@ export default {
       
       // Vérification dans la base de données si l'email n'est pas déjà utilisé
       try {
-        const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
-        //const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
+        //const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
+        const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
         if (response.data.exists) {
           this.emailError = `Cet email est déjà utilisé.`;
           this.errorEmailExist = true;
@@ -825,7 +830,6 @@ export default {
           }),
         });
 
-
         // Extraction des données de la réponse
         const responseData = await responseEmail.json();
 
@@ -903,9 +907,8 @@ export default {
           `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
           formData
         );*/
-        console.log("ici requete");
-        const response = await axios.post(`http://localhost:3000/api/users`, {
-        //const response = await axios.post('https://we-art.onrender.com/api/users', {
+        //const response = await axios.post(`http://localhost:3000/api/users`, {
+        const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
           email: this.email,
@@ -916,6 +919,12 @@ export default {
           type: this.userType,
           image_url: null,
           //image_url: response_image.data.secure_url,
+          ville: this.ville,
+          code_postal: this.codePostal,
+          pays: this.pays,
+          latitude: this.latitude,
+          longitude: this.longitude,
+          a_propos: this.aPropos,
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
 
