@@ -65,7 +65,7 @@
                 <v-btn color="primary" @click="addListeEvent">Recevoir une alerte<br>place libéré</v-btn>
               </template>
               <template v-else>
-                <v-btn color="red" @click="unregisterFromEvent">Ne plus être notifié</v-btn>
+                <v-btn color="red" @click="unlistWaitFromEvent">Ne plus être notifié</v-btn>
               </template>
             </template>
         </v-row>
@@ -119,6 +119,16 @@
         </template>
       </v-snackbar>
 
+
+       <!-- Snackbar pour le message de descinscription à la liste d'attente de l'evenement -->
+       <v-snackbar v-model="successMessageDesinscireListWait" timeout="3000">
+        Vous ne recevrez pas de notification de désistement pour cet évènement!
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="successMessageDesinscireListWait = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
+
+      
       <!-- Snackbar pour le message de copie du lien -->
       <v-snackbar v-model="shareSuccessMessage" timeout="3000">
         Lien copié dans le presse-papier !
@@ -163,6 +173,7 @@ export default {
       shareSuccessMessage: false,
       successMessageListeEvent: false,
       alreadyListeEvent: false,
+      successMessageDesinscireListWait:false,
     };
   },
   mounted() {
@@ -251,6 +262,24 @@ export default {
         } 
       }
       else{ // si non connecte, on redirige vers la page pour se connecter
+        this.$router.push('/login');
+      }
+    },
+
+    async unlistWaitFromEvent() { // fonction pour se desincrire de la liste d'attente d'un evenement
+      if(this.userConnected){ // utilisateur connecté
+          try {
+            //const response = await axios.delete(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+            const response = await axios.delete(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+
+            console.log('utilisateur supprimer a l evenement :', response.data);
+            this.successMessageDesinscireListWait = true; // Affiche le message de succès
+            this.alreadyListeEvent = false;
+          } catch (error) {
+            console.error('Erreur lors de la suppression de l\'utilisateur à l\'évènement', error);
+            this.successMessageDesinscireListWait = false; // Affiche le message de succès
+          } 
+      }else{ // si non connecte, on redirige vers la page pour se connecter
         this.$router.push('/login');
       }
     },
