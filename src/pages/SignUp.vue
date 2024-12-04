@@ -22,102 +22,109 @@
       </v-card>
     </v-dialog>
 
-    <div class="row-container">
-        <a 
+    <v-container>
+      <v-row class="my-1 row-container">
+        <v-btn
+          icon
+          class="mr-2"
           @click.prevent="prevStep" 
-          v-if="currentStep !== 6" 
-          :class="{ 'disabled-link': currentStep === 1 || currentStep === 6 }"
-        >
-            <v-icon>mdi-arrow-left</v-icon>
-        </a>
-        <span class="centered-text">
-          <b>Inscription</b>
-        </span>
-      </div>
-    <v-main class="vertical-center">
-          <v-card-text>
-      <div>
+          :class="{ 'disabled-link': currentStep === 1 || currentStep === 7 }"
+        > 
+        <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
+
+        <!-- Bouton qui permet de mettre inscription au milieu -->
+        <v-btn v-if="currentStep === 1"
+          icon
+          class="mr-2"
+        > 
+        </v-btn>
+        <h2 v-if="currentStep < 6">Inscription</h2>
+        <h2 v-if="currentStep === 6">Récapitulatif</h2>        
+
+        <!-- Bouton qui permet de mettre inscription au milieu -->
+        <v-btn
+          icon
+          class="mr-2"
+        > 
+        </v-btn>
+      </v-row>
+
+      <v-main class="vertical-center">
+        <v-card-text>
+          <div >
             <!-- Affichage du formulaire en fonction de l'étape -->
             <div v-if="currentStep === 1">
+              <v-img
+                :src="logo"
+                alt="Logo"
+                class="ma-5 mx-auto"
+                style=" width: 40%; height:100%; object-fit: cover;"
+              ></v-img>
+
+              <v-text-field 
+                v-model="firstName" 
+                label="Prénom *" 
+                required
+                outlined
+                :error-messages="firstNameError"
+                @blur="validateFirstName"
+              ></v-text-field>
+
               <v-text-field 
                 v-model="name" 
                 label="Nom *"
                 required 
+                outlined
                 :error-messages="nameError"
                 @blur="validateName"
               ></v-text-field>
-              <v-text-field 
-                v-model="firstName" 
-                label="Prénom *" 
-                required 
-                :error-messages="firstNameError"
-                @blur="validateFirstName"
-              ></v-text-field>
-              <v-file-input
-                v-model="imageUser"
-                label="Ajouter une photo *"
-                accept="image/*"
-                outlined
-                dense
-                required
-                @change="onFileChange"
-                :error-messages="imageError"
-                @blur="validateImage"
-              ></v-file-input>
-            </div>
-  
-            <div v-if="currentStep === 2">
+
               <v-text-field 
                 v-model="birthDate" 
                 label="Date de naissance *" 
-                required 
+                required
+                outlined
                 type="date"
                 :error-messages="birthDateError"
                 @blur="validateBirthDate"
               ></v-text-field>
+
               <v-select
                 v-model="gender"
                 :items="genders"
-                label="Sexe *"
+                label="Genre *"
                 required
+                outlined
                 :error-messages="genderError"
                 @blur="validateGender"
               ></v-select>
             </div>
-  
-            <div v-if="currentStep === 3">
+
+            <div v-if="currentStep === 2">
+              <v-img
+                :src="logo"
+                alt="Logo"
+                class="ma-5 mx-auto"
+                style=" width: 40%; height:100%; object-fit: cover;"
+              ></v-img>
+
               <v-text-field 
                 v-model="email" 
                 label="Email *" 
                 required 
+                outlined
                 type="email"
                 :error="errorEmailExist"
                 @blur="validateEmail"
-              > 
-            </v-text-field>
-            <div v-if="errorEmailExist" class="custom-error-message v-messages theme--light error--text">    <div class="v-messages__message">
-                Cet email est déjà utilisé.
-                <router-link to="/login" style="color: blue; text-decoration: underline;">Se connecter</router-link>
+              /> 
+            
+              <div v-if="errorEmailExist" class="custom-error-message v-messages theme--light error--text">    <div class="v-messages__message">
+                  Cet email est déjà utilisé.
+                  <router-link to="/login" style="color: blue; text-decoration: underline;">Se connecter</router-link>
+                </div>
               </div>
-            </div>
-              <v-select
-                v-model="userType"
-                :items="userTypes"
-                label="Type d'utilisateur *"
-                required
-                :error-messages="userTypeError"
-                @blur="validateUserType"
-              ></v-select>
-              <v-text-field 
-                v-model="phoneNumber" 
-                label="Numéro de téléphone *" 
-                required
-                :error-messages="phoneNumberError"
-                @blur="validatePhoneNumber"
-              ></v-text-field>
-            </div>
 
-            <div v-if="currentStep === 4">
               <!-- Champ du mot de passe -->
               <v-text-field 
                 v-model="password"
@@ -126,7 +133,7 @@
                 :type="showPassword ? 'text' : 'password'"
                 :error-messages="passwordError"
                 @input="checkPasswordStrength"
-              ></v-text-field>
+              />
 
               <!-- Indicateur de force du mot de passe -->
               <v-progress-linear 
@@ -134,7 +141,7 @@
                 :color="strengthColor"
                 height="8"
                 class="mb-3"
-              ></v-progress-linear>
+              />
               <div>{{ strengthText }}</div>
 
               <!-- Champ de confirmation du mot de passe -->
@@ -144,134 +151,279 @@
                 required 
                 :type="showPassword ? 'text' : 'password'"
                 :error-messages="passwordConfirmError"
-              ></v-text-field>
-               <!-- Case à cocher pour afficher le mot de passe -->
-               <v-checkbox
+              />
+                <!-- Case à cocher pour afficher le mot de passe -->
+                <v-checkbox
                 v-model="showPassword"
                 label="Afficher le mot de passe"
                 class="mt-3"
-              ></v-checkbox>
+              />
             </div>
 
-            <div v-if="currentStep === 5">
-              <v-card class="pa-4">
-                <v-card-title>
-                  <h2>Récapitulatif des informations :</h2>
-                </v-card-title>
-                <v-card-text>
-                  <v-list>
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Modifier photo de profil</span>
-                          <v-btn icon @click="editField('photo')" class="icon-pencil">
-                            <v-icon>mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
+            <div v-if="currentStep === 3">
+              <v-img
+                :src="logo"
+                alt="Logo"
+                class="ma-5 mx-auto"
+                style=" width: 40%; height:100%; object-fit: cover;"
+              ></v-img>
 
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Nom:</span>
-                          <span>{{ name }}</span>
-                          <v-btn icon @click="editField('name')" class="icon-pencil">
-                            <v-icon>mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
+              <v-autocomplete
+                v-model="ville"
+                label="Ville *"
+                :items="suggestedVilles"
+                @update:search-input="fetchPostalCodes"
+                outlined
+                required
+                :error-messages="villeError"
+                @blur="validateVille"
+              />
 
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Prénom:</span>
-                          <span>{{ firstName }}</span>
-                          <v-btn icon @click="editField('firstName')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
+              <v-text-field
+                v-model="codePostal"
+                label="Code Postal"
+                outlined
+                disabled
+              />
 
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Email:</span>
-                          <span>{{ email }}</span>
-                          <v-btn icon @click="editField('email')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
+              <v-text-field 
+                v-model="pays" 
+                label="Pays" 
+                disabled                
+                outlined
+              />
 
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Mot de passe:</span>
-                          <span>**********</span>
-                          <v-btn icon @click="editField('password')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Date de naissance:</span>
-                          <span>{{ birthDate }}</span>
-                          <v-btn icon @click="editField('birthDate')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Type:</span>
-                          <span>{{ userType }}</span>
-                          <v-btn icon @click="editField('userType')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Sexe:</span>
-                          <span>{{ gender }}</span>
-                          <v-btn icon @click="editField('gender')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
-
-                    <v-list-item>
-                      <v-list-item-content>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                          <span style="font-weight: bold;">Numéro de téléphone:</span>
-                          <span>{{ phoneNumber }}</span>
-                          <v-btn icon @click="editField('phoneNumber')" class="icon-pencil">
-                            <v-icon >mdi-pencil</v-icon>
-                          </v-btn>
-                        </div>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                </v-card-text>
-              </v-card>
+              <v-text-field 
+                v-model="phoneNumber" 
+                label="Numéro de téléphone *" 
+                required
+                outlined
+                :error-messages="phoneNumberError"
+                @blur="validatePhoneNumber"
+              />
             </div>
 
-            <div v-if="currentStep === 6" style="text-align: center;">
+            <div v-if="currentStep === 4">
+              <v-img
+                :src="logo"
+                alt="Logo"
+                class="ma-5 mx-auto"
+                style=" width: 40%; height:100%; object-fit: cover;"
+              ></v-img>
+
+              <h2 class="text-center">Je suis ...</h2>
+              <v-radio-group
+                v-model="userType"
+                :error-messages="userTypeError"
+                @blur="validateUserType"
+                required
+              >
+              <br>
+                <v-radio label="Amateur (je veux participer à des ateliers)" value="participant"></v-radio>
+                <v-radio label="Pro (je veux créer et participer à des ateliers)" value="organisateur"></v-radio>
+              </v-radio-group>
+            </div>
+
+            <div v-if="currentStep === 5" style="text-align: center;">
+              <v-img
+                v-if="imageUser"
+                :src="imageUser"
+                alt="Photo"
+                class="rounded-circle"
+                style="width: 150px; height: 150px; object-fit: cover; margin: auto;"
+              ></v-img>
+
+              <!-- Image vierge si aucune image n'est ajoutée -->
+              <v-img
+                v-else
+                :src="photo_default"
+                alt="Photo vierge"
+                max-width="100%"
+                max-height="100%"
+                class="rounded-circle"
+                style="width: 150px; height: 150px; object-fit: cover; margin: auto;"
+                @click="triggerFileInput"
+              ></v-img>
+
+              <!-- Bouton pour ouvrir le sélecteur d'image -->
+              <v-btn
+                icon
+                class="bottom-2 right-2"
+                @click="triggerFileInput"
+                :error-messages="imageError"
+                @blur="validateImage"
+              >
+                <v-icon>mdi-camera</v-icon>
+              </v-btn>
+
+              <!-- Input caché pour sélectionner une image -->
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/*"
+                style="display: none;"
+                required
+                @change="onFileChange"
+              />
+              <br>
+              <v-text v-if="imageError" class="error-message">
+                {{ imageError }}
+              </v-text>
+              <p style="font-size: 1.2rem;">Ajouter photo</p>
+              
+              <v-textarea 
+                v-model="aPropos" 
+                label="Description *" 
+                required 
+                outlined
+                auto-grow
+                rows="3"
+                style="resize: both; min-height: 100px;"
+                :error-messages="aProposError"
+                @blur="validateAPropos"
+              />
+              <br>
+            </div>
+
+            <div v-if="currentStep === 6">
+              <v-card-text>
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Nom:</span>
+                        <span>{{ name }}</span>
+                        <v-btn icon @click="editField('name')" class="icon-pencil">
+                          <v-icon>mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Prénom:</span>
+                        <span>{{ firstName }}</span>
+                        <v-btn icon @click="editField('firstName')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Date de naissance:</span>
+                        <span>{{ birthDate }}</span>
+                        <v-btn icon @click="editField('birthDate')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Genre:</span>
+                        <span>{{ gender }}</span>
+                        <v-btn icon @click="editField('gender')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Email:</span>
+                        <span>{{ email }}</span>
+                        <v-btn icon @click="editField('email')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Mot de passe:</span>
+                        <span>**********</span>
+                        <v-btn icon @click="editField('password')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Numéro de téléphone:</span>
+                        <span>{{ phoneNumber }}</span>
+                        <v-btn icon @click="editField('phoneNumber')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Type:</span>
+                        <span>{{ userType }}</span>
+                        <v-btn icon @click="editField('userType')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Ville:</span>
+                        <span>{{ ville }}</span>
+                        <v-btn icon @click="editField('ville')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Modifier ma description</span>
+                        <v-btn icon @click="editField('aPropos')" class="icon-pencil">
+                          <v-icon >mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Modifier photo de profil</span>
+                        <v-btn icon @click="editField('photo')" class="icon-pencil">
+                          <v-icon>mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+
+                </v-list>
+              </v-card-text>
+            </div>
+
+            <div v-if="currentStep === 7" style="text-align: center;">
               <br><h2>C'est bientôt fini !</h2><br>
               <p>Veuillez vérifier votre boîte de réception. Nous venons d'envoyer un message à l'adresse <strong>{{ this.email }}</strong> pour vérifier votre adresse e-mail. Vous devez insérer le code à 4 chiffres de cet e-mail pour terminer l'inscription.</p>
               <br>
@@ -320,17 +472,17 @@
               <br>
               <small>Vous n'avez pas reçu d'email ? Essayez de vérifier votre dossier spam ou social. Si vous ne recevez pas le message dans l'heure qui suit, vous pouvez <a @click="sendEmail()" class="link">renvoyer le code.</a></small>
               <br>
-              <v-btn @click="validateVerificationCode" v-if="currentStep === 6" color="primary">Valider</v-btn>
+              <v-btn @click="validateVerificationCode" v-if="currentStep === 7" color="primary">Valider</v-btn>
             </div>
-        
-      <div style="text-align: center;">
-        <v-btn   @click="nextStep()" v-if="currentStep !== 6" color="primary">Suivant</v-btn>
-      </div>
-    </div>
-   
-      
-    </v-card-text>
-    </v-main>
+          
+            <div style="text-align: center;">
+              <v-btn @click="nextStep()" v-if="currentStep === 6" color="primary">Confirmer</v-btn>
+              <v-btn @click="nextStep()" v-if="currentStep < 6" color="primary">Suivant</v-btn>
+            </div>
+          </div>
+        </v-card-text>
+      </v-main>
+  </v-container>
   </v-app>
 </template>
 
@@ -340,9 +492,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      logo: require('@/assets/we_art.svg'),
+      photo_default: require('@/assets/image_vierge.svg'),
       loading: false,
       currentStep: 1,
-      steps: ['Informations personnelles', 'Informations de contact', 'Informations de connexion', 'Confirmation du mot de passe', 'Récapitulatif', 'Vérification de l\'email'],
+      steps: 7,
       name: '',
       firstName: '',
       imageUser: null,
@@ -352,17 +506,25 @@ export default {
       passwordConfirm: '', // Nouvel état pour la confirmation du mot de passe
       birthDate: '',
       userType: '',
-      userTypes: ['Organisateur', 'Participant'],
       gender: '',
       genders: ['Homme', 'Femme', 'Non binaire', "Ne se prononce pas"],
       phoneNumber: '',
+      ville: '',
+      codePostal: '',
+      pays: '',
+      latitude: '',
+      longitude: '',
+      suggestedVilles: [],
+      aPropos: '',
       // Erreurs de validation
       nameError: '',
       firstNameError: '',
       imageError: '',
       emailError: '',
+      villeError: '',
+      aProposError: '',
       passwordError: '',
-      passwordConfirmError: '', // Erreur de confirmation du mot de passe
+      passwordConfirmError: '',
       passwordStrength: 0, // Force du mot de passe en pourcentage
       strengthText: '', // Texte indiquant la force
       strengthColor: 'red', // Couleur de la barre de force
@@ -381,8 +543,27 @@ export default {
   },
   
   methods: {
+    handleAction() {
+      if (this.successMessage) {
+        this.$router.push('/login'); // Rediriger vers la page de connexion en cas de succès
+      } else {
+        this.closeDialog(); // Fermer simplement la boîte de dialogue en cas d'erreur
+      }
+    },
+    triggerFileInput() { // Méthode pour déclencher le clic sur l'input de type file
+      this.$refs.fileInput.click();  // Simule un clic sur l'élément input caché
+    },
     onFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.imageUser = reader.result;  // Assigne l'image sélectionnée à imageUser
+        };
+        reader.readAsDataURL(file);
+      }
       this.imageUser = event.target.files[0];
+      this.validateImage();
     },
     focusNext(index) {
       // Check if the current input is filled and if there is a next input to focus
@@ -396,40 +577,9 @@ export default {
     },
     async nextStep() {
       if (await this.validateCurrentStep()) {
-        if (this.currentStep < this.steps.length) {
+        if (this.currentStep < this.steps) {
           this.currentStep++;
         }
-      }
-    },
-    handleAction() {
-      if (this.successMessage) {
-        this.$router.push('/login'); // Rediriger vers la page de connexion en cas de succès
-      } else {
-        this.closeDialog(); // Fermer simplement la boîte de dialogue en cas d'erreur
-      }
-    },
-    async validateCurrentStep() {
-      switch (this.currentStep) {
-        case 1:
-          return this.validateName() && this.validateFirstName() && this.validateImage();
-        case 2:
-          return this.validateBirthDate() && this.validateGender();
-        case 3:
-          return await this.validateEmail() && this.validateUserType()  && this.validatePhoneNumber();
-        case 4:{
-          // Appel de validatePassword() et validatePasswordConfirm() avec `showErrors = true` pour afficher les messages
-          const isPasswordValid = this.validatePassword(true);
-          const isPasswordConfirmValid = this.validatePasswordConfirm();
-          return isPasswordValid && isPasswordConfirmValid;
-        }
-        case 5:
-          this.currentStep = 6;
-          return this.createUser(); // Création d'un utilisateur, une fois toutes ses informations verifiées
-        case 6:
-          // Puis verification du code pour valider le compte
-          return this.validateVerificationCode();
-        default:
-          return true;
       }
     },
     editField(fieldName) {
@@ -437,21 +587,50 @@ export default {
       switch (fieldName) {
         case 'name':
         case 'firstName':
-        case 'photo':
-          this.currentStep = 1; // Étape pour les informations personnelles
-          break;
         case 'birthDate':
         case 'gender':
-          this.currentStep = 2; // Étape pour les informations de contact
+          this.currentStep = 1;
           break;
         case 'email':
-        case 'userType':
-        case 'phoneNumber':
-          this.currentStep = 3; // Étape pour le type d'utilisateur et autres informations
-          break;
         case 'password':
-          this.currentStep = 4; // Étape pour le type d'utilisateur et autres informations
+          this.currentStep = 2;
           break;
+        case 'ville':
+        case 'phoneNumber':
+          this.currentStep = 3;
+          break;
+        case 'userType':
+          this.currentStep = 4;
+          break;
+        case 'photo':
+        case 'aPropos':
+          this.currentStep = 5;
+          break;
+      }
+    },
+    async validateCurrentStep() {
+      switch (this.currentStep) {
+        case 1:
+          return await  this.validateFirstName() && this.validateName() && this.validateBirthDate() && this.validateGender();
+        case 2:{
+          const isPasswordValid = this.validatePassword(true);
+          const isPasswordConfirmValid = this.validatePasswordConfirm();
+          return this.validateEmail() && isPasswordValid && isPasswordConfirmValid;
+        }
+        case 3:
+          return this.validateVille() && this.validatePhoneNumber();
+        case 4:
+          return this.validateUserType();
+        case 5:
+          return this.validateImage() && this.validateAPropos();
+        case 6:
+          this.currentStep = 7;
+          return this.createUser(); // Création d'un utilisateur, une fois toutes ses informations verifiées
+        case 7:
+          // Puis verification du code pour valider le compte
+          return this.validateVerificationCode();
+        default:
+          return true;
       }
     },
     validateName() {
@@ -476,6 +655,24 @@ export default {
       this.imageError = this.imageUser ? '' : 'Veuillez ajouter une photo de profil.';
       return !this.imageError;
     },
+    validateVille() {
+      if (this.ville && this.ville.trim() !== '') { //non vide et ne contient pas que des espaces
+        this.villeError = '';
+        return true;
+      } else {
+        this.villeError = 'Veuillez remplir le champ.';
+        return false;
+      }
+    },
+    validateAPropos() {
+      if (this.aPropos && this.aPropos.trim() !== '') { //non vide et ne contient pas que des espaces
+        this.aProposError = '';
+        return true;
+      } else {
+        this.aProposError = 'Veuillez remplir le champ.';
+        return false;
+      }
+    },
     async validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.email)) {
@@ -488,8 +685,8 @@ export default {
       
       // Vérification dans la base de données si l'email n'est pas déjà utilisé
       try {
-        //const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
-        const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
+        const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
+        //const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
         if (response.data.exists) {
           this.emailError = `Cet email est déjà utilisé.`;
           this.errorEmailExist = true;
@@ -506,42 +703,6 @@ export default {
         return false;
       }
     },
-
-    async sendEmail() {
-      try {
-        // Envoi de la requête POST pour envoyer un nouveau code email
-        const responseEmail = await fetch('https://we-art.onrender.com/api/users/sendEmailCode', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            firstName: this.firstName,
-            lastName: this.lastName,
-            email: this.email,
-          }),
-        });
-
-
-        // Extraction des données de la réponse
-        const responseData = await responseEmail.json();
-
-        // Vérification si la requête a échoué
-        if (!responseEmail.ok) {
-          console.error(`Erreur pour l'envoi d'un nouveau mail :`, responseData.message || responseData);
-          throw new Error(`Erreur lors de l'envoi d'un nouveau mail : ${responseData.message || 'Erreur inconnue'}`);
-        }
-
-        // Succès : traitement des données si nécessaire
-        this.successResendMail = responseData.message;
-      } catch (error) {
-        // Gestion des erreurs
-        console.error('Erreur dans sendEmail:', error);
-        throw error;
-      }
-    },
-
-    
     validatePassword(showErrors = false) {
       if (!this.password) {
         this.passwordError = showErrors ? 'Veuillez remplir le champ.' : '';
@@ -649,7 +810,86 @@ export default {
 
       return !this.phoneNumberError;
     },
+    async sendEmail() {
+      try {
+        // Envoi de la requête POST pour envoyer un nouveau code email
+        const responseEmail = await fetch('https://we-art.onrender.com/api/users/sendEmailCode', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+          }),
+        });
 
+
+        // Extraction des données de la réponse
+        const responseData = await responseEmail.json();
+
+        // Vérification si la requête a échoué
+        if (!responseEmail.ok) {
+          console.error(`Erreur pour l'envoi d'un nouveau mail :`, responseData.message || responseData);
+          throw new Error(`Erreur lors de l'envoi d'un nouveau mail : ${responseData.message || 'Erreur inconnue'}`);
+        }
+
+        // Succès : traitement des données si nécessaire
+        this.successResendMail = responseData.message;
+      } catch (error) {
+        // Gestion des erreurs
+        console.error('Erreur dans sendEmail:', error);
+        throw error;
+      }
+    },
+    async fetchPostalCodes(ville) {      
+      if (ville.length >= 3) {
+        try {
+          const response = await axios.get(
+            `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(ville)}&type=municipality`
+          );
+
+          const places = response.data.features.map(feature => ({
+            city: feature.properties.city,
+            postcode: feature.properties.postcode,
+            country: feature.properties.context?.split(', ').pop() || 'France', // Extraction du pays depuis le contexte
+            latitude: feature.geometry.coordinates[1],
+            longitude: feature.geometry.coordinates[0]
+          }));
+
+          // Création d'une liste de villes uniques
+          this.suggestedVilles = [...new Set(places.map(place => place.city))];
+
+          // Vérification si la ville saisie correspond exactement à une ville suggérée
+          const matchedPlace = places.find(
+            place => place.city.toLowerCase() === ville.toLowerCase()
+          );
+          
+          if (matchedPlace) {
+            this.codePostal = matchedPlace.postcode;
+            this.pays = "France";
+            this.latitude = matchedPlace.latitude;
+            this.longitude = matchedPlace.longitude;
+          } else {
+            this.codePostal = '';
+            this.pays = '';
+            this.latitude = '';
+            this.longitude = '';
+          }
+
+        } catch (error) {
+          console.error("Erreur lors de la récupération des villes :", error);
+          this.suggestedVilles = [];
+          this.codePostal = '';
+          this.pays = '';
+        }
+      } else {
+        this.suggestedVilles = [];
+        this.codePostal = '';
+        this.pays = '';
+      }
+    },
     async createUser() {
       if (!this.validateCurrentStep()) {
         return;
@@ -663,8 +903,9 @@ export default {
           `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
           formData
         );*/
-        //const response = await axios.post(`http://localhost:3000/api/users`, {
-        const response = await axios.post('https://we-art.onrender.com/api/users', {
+        console.log("ici requete");
+        const response = await axios.post(`http://localhost:3000/api/users`, {
+        //const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
           email: this.email,
@@ -712,7 +953,6 @@ export default {
         this.loading = false;
       }
     },
-
     async validateVerificationCode() {
       // Convertir le tableau verificationCode en une chaîne de chiffres
       var verificationCodeString = this.verificationCode.join('');
@@ -725,45 +965,44 @@ export default {
       if (!this.verificationCodeError) {
         console.log("token : ",verificationCodeString,"mail : ", this.email);  
         try {
-              //const response = await axios.post(`http://localhost:3000/api/verify-code`, {
+          //const response = await axios.post(`http://localhost:3000/api/verify-code`, {
 
-              const response = await axios.post('https://we-art.onrender.com/api/verify-code', {
-                token: verificationCodeString, // Le code de vérification
-                email: this.email // L'email de l'utilisateur
-              });
-              // Vérification du code selon le code de réponse
-              if (response.status === 200) {
-                  console.log(response.data.message); // "Email vérifié avec succès"
-                  // Set success message and open dialog
-                  this.successMessage = 'Nous avons bien créé votre compte.';
-                  this.errorMessage = '';
-                  this.dialog = true;  // Open the dialog for success
-                  this.resetForm();
-                  //this.nextStep();
-                  return true; // Validation réussie
-              } else {
-                  this.verificationCodeError = 'Une erreur est survenue, veuillez réessayer.'; // Gestion d'autres codes d'erreur
-                  console.log(response.data.message);
-              }
-          } catch (error) {
-              // Gestion des erreurs lors de l'appel à l'API
-              if (error.response) {
-                  // L'erreur est une réponse de l'API
-                  if (error.response.status === 500) {
-                      this.verificationCodeError = "Une erreur est survenue lors de la vérification de l'email.";
-                  }else if (error.response.status === 400) {
-                  this.verificationCodeError = 'Code invalide'; // Message d'erreur si le token est invalide
-                  }
-              } else {
-                  // Erreur autre (réseau, etc.)
-                  this.verificationCodeError = "Erreur de connexion. Veuillez réessayer.";
-              }
+          const response = await axios.post('https://we-art.onrender.com/api/verify-code', {
+            token: verificationCodeString, // Le code de vérification
+            email: this.email // L'email de l'utilisateur
+          });
+          // Vérification du code selon le code de réponse
+          if (response.status === 200) {
+              console.log(response.data.message); // "Email vérifié avec succès"
+              // Set success message and open dialog
+              this.successMessage = 'Nous avons bien créé votre compte.';
+              this.errorMessage = '';
+              this.dialog = true;  // Open the dialog for success
+              this.resetForm();
+              //this.nextStep();
+              return true; // Validation réussie
+          } else {
+              this.verificationCodeError = 'Une erreur est survenue, veuillez réessayer.'; // Gestion d'autres codes d'erreur
+              console.log(response.data.message);
           }
+        } catch (error) {
+          // Gestion des erreurs lors de l'appel à l'API
+          if (error.response) {
+              // L'erreur est une réponse de l'API
+              if (error.response.status === 500) {
+                  this.verificationCodeError = "Une erreur est survenue lors de la vérification de l'email.";
+              }else if (error.response.status === 400) {
+              this.verificationCodeError = 'Code invalide'; // Message d'erreur si le token est invalide
+              }
+          } else {
+              // Erreur autre (réseau, etc.)
+              this.verificationCodeError = "Erreur de connexion. Veuillez réessayer.";
+          }
+        }
       }
-
       // Retourne faux si il y a une erreur
       return !this.verificationCodeError;
-  },
+    },
     closeDialog() {
       this.dialog = false; // Ferme le dialog
       this.successMessage = ''; // Réinitialiser les messages après fermeture
@@ -780,21 +1019,30 @@ export default {
       this.imageUser = null;
       this.email = '';
       this.password = '';
-      this.passwordConfirm = ''; // Réinitialiser la confirmation du mot de passe
+      this.passwordConfirm = '';
       this.phoneNumber = '';
       this.birthDate = '';
       this.gender = '';
       this.userType = '';
+      this.ville = '';
+      this.codePostal = '';
+      this.latitude = '';
+      this.longitude = '';
+      this.pays = '';
+      this.aPropos = '';
+      //Erreur
       this.nameError = '';
       this.firstNameError = '';
       this.imageError = '';
       this.emailError = '';
       this.passwordError = '';
-      this.passwordConfirmError = ''; // Réinitialiser l'erreur de confirmation
+      this.passwordConfirmError = '';
       this.birthDateError = '';
       this.userTypeError = '';
       this.genderError = '';
       this.phoneNumberError = '';
+      this.villeError = '';
+      this.aProposError = '';
     },
   },
 };
@@ -807,10 +1055,7 @@ export default {
   }
 
   /* Add this style to align the recap information to the left */
-  .v-list-item-title {
-    text-align: left;
-  }
-
+  .v-list-item-title,
   .v-list-item-subtitle {
     text-align: left;
   }
@@ -818,10 +1063,6 @@ export default {
   .icon-pencil{
     background-color: #F2992C;
     color: #ffedd7 !important;
-  }
-
-  .mb-3 {
-    margin-bottom: 1rem;
   }
 
   .verification-code-container {
@@ -853,12 +1094,8 @@ export default {
   }
 
   .row-container {
-    padding-top: 1rem;
-    margin-left: 1rem;
     display: flex;
-    justify-content: center; /* Centrer horizontalement les éléments */
-    align-items: center; /* Centrer verticalement les éléments */
-    opacity: 1;
+    justify-content: space-between;
   }
 
 .centered-text {
@@ -874,7 +1111,6 @@ export default {
 }
 
 .vertical-center{
-  align-items: center;
   display: flex;
   height: 100%;
 }
