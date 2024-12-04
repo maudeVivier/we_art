@@ -651,6 +651,21 @@ exports.addUserToEvent = async (req, res) => {
             return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
         }
 
+
+        // Vérifier si l'utilisateur participe déjà à l'événement
+        const listWaitCheck = await pool.query(
+            'SELECT * FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
+            [userId, eventId]
+        );
+
+        // Si l'utilisateur est dans la liste d'attente, le retirer de la liste d'attente
+        if (listWaitCheck.rowCount > 0) {
+            await pool.query(
+                'DELETE FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
+                [userId, eventId]
+            );
+        }
+
         // Insérer dans la table de jointure participantsevents
         await pool.query(
             'INSERT INTO participantsevents (id_user, id_event) VALUES ($1, $2) ON CONFLICT DO NOTHING',
