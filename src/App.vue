@@ -15,13 +15,7 @@
         <v-icon>mdi-home</v-icon>
       </v-btn>
 
-      <v-btn
-        :to="{ name: 'ListEvents' }"
-        :class="{ 'btn-active': active === 1 }"
-      >
-        <span>Événements</span>
-        <v-icon>mdi-calendar</v-icon>
-      </v-btn>
+     
 
       <v-btn
         v-if="isAuthenticated" 
@@ -43,11 +37,11 @@
       </v-btn>
 
       <v-btn
-        :to="{ name: 'map' }"
-        :class="{ 'btn-active': active === 3 }"
+        :to="{ name: 'ListEvents' }"
+        :class="{ 'btn-active': active === 1 }"
       >
-        <span>Carte</span>
-        <v-icon>mdi-map</v-icon>
+        <span>Explorer</span>
+        <v-icon>mdi-earth</v-icon>
       </v-btn>
 
       <!-- Changer dynamiquement Connexion en Profil -->

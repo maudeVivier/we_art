@@ -7,7 +7,6 @@ import LoginPage from '../pages/LoginPage.vue'
 import SignUp from '../pages/SignUp.vue'
 import CreateEvents from '../pages/CreateEvents.vue'
 import ListEvents from '../pages/ListEvents.vue'
-import MapView from '../pages/MapView.vue'
 import EventDetails from '../pages/EventDetails.vue'; // Page de détails
 import AddFakeData from '../pages/AddFakeData.vue'
 import UserProfile from '../pages/Profile.vue'; // Import du composant Profile
@@ -51,11 +50,6 @@ const router = new Router({
       path: '/createEvents',
       name: 'createEvents',
       component: CreateEvents,   
-    },
-    {
-      path: '/map',
-      name: 'map',
-      component: MapView
     },
     {
       path: '/eventDetails/:id', // Route avec l'ID de l'événement

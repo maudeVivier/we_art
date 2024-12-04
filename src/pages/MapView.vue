@@ -90,18 +90,18 @@ export default {
       return this.events.filter(event => event.latitude && event.longitude);
     },
     displayedEvents() {
-  // S'assurer que l'événement sélectionné soit toujours affiché en premier
-  const events = this.nearbyEvents.slice(this.currentScrollIndex, this.currentScrollIndex + 2);
-  
-  // Vérifier si l'événement sélectionné est déjà affiché en premier
-  if (this.selectedEvent && events.length > 0 && events[0].id !== this.selectedEvent.id) {
-    // Si l'événement sélectionné n'est pas déjà en premier, on le place en premier
-    return [this.selectedEvent, ...events.filter(event => event.id !== this.selectedEvent.id)];
-  }
-  
-  // Retourner les événements à afficher
-  return events.length > 0 ? events : this.events; // Afficher tous les événements s'il n'y a pas d'événements proches
-},
+      // S'assurer que l'événement sélectionné soit toujours affiché en premier
+      const events = this.nearbyEvents.slice(this.currentScrollIndex, this.currentScrollIndex + 2);
+      
+      // Vérifier si l'événement sélectionné est déjà affiché en premier
+      if (this.selectedEvent && events.length > 0 && events[0].id !== this.selectedEvent.id) {
+        // Si l'événement sélectionné n'est pas déjà en premier, on le place en premier
+        return [this.selectedEvent, ...events.filter(event => event.id !== this.selectedEvent.id)];
+      }
+      
+      // Retourner les événements à afficher
+      return events.length > 0 ? events : this.events; // Afficher tous les événements s'il n'y a pas d'événements proches
+    },
 
     moreEventsAvailable() {
       return this.nearbyEvents.length > this.currentScrollIndex + 2; // Vérifier si plus d'événements sont disponibles
@@ -130,42 +130,42 @@ export default {
     },
     
     selectEvent(event) {
-    this.selectedEvent = event;
-    this.currentScrollIndex = 0; // Réinitialiser l'index de défilement
-    this.center = [event.latitude, event.longitude]; // Centrer la carte sur l'événement sélectionné
-    this.showEventCards = true; // Afficher les cartes d'événements
-  },
+      this.selectedEvent = event;
+      this.currentScrollIndex = 0; // Réinitialiser l'index de défilement
+      this.center = [event.latitude, event.longitude]; // Centrer la carte sur l'événement sélectionné
+      this.showEventCards = true; // Afficher les cartes d'événements
+    },
     
-  centerMapOnEvent(event) {
-  console.log('Clic sur la vignette', event); // Vérifie si cette méthode est appelée
-  this.center = [event.latitude, event.longitude]; // Centre la carte sur l'événement sélectionné
-  const index = this.nearbyEvents.findIndex(e => e.id === event.id);
-  
-  if (index !== -1) {
-    this.currentScrollIndex = index; // Met à jour l'index de défilement pour que l'événement soit en première position
-    this.selectedEvent = event; // Met à jour l'événement sélectionné
-  }
-},
+    centerMapOnEvent(event) {
+      console.log('Clic sur la vignette', event); // Vérifie si cette méthode est appelée
+      this.center = [event.latitude, event.longitude]; // Centre la carte sur l'événement sélectionné
+      const index = this.nearbyEvents.findIndex(e => e.id === event.id);
+      
+      if (index !== -1) {
+        this.currentScrollIndex = index; // Met à jour l'index de défilement pour que l'événement soit en première position
+        this.selectedEvent = event; // Met à jour l'événement sélectionné
+      }
+    },
 
 
     scrollRight() {
-    if (this.moreEventsAvailable) {
-      this.currentScrollIndex += 1; // Augmente l'index de défilement
-    }
-    },
+      if (this.moreEventsAvailable) {
+        this.currentScrollIndex += 1; // Augmente l'index de défilement
+      }
+      },
 
-    scrollLeft() {
-    if (this.currentScrollIndex > 0) {
-      this.currentScrollIndex -= 1; // Diminue l'index de défilement
-    }
+      scrollLeft() {
+      if (this.currentScrollIndex > 0) {
+        this.currentScrollIndex -= 1; // Diminue l'index de défilement
+      }
     },
 
     carouselStyle() {
-    return {
-      transform: `translateX(-${this.currentScrollIndex * 100}%)`, // Déplace le carrousel en fonction de l'index actuel
-      transition: 'transform 0.5s ease' // Animation douce pour le défilement
-    };
-  },
+      return {
+        transform: `translateX(-${this.currentScrollIndex * 100}%)`, // Déplace le carrousel en fonction de l'index actuel
+        transition: 'transform 0.5s ease' // Animation douce pour le défilement
+      };
+    },
 
     calculateDistance(lat1, lon1, lat2, lon2) {
       const R = 6371; // Rayon de la Terre en km
