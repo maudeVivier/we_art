@@ -747,7 +747,79 @@ exports.removeUserFromEvent = async (req, res) => {
 };
 
 
+// GET - Voir si un utilisateur est inscrit dans la liste d'attente d'un évènement
+/**
+ * @swagger
+ * /api/events/listWait/{eventId}/users/{userId}:
+ *   get:
+ *     summary: Vérifier la présence dans la liste d'attente d'un utilisateur à un événement
+ *     description: Vérifie si un utilisateur spécifique est dans la liste d'attente d'un événement donné.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         description: ID de l'événement à vérifier
+ *         schema:
+ *           type: integer
+ *           example: 23
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: ID de l'utilisateur à vérifier
+ *         schema:
+ *           type: integer
+ *           example: 140
+ *     responses:
+ *       200:
+ *         description: Indique si l'utilisateur est dans la liste d'attente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 participating:
+ *                   type: boolean
+ *                   example: true
+ *       404:
+ *         description: Événement ou utilisateur non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur ou événement non trouvé."
+ *       500:
+ *         description: Erreur interne lors de la vérification de la liste attente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la vérification de la liste attente."
+ */
+exports.checkUserListWait = async (req, res) => {
+    const { eventId, userId } = req.params;
 
+    try {
+      const result = await pool.query(
+        'SELECT * FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
+        [userId, eventId]
+      );
+      if (result.rows.length > 0) {
+        res.json({ participating: true });
+      } else {
+        res.json({ participating: false });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification de la liste attente :', error);
+      res.status(500).json({ error: 'Erreur lors de la vérification de la liste attente.' });
+    }
+};
 
 
 // POST - Se mettre dans la liste d'attente d'un evenement

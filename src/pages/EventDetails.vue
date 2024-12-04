@@ -61,8 +61,11 @@
               <template v-else-if="!event.is_deadline_valid">
                 <p class="text-info">Il est trop tard pour s'inscrire à cet événement.</p>
               </template>
-              <template v-else-if="!event.is_participant_limit_valid">
-                <p class="text-info">Le nombre maximal de participants a été atteint.</p>
+              <template v-else-if="!event.is_participant_limit_valid && !alreadyListeEvent">
+                <v-btn color="primary" @click="addListeEvent">Recevoir une alerte<br>place libéré</v-btn>
+              </template>
+              <template v-else>
+                <v-btn color="red" @click="unregisterFromEvent">Ne plus être notifié</v-btn>
               </template>
             </template>
         </v-row>
@@ -80,7 +83,22 @@
         <!-- Participants -->
         <v-row>
           <v-col>
-            <p style="font-size:20px; margin-bottom: 3px">Participants :</p>
+            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants.length }}/{{ event.nombre_de_participants_max }})</p>
+          </v-col>
+        </v-row>
+
+        <!-- Liste des participants -->
+        <v-row>
+          <v-col v-for="participant in event.participants" :key="participant.id" class="d-flex flex-column align-center">
+            <!-- Image du participant -->
+            <v-avatar size="64" class="mb-2">
+              <img :src="participant.image_user" :alt="`${participant.firstname} ${participant.lastname}`" />
+            </v-avatar>
+
+            <!-- Nom et prénom du participant -->
+            <p style="font-size:16px; text-align: center; margin: 0;">
+              {{ participant.firstname }} {{ participant.lastname }}
+            </p>
           </v-col>
         </v-row>
       </v-container>
@@ -106,6 +124,14 @@
         Lien copié dans le presse-papier !
         <template v-slot:action="{ attrs }">
           <v-btn text v-bind="attrs" @click="shareSuccessMessage = false">Fermer</v-btn>
+        </template>
+      </v-snackbar>
+
+      <!-- Snackbar pour le message ajouter en liste d'attente à l'evenement -->
+      <v-snackbar v-model="successMessageListeEvent" timeout="3000">
+        Vous serez notifié si une place se libère pour cet évènement!
+        <template v-slot:action="{ attrs }">
+          <v-btn text v-bind="attrs" @click="successMessageListeEvent = false">Fermer</v-btn>
         </template>
       </v-snackbar>
 
@@ -135,6 +161,8 @@ export default {
       successMessageDesinscire: false,
       alreadyParticipating : false,
       shareSuccessMessage: false,
+      successMessageListeEvent: false,
+      alreadyListeEvent: false,
     };
   },
   mounted() {
@@ -155,6 +183,8 @@ export default {
         this.event = response.data;
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
+        await this.checkListeWait();
+
       } catch (error) {
         console.error("Erreur lors de la récupération des détails de l'événement:", error);
       } finally {
@@ -193,6 +223,38 @@ export default {
         }
       }
     },
+
+    async checkListeWait() { // fonction pour afficher le bouton Ne plus être notifier ou etre notifier à un évènement
+      if (this.userConnected) {
+        try {
+          //const response = await axios.get(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+          const response = await axios.get(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+          this.alreadyListeEvent = response.data.participating;
+        } catch (error) {
+          console.error('Erreur lors de la vérification de la liste d\'attente', error);
+        }
+      }
+    },
+    
+    async addListeEvent() {
+      if(this.userConnected){ // utilisateur connecté
+        try {
+          //const response = await axios.post(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+          const response = await axios.post(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+
+          console.log('utilisateur ajouté a la liste d\'attente evenement :', response.data);
+          this.successMessageListeEvent = true; // Affiche le message de succès
+          this.alreadyListeEvent = true;
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout de l\'utilisateur à l\'évènement', error);
+          this.successMessageListeEvent = false; // Affiche le message de succès
+        } 
+      }
+      else{ // si non connecte, on redirige vers la page pour se connecter
+        this.$router.push('/login');
+      }
+    },
+
     async participateEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
@@ -209,10 +271,10 @@ export default {
           console.error('Erreur lors de l\'ajout de l\'utilisateur à l\'évènement', error);
           this.successMessageParticipe = false; // Affiche le message de succès
         } 
-    }
-    else{ // si non connecte, on redirige vers la page pour se connecter
-      this.$router.push('/login');
-    }
+      }
+      else{ // si non connecte, on redirige vers la page pour se connecter
+        this.$router.push('/login');
+      }
     },
     async unregisterFromEvent() { // fonction pour se desincrire d'un evenement
       if(this.userConnected){ // utilisateur connecté
