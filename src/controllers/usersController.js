@@ -936,3 +936,119 @@ exports.getUserEvents = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de la récupération des événements de l'utilisateur." });
     }
 };
+
+
+
+
+// GET - Récupérer tous les événements qui viennent de liberer une place d'un utilisateur en liste d'attente
+/**
+ * @swagger
+ * /api/users/{userId}/notifsevents:
+ *   get:
+ *     summary: Récupérer tous les événements qui viennent de liberer une place d'un utilisateur en liste d'attente
+ *     description: Retourne la liste de tous les événements qui viennent de liberer une place auxquels l'utilisateur es en liste d'attente.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Liste des événements auxquels l'utilisateur est en liste d'attente et ayant des places libres.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   idEvent:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Conférence Tech"
+ *                   description:
+ *                     type: string
+ *                     example: "Une conférence sur les nouvelles technologies."
+ *                   street:
+ *                     type: string
+ *                     example: "3 rue de la métallurgie"
+ *                   city:
+ *                     type: string
+ *                     example: "Lyon"
+ *                   postal_code:
+ *                     type: string
+ *                     example: "69003"
+ *                   country:
+ *                     type: string
+ *                     example: "France"
+ *                   start_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   end_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   created_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   latitude:
+ *                     type: string
+ *                     example: "45.754205"
+ *                   longitude:
+ *                     type: string
+ *                     example: "4.869387"
+ *       404:
+ *         description: Utilisateur introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur introuvable."
+ *       500:
+ *         description: Erreur interne lors de la récupération des événements.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération des événements."
+ */
+exports.getUserNotifsEvents = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur existe
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ message: "Utilisateur introuvable." });
+        }
+
+        // Récupérer tous les événements auxquels l'utilisateur participe
+        const result = await pool.query(
+            `SELECT e.* 
+            FROM listeattentesevents lae
+            INNER JOIN events e ON lae.id_event = e.id
+            WHERE lae.id_user = $1
+            AND e.nombre_de_participants_max > (
+                                                SELECT COUNT(*) 
+                                                FROM participantsevents pe 
+                                                WHERE pe.id_event = e.id
+            )`,
+            [userId]
+        );
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error("Erreur lors de la récupération des événements:", err);
+        res.status(500).send({ error: "Erreur lors de la récupération des événements." });
+    }
+};
