@@ -305,6 +305,11 @@ export default {
     },
   },
   methods: {
+    handleNotificationsUpdate() {
+      // Simulez ici la mise à jour des notifications
+      this.$emit('update-notifications'); // Émettre un événement pour signaler le changement
+    },
+
     async participateEvent(eventId) {
       console.log('participateEvent', eventId);
       if(this.userConnected){ // utilisateur connecté
@@ -315,6 +320,7 @@ export default {
           console.log('utilisateur ajouté a l evenement :', response.data);
           this.fetchEvents();
           this.fetchEventsNotifs();
+          this.handleNotificationsUpdate()
         } catch (error) {
           console.error('Erreur lors de l\'ajout de l\'utilisateur à l\'évènement', error);
         } 
@@ -332,6 +338,7 @@ export default {
 
           this.fetchEvents();
           this.fetchEventsNotifs();
+          this.handleNotificationsUpdate()
         } catch (error) {
           console.error('Erreur lors de la suppression de l\'utilisateur à la liste d\'attente', error);
         } 
