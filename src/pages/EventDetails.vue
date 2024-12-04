@@ -83,7 +83,7 @@
         <!-- Participants -->
         <v-row>
           <v-col>
-            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants.length }}/{{ event.nombre_de_participants_max }})</p>
+            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants ? event.participants.length : 0 }}/{{ event.nombre_de_participants_max }})</p>
           </v-col>
         </v-row>
 
