@@ -410,6 +410,23 @@ exports.createEvent = async (req, res) => {
  *                 already_participating:
  *                   type: boolean
  *                   example: false
+ *                 participants:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 5
+ *                       firstname:
+ *                         type: string
+ *                         example: "Alice"
+ *                       lastname:
+ *                         type: string
+ *                         example: "Durand"
+ *                       image_user:
+ *                         type: string
+ *                         example: "alice.jpg"
  *       404:
  *         description: Événement non trouvé.
  *         content:
@@ -449,7 +466,23 @@ exports.getEventById = async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Événement non trouvé' });
         }
-        res.json(result.rows[0]);
+
+
+        // Récupérer les participants associés à cet événement
+        const participantsResult = await pool.query(
+            `SELECT u.id, u.firstname, u.lastname, u.image_user 
+            FROM participantsevents pe
+            INNER JOIN users u ON pe.id_user = u.id
+            WHERE pe.id_event = $1`, 
+            [id]
+        );
+
+        // Fusionner les résultats
+        const event = result.rows[0];
+        event.participants = participantsResult.rows;
+
+
+        res.json(event);
     } catch (err) {
         console.error('Erreur lors de la récupération de l\'evenement:', err);
         res.status(500).send({ error: 'Erreur lors de la récupération de l\'evenement' });
@@ -712,6 +745,215 @@ exports.removeUserFromEvent = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de la désinscription de l'utilisateur de l'événement." });
     }
 };
+
+
+
+
+
+// POST - Se mettre dans la liste d'attente d'un evenement
+/**
+ * @swagger
+ * /api/events/listWait/{eventId}/users/{userId}:
+ *   post:
+ *     summary: Ajouter un utilisateur dans la liste d'attente d'un événement
+ *     description: Ajouter un utilisateur dans la liste d'attente d'un événement.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement auquel ajouter l'utilisateur
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur à ajouter à la liste d'attente de l'événement
+ *     responses:
+ *       201:
+ *         description: Utilisateur ajouté à la liste d'attente de l'événement avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur ajouté à la liste d'attente de l'événement avec succès."
+ *       400:
+ *         description: Requête invalide (ex. utilisateur ou événement non trouvé).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Utilisateur ou événement introuvable."
+ *       409:
+ *         description: Conflit détecté (ex. l'utilisateur participe déjà ou est dans la liste d'attente).
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   examples:
+ *                     already_participating:
+ *                       value: "L'utilisateur participe déjà à cet événement."
+ *                     already_in_waitlist:
+ *                       value: "L'utilisateur est déjà dans la liste d'attente pour cet événement."
+ *       500:
+ *         description: Erreur interne lors de l'ajout de l'utilisateur à l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de l'ajout de l'utilisateur à la liste d'attente de l'événement."
+ */
+exports.addUserToListAttenteEvent = async (req, res) => {
+    const { eventId, userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur et l'événement existent
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+
+        if (userCheck.rowCount === 0 || eventCheck.rowCount === 0) {
+            return res.status(400).json({ error: "Utilisateur ou événement introuvable." });
+        }
+
+        // Vérifier si l'utilisateur participe déjà à l'événement
+        const participationCheck = await pool.query(
+            'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
+            [userId, eventId]
+        );
+
+        if (participationCheck.rowCount > 0) {
+            // L'utilisateur participe déjà à l'événement
+            console.log("L'utilisateur participe déjà à cet événement.");
+            return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
+        }
+
+
+        // Vérifier si l'utilisateur participe déjà à l'événement
+        const participationListAttenteCheck = await pool.query(
+            'SELECT * FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
+            [userId, eventId]
+        );
+
+        if (participationListAttenteCheck.rowCount > 0) {
+            // L'utilisateur est déjà dans la liste d'attente pour cet événement
+            console.log("L'utilisateur est déjà dans la liste d'attente pour cet événement.");
+            return res.status(409).json({ message: "L'utilisateur est déjà dans la liste d'attente pour cet événement." });
+        }
+
+
+
+        // Insérer dans la table de jointure listeattentesevents
+        await pool.query(
+            'INSERT INTO listeattentesevents (id_user, id_event) VALUES ($1, $2) ON CONFLICT (id_user, id_event) DO NOTHING',
+            [userId, eventId]
+        );
+        console.log("utilisateur ajoute a la liste d'attente de l' evenement avec succes")
+        res.status(201).json({ message: "Utilisateur ajouté à la liste d'attente de l'événement avec succès." });
+    } catch (err) {
+        console.error("Erreur lors de l'ajout de l'utilisateur à l'événement:", err);
+        res.status(500).send({ error: "Erreur lors de l'ajout de l'utilisateur à la liste d'attente de l'événement." });
+    }
+};
+
+
+
+// DELETE - Désinscrire un utilisateur de la liste d'attente d'un événement
+/**
+ * @swagger
+ * /api/events/listWait/{eventId}/users/{userId}:
+ *   delete:
+ *     summary: Désinscrire un utilisateur de la liste d'attente d'un événement
+ *     description: Désinscrire un utilisateur de la liste d'attente d'un événement.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement dont désinscrire l'utilisateur de la liste d'attente
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur à désinscrire de la liste d'attente de l'événement
+ *     responses:
+ *       200:
+ *         description: Utilisateur désinscrit de la liste d'attente de l'événement avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur désinscrit de la liste d'attente de l'événement avec succès."
+ *       404:
+ *         description: L'utilisateur n'est pas inscrit à la liste d'attente de cet événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "L'utilisateur n'est pas inscrit à la liste d'attente de cet événement."
+ *       500:
+ *         description: Erreur interne lors de la désinscription de l'utilisateur de la liste d'attente de l'événement.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la désinscription de l'utilisateur à la liste d'attente de l'événement."
+ */
+exports.removeUserFromListAttenteEvent = async (req, res) => {
+    const { eventId, userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur est actuellement inscrit à la liste d'attente de l'événement
+        const participationCheck = await pool.query(
+            'SELECT * FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
+            [userId, eventId]
+        );
+        if (participationCheck.rowCount === 0) {
+            // L'utilisateur n'est pas inscrit à la liste d'attente de l'événement
+            return res.status(404).json({ message: "L'utilisateur n'est pas inscrit à la liste d'attente de cet événement." });
+        }
+
+        // Supprimer l'enregistrement dans la table de jointure listeattentesevents
+        await pool.query(
+            'DELETE FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
+            [userId, eventId]
+        );
+
+        res.status(200).json({ message: "Utilisateur désinscrit de la liste d'attente de l'événement avec succès." });
+    } catch (err) {
+        console.error("Erreur lors de la désinscription de l'utilisateur à la liste d'attente de l'événement:", err);
+        res.status(500).send({ error: "Erreur lors de la désinscription de l'utilisateur à la liste d'attente de l'événement." });
+    }
+};
+
+
+
+
 
 // POST - Ajouter un commentaire à un événement
 /**
