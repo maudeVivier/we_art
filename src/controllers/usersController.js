@@ -1052,3 +1052,84 @@ exports.getUserNotifsEvents = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de la récupération des événements." });
     }
 };
+
+
+
+// GET - Récupérer le nombre de notifications
+/**
+ * @swagger
+ * /api/users/{userId}/notifscount:
+ *   get:
+ *     summary: Récupérer le nombre de notifications
+ *     description: Retourne le nombre de notifications pour un utilisateur spécifique.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Nombre de notifications récupéré avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   example: 3
+ *       404:
+ *         description: Utilisateur introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur introuvable."
+ *       500:
+ *         description: Erreur interne lors de la récupération du nombre de notifications.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération du nombre de notifications."
+ */
+exports.getUserNotifsCount = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur existe
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ message: "Utilisateur introuvable." });
+        }
+
+        // Récupérer tous les événements auxquels l'utilisateur participe
+        const result = await pool.query(
+            `SELECT COUNT(*) 
+            FROM listeattentesevents lae
+            INNER JOIN events e ON lae.id_event = e.id
+            WHERE lae.id_user = $1
+            AND e.nombre_de_participants_max > (
+                                                SELECT COUNT(*) 
+                                                FROM participantsevents pe 
+                                                WHERE pe.id_event = e.id
+            )`,
+            [userId]
+        );
+
+        const notifCount = result.rows[0].count || 0; // Par défaut 0 si aucun résultat
+        res.status(200).json({ count: notifCount });
+    } catch (err) {
+        console.error("Erreur lors de la récupération du nombre de notifications :", err);
+        res.status(500).send({ error: "Erreur lors de la récupération du nombre de notifications." });
+    }
+};

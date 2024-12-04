@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUsers, createUser, updateUser, deleteUser, loginUser, verifyEmail, getUserEvents, getUserById, checkEmail, resendCode, getUserNotifsEvents} = require('../controllers/usersController');
+const { getUsers, createUser, updateUser, deleteUser, loginUser, verifyEmail, getUserEvents, getUserById, checkEmail, resendCode, getUserNotifsEvents, getUserNotifsCount} = require('../controllers/usersController');
 
 const router = express.Router();
 
@@ -14,6 +14,7 @@ router.get('/users/:id', getUserById);
 router.get('/users/email/:email', checkEmail);
 router.post('/users/sendEmailCode', resendCode);
 router.get('/users/:userId/notifsevents', getUserNotifsEvents);
+router.get('/users/:userId/notifscount', getUserNotifsCount);
 
 
 module.exports = router;
