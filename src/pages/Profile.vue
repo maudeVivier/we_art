@@ -1,25 +1,74 @@
 <template>
   <v-app>
-      <v-main>
-  <v-container>
-    <v-card>
-      <v-card-title>Profil de l'utilisateur</v-card-title>
-      <v-card-text>
-        <img :src="user.image_user" alt="User Image" style="width: 200px; height: 200px; object-fit: cover;" />
-        <p><strong>Prénom :</strong> {{ user.firstname }}</p>
-        <p><strong>Nom :</strong> {{ user.lastname }}</p>
-        <p><strong>Type :</strong> {{ user.type }}</p>
-        <p><strong>Email :</strong> {{ user.email }}</p>
-        <p><strong>Téléphone :</strong> {{ user.phone }}</p>
-      </v-card-text>
-      <v-card-actions>
+    <v-main>
+      <v-container>
+        <v-row class="my-1 ml-1 align-center justify-space-between">
+          <v-btn @click="goBack" icon class="mr-2">
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
+          <h2>Mon profil</h2>
+          <v-btn @click="updateUserInfos" icon class="mr-2">
+            <v-icon>mdi-cog-outline</v-icon>
+          </v-btn>
+        </v-row>
+
+        <v-row class="justify-space-start align-center">
+          <v-col 
+          cols="auto"
+          sm="2"
+          md="2"
+          lg="2"
+          >
+            <v-img
+              :src="user.image_user"
+              alt="User Image"
+              class="profil-image"
+            ></v-img>
+          </v-col>
+          <v-col
+          cols="auto"
+          sm="4"
+          md="4"
+          lg="4"
+          >
+            <h4 class="mb-0">
+              {{ user.firstname }} {{ user.lastname }}
+              <v-icon v-if="user.is_verified" color="primary">mdi-check-decagram</v-icon>
+            </h4>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="auto" class="d-flex align-center mr-4">
+            <v-icon class="mr-2">mdi-heart-outline</v-icon>
+            <span>Favoris</span>
+          </v-col>
+          <v-col cols="auto" class="d-flex align-center mr-4">
+            <v-icon class="mr-2">mdi-web</v-icon>
+            <span>Français</span>
+          </v-col>
+          <v-col cols="auto" class="d-flex align-center">
+            <v-icon class="mr-2">mdi-map-marker-outline</v-icon>
+            <span>Lyon, France</span>
+          </v-col>
+        </v-row>
+
+        <v-row class="profile-propos">
+          <v-col>
+            <p style="font-size:20px; margin-bottom: 3px; color: #F2992C;">A propos</p>
+          </v-col>
+        </v-row>
+
+        <v-row class="profile-interet">
+          <v-col>
+            <p color="primary" style="font-size:20px; margin-bottom: 3px; color: #F2992C;">Interêts</p>
+          </v-col>
+        </v-row>
+
         <v-btn color="primary" @click="handleLogout">Déconnexion</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-container>
-</v-main>
-</v-app>
-     
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
@@ -46,7 +95,6 @@ export default {
 
     async fetchUserDetails() {
       try {
-        // Appel API pour récupérer les informations de l'utilisateur
         //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
@@ -54,7 +102,9 @@ export default {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
       }
     },
-
+    async updateUserInfos(){
+      this.$router.push('/updateProfile');
+    },
     handleLogout() {
       // Exécute l'action de déconnexion de Vuex
       this.logout();
@@ -72,3 +122,12 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.profil-image {
+  width: 130px; 
+  height: 130px; 
+  object-fit: cover;
+  border-radius: 50%;
+}
+</style>

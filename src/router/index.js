@@ -10,6 +10,7 @@ import ListEvents from '../pages/ListEvents.vue'
 import EventDetails from '../pages/EventDetails.vue'; // Page de détails
 import AddFakeData from '../pages/AddFakeData.vue'
 import UserProfile from '../pages/Profile.vue'; // Import du composant Profile
+import UpdateProfile from '../pages/UpdateProfile.vue'
 import store from '../store.js';
 import MyEvents from '../pages/MyEvents.vue'
 
@@ -28,7 +29,6 @@ const router = new Router({
       name: 'Login',
       component: LoginPage,
       meta: { requiresAuth: false }
-
     },
     {
       path: '/signup',
@@ -67,6 +67,11 @@ const router = new Router({
       name: 'UserProfile',
       component: UserProfile,
       meta: { requiresAuth: true } // Route protégée
+    },
+    {
+      path: '/updateProfile',
+      name: 'UpdateProfile',
+      component: UpdateProfile
     }
   ]
 });

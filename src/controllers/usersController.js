@@ -130,7 +130,7 @@ exports.getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10); // Conversion de l'identifiant en entier
     try {
         const result = await pool.query(
-            'SELECT id, firstname, lastname, birthday, sex, phone, email, type, image_user FROM users WHERE id = $1',
+            'SELECT id, firstname, lastname, birthday, sex, phone, email, type, image_user, is_verified FROM users WHERE id = $1',
             [userId]
         );
         
