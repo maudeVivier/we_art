@@ -16,6 +16,18 @@ const opencage = require('opencage-api-client');
  *     summary: Récupérer tous les événements
  *     description: Retourne la liste de tous les événements dans la base de données avec le nombre de participants pour chaque événement.
  *     tags: [Events]
+ *     parameters:
+ *       - in: query
+ *         name: discipline
+ *         schema:
+ *           type: string
+ *           description: >
+ *             Liste des disciplines pour filtrer, séparées par des virgules.
+ *             Exemple : "Musique,Danse".
+ *             Les disciplines acceptées sont définies dans le type ENUM
+ *             `disciplines_types` de la base de données : Musique, Danse, Théâtre,
+ *             Peinture, Dessin, Poterie, Arts textiles, Photographie, Création
+ *             de bijoux, Gravure, Sculpture.
  *     responses:
  *       200:
  *         description: Liste des événements avec le nombre de participants.
@@ -87,6 +99,16 @@ const opencage = require('opencage-api-client');
  *                   participant_count:
  *                     type: integer
  *                     example: 42
+ *       400:
+ *         description: Paramètre de requête invalide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Les disciplines suivantes ne sont pas valides : Photo, autre"
  *       500:
  *         description: Erreur interne lors de la récupération des événements.
  *         content:
@@ -99,12 +121,39 @@ const opencage = require('opencage-api-client');
  *                   example: "Erreur lors de la récupération des évènements."
  */
 exports.getAllEvents = async (req, res) => {
+    const allowedDisciplinesResult = await pool.query(`
+        SELECT unnest(enum_range(NULL::discipline_type)) AS discipline
+    `);
+    const allowedDisciplines = allowedDisciplinesResult.rows.map(row => row.discipline);
+    
+    const disciplines = req.query.discipline ? req.query.discipline.split(',') : null;
+    
     try {
-        const result = await pool.query(`
+        if (disciplines) {
+            const invalidDisciplines = disciplines.filter(d => !allowedDisciplines.includes(d));
+            if (invalidDisciplines.length > 0) {
+                return res.status(400).json({
+                    error: `Les disciplines suivantes ne sont pas valides : ${invalidDisciplines.join(', ')}`
+                });
+            }
+        }
+        
+        let query = `
             SELECT e.*, COUNT(pe.id_user) AS participant_count
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
-            GROUP BY e.id`)
+        `;
+        const conditions = [];
+        const values = [];
+        if (disciplines) {
+            conditions.push(`e.discipline = ANY($${values.length + 1}::discipline_type[])`);
+            values.push(disciplines); // Ajout direct en tant que tableau
+        }
+        if (conditions.length > 0) {
+            query += ` WHERE ${conditions.join(' AND ')}`;
+        }
+        query += ' GROUP BY e.id';
+        const result = await pool.query(query,values)
         res.json(result.rows);
     } catch (err) {
         console.error('Erreur lors de la récupération des évènements:', err);

@@ -155,7 +155,7 @@ exports.getUsers = async (req, res) => {
  *                   example: 4.835659
  *                 a_propos:
  *                   type: string
- *                     example: "Artiste peintre passionné par l'abstrait, exposant régulièrement dans des galeries internationales."
+ *                   example: "Artiste peintre passionné par l'abstrait, exposant régulièrement dans des galeries internationales."
  *       404:
  *         description: Utilisateur non trouvé
  *       500:
