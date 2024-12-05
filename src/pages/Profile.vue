@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-container>
+      <v-container v-if="!loading">
         <v-row class="my-1 ml-1 align-center justify-space-between">
           <v-btn @click="goBack" icon class="mr-2">
             <v-icon>mdi-arrow-left</v-icon>
@@ -77,6 +77,7 @@ export default {
   data() {
     return {
       user: {},     // Objet pour stocker les informations de l'utilisateur
+      loading: true,
     };
   },
 
@@ -91,11 +92,15 @@ export default {
 
     async fetchUserDetails() {
       try {
+        this.loading=true
         const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
         // const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
+      }
+      finally {
+        this.loading=false
       }
     },
     async updateUserInfos(){
@@ -117,12 +122,16 @@ export default {
         year: 'numeric',
       }).format(new Date(date));
     },
+    goBack() {
+      this.$router.go(-1); // Retourne à la page précédente dans l'historique du navigateur
+    },
   },
   created() {
     if (this.userConnected) {
       this.fetchUserDetails(); // Appelez la fonction pour récupérer les détails utilisateur
     }
   },
+  
 };
 </script>
 

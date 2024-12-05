@@ -1,7 +1,7 @@
 <template>
     <v-app>
       <v-main>
-        <v-container>
+        <v-container v-if="!loading">
           <v-row class="my-1 ml-1 align-center justify-space-between">
             <v-btn icon class="mr-2">
             </v-btn>
@@ -272,7 +272,9 @@
         aProposError: '',
         suggestedVilles: [],
         editedUser: {},
+        loading : true,
       };
+
     },
     computed: {
       userConnected() {
@@ -589,12 +591,16 @@
       },
       async fetchUserDetails() {
         try {
+          this.loading = true
           // const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
           const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
           this.user = response.data;          
           this.editInfos();
         } catch (error) {
           console.error('Erreur lors de la récupération des informations utilisateur :', error);
+        } finally {
+          this.loading = false
+
         }
       },
     },
