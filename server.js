@@ -16,7 +16,7 @@ const app = express();
 // Configurer CORS pour autoriser les requêtes de localhost:8001
 const corsOptions = {
     origin: '*', // Remplacez par l'URL de votre frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
   };
   

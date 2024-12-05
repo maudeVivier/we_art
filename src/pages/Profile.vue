@@ -40,12 +40,8 @@
 
         <v-row>
           <v-col cols="auto" class="d-flex align-center mr-4">
-            <v-icon class="mr-2">mdi-heart-outline</v-icon>
-            <span>Favoris</span>
-          </v-col>
-          <v-col cols="auto" class="d-flex align-center mr-4">
-            <v-icon class="mr-2">mdi-web</v-icon>
-            <span>Français</span>
+            <v-icon class="mr-2">mdi-calendar</v-icon>
+            <span>{{ formatDate(user.birthday) }}</span>
           </v-col>
           <v-col cols="auto" class="d-flex align-center">
             <v-icon class="mr-2">mdi-map-marker-outline</v-icon>
@@ -80,7 +76,6 @@ export default {
   name: 'UserProfile',
   data() {
     return {
-      userId: null, // ID de l'utilisateur
       user: {},     // Objet pour stocker les informations de l'utilisateur
     };
   },
@@ -96,8 +91,8 @@ export default {
 
     async fetchUserDetails() {
       try {
-        //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
-        const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
+        const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
+        // const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
@@ -114,7 +109,14 @@ export default {
       localStorage.removeItem('idUser');
       // Rafraîchit la page pour réinitialiser l'état de l'application
       window.location.reload();
-    }
+    }, 
+    formatDate(date) {
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(date));
+    },
   },
   created() {
     if (this.userConnected) {

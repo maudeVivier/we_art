@@ -10,7 +10,7 @@ router.delete('/users/:id', deleteUser);
 router.post('/users/login', loginUser);
 router.post('/verify-code', verifyEmail);
 router.get('/users/:userId/events', getUserEvents);
-router.get('/users/:id', getUserById);
+router.post('/users/:id', getUserById);
 router.get('/users/email/:email', checkEmail);
 router.post('/users/sendEmailCode', resendCode);
 router.get('/users/:userId/notifsevents', getUserNotifsEvents);

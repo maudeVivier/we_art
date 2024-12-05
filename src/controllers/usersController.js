@@ -81,11 +81,11 @@ exports.getUsers = async (req, res) => {
     }
 };
 
-// GET - Récupérer un utilisateurs
+// POST - Récupérer un utilisateur
 /**
  * @swagger
  * /api/users/{id}:
- *   get:
+ *   post:
  *     summary: Récupérer un utilisateur par ID
  *     description: Retourne un utilisateur spécifique dans la base de données.
  *     tags: [Users]
@@ -139,6 +139,9 @@ exports.getUsers = async (req, res) => {
  *                 ville:
  *                   type: string
  *                   example: "Lyon"
+ *                 code_postal:
+ *                   type: string
+ *                   example: "69000"
  *                 pays:
  *                   type: string
  *                   example: "France"
@@ -162,7 +165,7 @@ exports.getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10); // Conversion de l'identifiant en entier
     try {
         const result = await pool.query(
-            'SELECT id, firstname, lastname, birthday, sex, phone, email, type, image_user, is_verified, ville, pays, latitude, longitude, a_propos FROM users WHERE id = $1',
+            'SELECT id, firstname, lastname, birthday, sex, phone, email, password, type, image_user, is_verified, ville, code_postal, pays, latitude, longitude, a_propos FROM users WHERE id = $1',
             [userId]
         );
         
@@ -356,7 +359,6 @@ exports.createUser = async (req, res) => {
     }
 };
 
-
 // POST - Envoyer le code de vérification
 /**
  * @swagger
@@ -409,8 +411,6 @@ exports.createUser = async (req, res) => {
  */
 exports.resendCode = async (req, res) => {
     const { firstName, lastName, email } = req.body;  // Modifications pour correspondre aux colonnes
-   
-
 
     try {
         const verificationToken = Math.floor(1000 + Math.random() * 9000);
@@ -441,7 +441,6 @@ exports.resendCode = async (req, res) => {
     }
 };
 
-
 // Fonction pour envoyer le mail de verification quand on crée un compte
 const sendVerificationEmail = async (email, firstName, lastName, verificationToken) => {
     const mailOptions = {
@@ -462,7 +461,7 @@ const sendVerificationEmail = async (email, firstName, lastName, verificationTok
     }
 };
 
- // Fonction pour vérifier si l'email existe déjà
+ // GET - Fonction pour vérifier si l'email existe déjà
   /**
    * @swagger
    * /api/users/{email}:
@@ -604,15 +603,12 @@ exports.deleteUser = async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               firstname:
  *                 type: string
  *                 example: "John"
- *               lastName:
+ *               lastname:
  *                 type: string
  *                 example: "Doe"
- *               email:
- *                 type: string
- *                 example: "john.doe@example.com"
  *               birthday:
  *                 type: string
  *                 format: date
@@ -621,10 +617,43 @@ exports.deleteUser = async (req, res) => {
  *                 type: string
  *                 enum: [Man, Woman, Non-binary, Not Specified]
  *                 example: "Man"
+ *               phone:
+ *                 type: string
+ *                 example: "+33123456789"
+ *               email:
+ *                 type: string
+ *                 example: "john.doe@example.com"
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "securePassword123"
  *               type:
  *                 type: string
  *                 enum: [Organizer, Participant]
  *                 example: "Organizer"
+ *               image_user:
+ *                 type: string
+ *                 example: "https://example.com/images/user.jpg"
+ *               ville:
+ *                 type: string
+ *                 example: "Paris"
+ *               code_postal:
+ *                 type: string
+ *                 example: "75001"
+ *               pays:
+ *                 type: string
+ *                 example: "France"
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *                 example: 48.8566
+ *               longitude:
+ *                 type: number
+ *                 format: float
+ *                 example: 2.3522
+ *               a_propos:
+ *                 type: string
+ *                 example: "Artiste passionné par la peinture abstraite et la sculpture moderne."
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour avec succès.
@@ -636,15 +665,12 @@ exports.deleteUser = async (req, res) => {
  *                 id:
  *                   type: integer
  *                   example: 1
- *                 firstName:
+ *                 firstname:
  *                   type: string
  *                   example: "John"
- *                 lastName:
+ *                 lastname:
  *                   type: string
  *                   example: "Doe"
- *                 email:
- *                   type: string
- *                   example: "john.doe@example.com"
  *                 birthday:
  *                   type: string
  *                   format: date
@@ -653,10 +679,39 @@ exports.deleteUser = async (req, res) => {
  *                   type: string
  *                   enum: [Man, Woman, Non-binary, Not Specified]
  *                   example: "Man"
+ *                 phone:
+ *                   type: string
+ *                   example: "+33123456789"
+ *                 email:
+ *                   type: string
+ *                   example: "john.doe@example.com"
  *                 type:
  *                   type: string
  *                   enum: [Organizer, Participant]
  *                   example: "Organizer"
+ *                 image_user:
+ *                   type: string
+ *                   example: "https://example.com/images/user.jpg"
+ *                 ville:
+ *                   type: string
+ *                   example: "Paris"
+ *                 code_postal:
+ *                   type: string
+ *                   example: "75001"
+ *                 pays:
+ *                   type: string
+ *                   example: "France"
+ *                 latitude:
+ *                   type: number
+ *                   format: float
+ *                   example: 48.8566
+ *                 longitude:
+ *                   type: number
+ *                   format: float
+ *                   example: 2.3522
+ *                 a_propos:
+ *                   type: string
+ *                   example: "Artiste passionné par la peinture abstraite et la sculpture moderne."
  *       404:
  *         description: Utilisateur non trouvé.
  *         content:
@@ -678,14 +733,60 @@ exports.deleteUser = async (req, res) => {
  *                   type: string
  *                   example: "Erreur lors de la mise à jour de l'utilisateur."
  */
-exports.updateUser = async (req, res) => {
+exports.updateUser = async (req, res) => {    
     const { id } = req.params;
-    const { firstName, lastName, email, password, birthday, sex, type, phone } = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstname, lastname, birthday, sex, phone, email, password, type, image_user, ville, code_postal, pays, latitude, longitude, a_propos} = req.body;  // Modifications pour correspondre aux colonnes
+    var result;
+
+    var sexEnglish = sex;
+    if(sex.text){
+        switch (sex.text) {
+            case "Homme":
+                sexEnglish = "Man";
+                break;
+            case "Femme":
+                sexEnglish = "Woman";
+                break;
+            case "Non binaire":
+                sexEnglish = "Non-binary";
+                break;
+            case "Ne se prononce pas":
+                sexEnglish = "Not Specified";
+                break;
+            default:
+                return res.status(400).json({ error: 'Invalid sex value' });
+        }
+    }
+
+    var typeEnglish = type;
+    if(type.text){
+        switch (type.text) {
+            case "Organisateur":
+                typeEnglish = "Organizer";
+                break;
+            case "Participant":
+                typeEnglish = "Participant";
+                break;
+            default:
+                return res.status(400).json({ error: 'Invalid type value' });
+        }
+    }
     try {
-        const result = await pool.query(
-            'UPDATE users SET firstName = $1, lastName = $2, email = $3, password = $4, birthday = $5, sex = $6, type = $7, phone = $8 WHERE id = $7 RETURNING *',
-            [firstName, lastName, email, password, birthday, sex, type, phone, id]
-        );
+        if(password === '') { //Si mot de passe pas rempli
+            result = await pool.query(
+                'UPDATE users SET firstname = $1, lastname = $2, birthday = $3, sex = $4, phone = $5, email = $6, type = $7, image_user = $8, ville = $9, code_postal = $10, pays = $11, latitude = $12, longitude = $13, a_propos = $14 WHERE id = $15 RETURNING *',
+                [firstname, lastname, birthday, sexEnglish, phone, email, typeEnglish, image_user, ville, code_postal, pays, latitude, longitude, a_propos, id]
+            );
+        }
+        else{ // Si changement de mot de passe
+            const bcrypt = require('bcrypt');
+            const saltRounds = 10;
+            const hash = bcrypt.hashSync(password, saltRounds);   
+            result = await pool.query(
+                'UPDATE users SET firstname = $1, lastname = $2, birthday = $3, sex = $4, phone = $5, email = $6, password = $7, type = $8, image_user = $9, ville = $10, code_postal = $11, pays = $12, latitude = $13, longitude = $14, a_propos = $15 WHERE id = $16 RETURNING *',
+                [firstname, lastname, birthday, sexEnglish, phone, email, hash, typeEnglish, image_user, ville, code_postal, pays, latitude, longitude, a_propos, id]
+            );
+        }
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
@@ -969,9 +1070,6 @@ exports.getUserEvents = async (req, res) => {
     }
 };
 
-
-
-
 // GET - Récupérer tous les événements qui viennent de liberer une place d'un utilisateur en liste d'attente
 /**
  * @swagger
@@ -1084,8 +1182,6 @@ exports.getUserNotifsEvents = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de la récupération des événements." });
     }
 };
-
-
 
 // GET - Récupérer le nombre de notifications
 /**
