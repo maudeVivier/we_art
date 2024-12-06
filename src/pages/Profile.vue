@@ -93,8 +93,8 @@ export default {
     async fetchUserDetails() {
       try {
         this.loading=true
-        const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
-        // const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
+        //const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
+        const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
