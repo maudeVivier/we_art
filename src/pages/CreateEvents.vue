@@ -1,206 +1,289 @@
 <template>
   <v-app>
-    <v-main>
-      <v-container>
-        <v-card>
-          <v-card-title>
-            <h1>Créer un Événement</h1>
-          </v-card-title>
+    <v-dialog max-width="600px">
+    </v-dialog>
 
-          <v-card-text>
-            <form @submit.prevent="createEvent">
-              <!-- Image de l'Événement -->
-              <v-file-input
-                v-model="imageEvent"
-                label="Télécharger une image *"
-                accept="image/*"
-                outlined
-                dense
-                required
-              ></v-file-input>
+    <v-container>
+      <v-row class="my-1 row-container">
+        <v-btn
+          icon
+          class="mr-2"
+          @click.prevent="prevStep" 
+          :class="{ 'disabled-link': currentStep === 1 || currentStep === 7 }"
+        > 
+        <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
 
-              <!-- Nom de l'Événement -->
-              <v-text-field
-                v-model="name"
-                label="Nom de l'Événement *"
-                required
-                outlined
-                dense
-              ></v-text-field>
+        <h2>Créer un atelier</h2>
 
-              <!-- Description -->
-              <v-textarea
-                v-model="description"
-                label="Description *"
-                required
-                outlined
-                dense
-                rows="4"
-              ></v-textarea>
+        <!-- Bouton qui permet de mettre inscription au milieu -->
+        <v-btn
+          icon
+          class="mr-2"
+        > 
+        </v-btn>
+      </v-row>
 
-              <!-- Discipline -->
-              <v-select
-                v-model="discipline"
-                :items="disciplines"
-                label="Discipline *"
-                required
-                outlined
-              ></v-select>
+    <v-main class="vertical-center">
+      <v-card-text>
+        <div>
+          <div v-if="currentStep === 1" style="text-align: center;">
+            <v-img
+              v-if="imageEvent"
+              :src="imageEvent"
+              alt="Photo"
+              style="width: 100%; height: 150px; object-fit: cover; margin: auto;"
+            ></v-img>
 
-              <!-- Niveau -->
-              <v-select
-                v-model="niveau"
-                :items="niveaux"
-                label="Niveau *"
-                required
-                outlined
-              ></v-select>
+            <!-- Image vierge si aucune image n'est ajoutée -->
+            <v-img
+              v-else
+              :src="photo_default"
+              alt="Photo vierge"
+              max-width="100%"
+              max-height="100%"
+              style="width: 150px; height: 150px; object-fit: cover; margin: auto;"
+              @click="triggerFileInput"
+            ></v-img>
 
-              <!-- Nombre de participants max -->
-              <v-text-field
-                v-model="nombre_de_participants_max"
-                label="Nombre de participants maximum *"
-                required
-                outlined
-                dense
-                type="number"
-              ></v-text-field>
+            <!-- Bouton pour ouvrir le sélecteur d'image -->
+            <v-btn
+              icon
+              class="bottom-2 right-2"
+              @click="triggerFileInput"
+            >
+              <v-icon>mdi-camera</v-icon>
+            </v-btn>
 
-              <!-- Date et Heure de la deadline -->
-              <v-text-field
-                v-model="deadlineDateTime"
-                label="Date et Heure maximum pour s'inscrire"
-                readonly
-                outlined
-                prepend-icon="mdi-calendar-clock"
-                @click:prepend="deadlineOpenDateTime"
-              ></v-text-field>
+            <!-- Input caché pour sélectionner une image -->
+            <input
+              ref="fileInput"
+              type="file"
+              accept="image/*"
+              style="display: none;"
+              required
+              @change="onFileChange"
+            />
+            <br>
+            <v-text v-if="imageError" class="error-message">
+              {{ imageError }}
+            </v-text>
+            <p style="font-size: 1.2rem;">Ajouter une photo</p>
+          
+            <!-- Nom de l'Événement -->
+            <v-text-field
+              v-model="name"
+              label="Nom de l'Événement *"
+              required
+              outlined
+              dense
+            />
 
-              <v-dialog v-model="deadlineFormatted" persistent max-width="290px">
-                <v-date-picker v-model="deadlineDate" @input="deadlineSaveDateTime"></v-date-picker>
-                <v-time-picker v-model="deadlineTime" format="24hr" @input="deadlineSaveDateTime"></v-time-picker>
+            <!-- Discipline -->
+            <!-- <v-select
+              v-model="discipline"
+              :items="disciplines"
+              label="Discipline *"
+              required
+              outlined
+              dense
+            ></v-select> -->
+            <!-- <div class="d-flex">
+    <div class="column">
+        <v-checkbox
+            v-for="(discipline, index) in disciplines.filter(d => d.column === 'Colonne 1')"
+            :key="`col1-${index}`"
+            :label="discipline.name"
+            :value="discipline.name"
+            v-model="selectedDisciplines"
+            dense
+        ></v-checkbox>
+    </div>
 
-                <v-btn text @click="deadlineFormatted = false">Annuler</v-btn>
-                <v-btn text @click="deadlineSaveDateTime">OK</v-btn>
-              </v-dialog>
+    <div class="column">
+        <v-checkbox
+            v-for="(discipline, index) in disciplines.filter(d => d.column === 'Colonne 2')"
+            :key="`col2-${index}`"
+            :label="discipline.name"
+            :value="discipline.name"
+            v-model="selectedDisciplines"
+            dense
+        ></v-checkbox>
+    </div>
+</div> -->
 
-              <!-- Prix -->
-              <v-checkbox
-                v-model="prixLibre"
-                label="Prix libre ?"
-              ></v-checkbox>
 
-              <v-text-field
-                v-model="prix"
-                label="Prix *"
-                required
-                outlined
-                dense
-                type="number"
-                :disabled="prixLibre"
-              ></v-text-field>
+            <!-- Niveau -->
+            <v-select
+              v-model="niveau"
+              :items="niveaux"
+              label="Niveau *"
+              required
+              outlined
+              dense
+            ></v-select>
 
-              <!-- Date et Heure de Début -->
-              <v-text-field
-                v-model="debutDateTime"
-                label="Date et Heure de Début"
-                readonly
-                outlined
-                prepend-icon="mdi-calendar-clock"
-                @click:prepend="debutOpenDateTime"
-              ></v-text-field>
+            <!-- Description -->
+            <v-textarea
+              v-model="description"
+              label="Description *"
+              required
+              outlined
+              dense
+              rows="4"
+            ></v-textarea>
+          </div>
 
-              <v-dialog v-model="debutFormatted" persistent max-width="290px">
-                <v-date-picker v-model="debutDate" @input="debutSaveDateTime"></v-date-picker>
-                <v-time-picker v-model="debutTime" format="24hr" @input="debutSaveDateTime"></v-time-picker>
+          <div v-if="currentStep === 2">   <!-- Date et Heure de Début et de fin -->
+            <v-text-field
+              v-model="debutDateTime"
+              label="Date et Heure de Début"
+              readonly
+              outlined
+              prepend-icon="mdi-calendar-clock"
+              @click:prepend="debutOpenDateTime"
+            />
 
-                <v-btn text @click="debutFormatted = false">Annuler</v-btn>
-                <v-btn text @click="debutSaveDateTime">OK</v-btn>
-              </v-dialog>
+            <v-dialog v-model="debutFormatted" persistent max-width="290px">
+              <v-date-picker v-model="debutDate" @input="debutSaveDateTime"/>
+              <v-time-picker v-model="debutTime" format="24hr" @input="debutSaveDateTime"/>
 
-              <!-- Date et Heure de Fin -->
-              <v-text-field
-                v-model="finDateTime"
-                label="Date et Heure de Fin"
-                readonly
-                outlined
-                prepend-icon="mdi-calendar-clock"
-                @click:prepend="finOpenDateTime"
-              ></v-text-field>
+              <v-btn text @click="debutFormatted = false">Annuler</v-btn>
+              <v-btn text @click="debutSaveDateTime">OK</v-btn>
+            </v-dialog>
 
-              <v-dialog v-model="finFormatted" persistent max-width="290px">
-                <v-date-picker v-model="finDate" @input="finSaveDateTime"></v-date-picker>
-                <v-time-picker v-model="finTime" format="24hr" @input="finSaveDateTime"></v-time-picker>
+            <v-text-field
+              v-model="finDateTime"
+              label="Date et Heure de Fin"
+              readonly
+              outlined
+              prepend-icon="mdi-calendar-clock"
+              @click:prepend="finOpenDateTime"
+            />
 
-                <v-btn text @click="finFormatted = false">Annuler</v-btn>
-                <v-btn text @click="finSaveDateTime">OK</v-btn>
-              </v-dialog>
+            <v-dialog v-model="finFormatted" persistent max-width="290px">
+              <v-date-picker v-model="finDate" @input="finSaveDateTime"/>
+              <v-time-picker v-model="finTime" format="24hr" @input="finSaveDateTime"/>
 
-              <!-- Nom de la Rue -->
-              <v-text-field
-                v-model="street"
-                label="Nom et Numéro de la Rue *"
-                required
-                outlined
-                dense
-              ></v-text-field>
+              <v-btn text @click="finFormatted = false">Annuler</v-btn>
+              <v-btn text @click="finSaveDateTime">OK</v-btn>
+            </v-dialog>
 
-              <!-- Code Postal -->
-              <v-text-field
-                v-model="postal_code"
-                label="Code Postal *"
-                required
-                outlined
-                dense
-              ></v-text-field>
+                          <!-- Date et Heure de la deadline -->
+                          <v-text-field
+              v-model="deadlineDateTime"
+              label="Date et Heure maximum pour s'inscrire"
+              readonly
+              outlined
+              prepend-icon="mdi-calendar-clock"
+              @click:prepend="deadlineOpenDateTime"
+            ></v-text-field>
 
-              <!-- Ville -->
-              <v-text-field
-                v-model="city"
-                label="Ville *"
-                required
-                outlined
-                dense
-              ></v-text-field>
+            <v-dialog v-model="deadlineFormatted" persistent max-width="290px">
+              <v-date-picker v-model="deadlineDate" @input="deadlineSaveDateTime"></v-date-picker>
+              <v-time-picker v-model="deadlineTime" format="24hr" @input="deadlineSaveDateTime"></v-time-picker>
 
-              <!-- Pays -->
-              <v-text-field
-                v-model="country"
-                label="Pays *"
-                required
-                outlined
-                dense
-              ></v-text-field>
+              <v-btn text @click="deadlineFormatted = false">Annuler</v-btn>
+              <v-btn text @click="deadlineSaveDateTime">OK</v-btn>
+            </v-dialog>
+          </div>
 
-              <!-- Bouton de soumission -->
-              <v-btn type="submit" color="primary" class="mt-4" :disabled="loading">
-                <v-icon v-if="loading" small left>mdi-loading</v-icon>
-                Créer l'Événement
-              </v-btn>
-            </form>
+          <div v-if="currentStep === 3">
+          <!-- Nom de la Rue -->
+          <v-text-field
+            v-model="street"
+            label="Numéro et Nom de Rue *"
+            required
+            outlined
+            dense
+          />
 
-            <!-- Loading Spinner -->
-            <div v-if="loading" class="text-center mt-5">
-              <v-progress-circular
-                indeterminate
-                color="primary"
-                size="60"
-              ></v-progress-circular>
-              <p>Création de l'événement en cours...</p>
-            </div>
+        <v-row>
+          <v-col>
+            <!-- Code Postal -->
+            <v-text-field
+              v-model="postal_code"
+              label="Code Postal *"
+              required
+              outlined
+              dense
+            />
+          </v-col>
+          <v-col>
+            <!-- Ville -->
+            <v-text-field
+              v-model="city"
+              label="Ville *"
+              required
+              outlined
+              dense
+            />
+          </v-col>
+        </v-row>
+        <v-row>
+          <!-- Pays -->
+          <v-text-field
+            v-model="country"
+            label="Pays *"
+            required
+            outlined
+            dense
+          />
+        </v-row>
+                      <!-- Prix -->
+                      <v-checkbox
+              v-model="prixLibre"
+              label="Prix libre ?"
+            ></v-checkbox>
 
-            <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-            <!-- Snackbar pour le message de succès -->
-            <v-snackbar v-model="successMessage" timeout="3000">
-              Nous avons bien créé votre évènement!
-              <template v-slot:action="{ attrs }">
-                <v-btn text v-bind="attrs" @click="successMessage = false">Fermer</v-btn>
-              </template>
-            </v-snackbar>
-          </v-card-text>
-        </v-card>
-      </v-container>
+            <v-text-field
+              v-model="prix"
+              label="Prix *"
+              required
+              outlined
+              dense
+              type="number"
+              :disabled="prixLibre"
+            ></v-text-field>
+
+            <!-- Nombre de participants max -->
+            <v-text-field
+              v-model="nombre_de_participants_max"
+              label="Nombre de participants maximum *"
+              required
+              outlined
+              dense
+              type="number"
+            ></v-text-field>
+          </div>
+
+          <v-btn type="submit" color="primary" class="mt-4" :disabled="loading" @click="createEvent">
+              <v-icon v-if="loading" small left>mdi-loading</v-icon>
+              Créer l'Événement
+            </v-btn>
+        </div>
+
+                    <!-- Loading Spinner -->
+                    <div v-if="loading" class="text-center mt-5">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+              size="60"
+            ></v-progress-circular>
+            <p>Création de l'événement en cours...</p>
+          </div>
+
+        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
+          <!-- Snackbar pour le message de succès -->
+          <v-snackbar v-model="successMessage" timeout="3000">
+            Nous avons bien créé votre évènement!
+            <template v-slot:action="{ attrs }">
+              <v-btn text v-bind="attrs" @click="successMessage = false">Fermer</v-btn>
+            </template>
+          </v-snackbar>
+      </v-card-text>
     </v-main>
+    </v-container>
   </v-app>
 </template>
 
@@ -210,10 +293,14 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      currentStep: 1,
+      photo_default: require('@/assets/ajouter_photo.png'),
       imageEvent: null,
+      imageError: '',
       name: '',
       discipline: '',
-      disciplines: ['Musique', 'Danse', 'Théatre', 'Peinture', 'Dessin', 'Poterie', 'Arts textiles', 'Photographie', 'Création de bijoux', 'Gravure', 'Sculpture'],
+      disciplines: [],
+      // disciplines: ['Musique', 'Danse', 'Théatre', 'Peinture', 'Dessin', 'Poterie', 'Arts textiles', 'Photographie', 'Création de bijoux', 'Gravure', 'Sculpture'],
       niveau: '',
       niveaux: ['Débutant', 'Intermédiaire', 'Professionnel', 'Tous niveaux'],
       prix:0,
@@ -247,6 +334,21 @@ export default {
     },
   },
   methods: {
+    triggerFileInput() { // Méthode pour déclencher le clic sur l'input de type file
+      this.$refs.fileInput.click();  // Simule un clic sur l'élément input caché
+    },
+    onFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.imageEvent = reader.result;  // Assigne l'image sélectionnée à imageUser
+        };
+        reader.readAsDataURL(file);
+      }
+      this.imageEvent = event.target.files[0];
+      // this.validateImage();
+    },
     deadlineOpenDateTime() {
       this.deadlineFormatted = true;
     },
@@ -293,7 +395,6 @@ export default {
       }
       return true;
     },
-
     async createEvent() {
       if (!this.validateDates()) {
         return;
@@ -305,17 +406,17 @@ export default {
       this.loading = true;
       
       try {
-        const response_image = await axios.post(
-          `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
-          formData
-        );
-        const imageUrl = response_image.data.secure_url;
+        // const response_image = await axios.post(
+        //   `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
+        //   formData
+        // );
+        // const imageUrl = response_image.data.secure_url;
 
         if(this.prixLibre){
           this.prix = -1;
         }
-        //const response = await axios.post('http://localhost:3000/api/events', {
-        const response = await axios.post('https://we-art.onrender.com/api/events', {
+        const response = await axios.post('http://localhost:3000/api/events', {
+        // const response = await axios.post('https://we-art.onrender.com/api/events', {
           name: this.name,
           description: this.description,
           street: this.street,
@@ -330,7 +431,8 @@ export default {
           nombre_de_participants_max : this.nombre_de_participants_max,
           deadline: this.deadlineDateTime,
           id_organisateur: this.userConnected.idUser,
-          image_url: imageUrl,
+          // image_url: imageUrl,
+          image_url: null,
         });
 
         console.log('Événement ajouté:', response.data);
@@ -345,7 +447,7 @@ export default {
         this.loading = false;
       }
     },
-  resetForm() {
+    resetForm() {
       this.imageEvent = null,
       this.name = '';
       this.description = '';
@@ -362,13 +464,41 @@ export default {
       this.city = '';
       this.country = '';
     },
+    async allDisciplines() {
+            try {
+                // const response = await axios.get('http://localhost:3000/api/events/disciplines');
+                const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
+                this.disciplines = response.data.map(d => d.discipline); // Map pour extraire les noms
+                console.log("disciplines : ",this.disciplines)
+              } catch (error) {
+                console.error('Erreur lors de la récupération des disciplines:', error);
+            }
+        },
+  },
+  mounted() {
+    console.log("dans mounted")
+    this.allDisciplines();
   },
 };
 </script>
 
 <style scoped>
-.error {
-  color: red;
-  margin-top: 10px;
+  .error {
+    color: red;
+    margin-top: 10px;
+  }
+
+  .row-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .vertical-center{
+    display: flex;
+    height: 100%;
+  }
+.column {
+    width: 50%; /* Deux colonnes */
+    padding: 0 10px;
 }
 </style>

@@ -728,7 +728,6 @@ exports.addUserToEvent = async (req, res) => {
     }
 };
 
-
 // DELETE - Désinscrire un utilisateur d'un événement
 /**
  * @swagger
@@ -810,7 +809,6 @@ exports.removeUserFromEvent = async (req, res) => {
     }
 };
 
-
 // GET - Voir si un utilisateur est inscrit dans la liste d'attente d'un évènement
 /**
  * @swagger
@@ -884,7 +882,6 @@ exports.checkUserListWait = async (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la vérification de la liste attente.' });
     }
 };
-
 
 // POST - Se mettre dans la liste d'attente d'un evenement
 /**
@@ -1005,8 +1002,6 @@ exports.addUserToListAttenteEvent = async (req, res) => {
     }
 };
 
-
-
 // DELETE - Désinscrire un utilisateur de la liste d'attente d'un événement
 /**
  * @swagger
@@ -1086,10 +1081,6 @@ exports.removeUserFromListAttenteEvent = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de la désinscription de l'utilisateur à la liste d'attente de l'événement." });
     }
 };
-
-
-
-
 
 // POST - Ajouter un commentaire à un événement
 /**
@@ -1197,3 +1188,14 @@ exports.addComment = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de l'ajout du commentaire." });
     }
 };
+
+// GET - recuperer toutes les disciplines
+exports.allDisciplines = async (req, res) => {
+    try{
+        const result = await pool.query("SELECT unnest(enum_range(NULL::discipline_type)) AS discipline");
+        console.log("resultat des disciplines : ", result.rows)
+        res.json(result.rows);
+    }catch(error){
+        console.error("Erreur lors de la récupération des disciplines : ", error)
+    }
+}

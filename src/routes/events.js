@@ -1,5 +1,5 @@
 const express = require('express');
-const { getEventById, getAllEvents, createEvent, addUserToEvent, checkUserParticipation, removeUserFromEvent, addComment, addUserToListAttenteEvent, removeUserFromListAttenteEvent, checkUserListWait} = require('../controllers/eventsController');
+const { getEventById, getAllEvents, createEvent, addUserToEvent, checkUserParticipation, removeUserFromEvent, addComment, addUserToListAttenteEvent, removeUserFromListAttenteEvent, checkUserListWait, allDisciplines} = require('../controllers/eventsController');
 
 const router = express.Router();
 
@@ -13,6 +13,6 @@ router.post('/events/:eventId/comments', addComment);
 router.post('/events/listWait/:eventId/users/:userId', addUserToListAttenteEvent);
 router.delete('/events/listWait/:eventId/users/:userId', removeUserFromListAttenteEvent); 
 router.get('/events/listWait/:eventId/users/:userId', checkUserListWait);
-
+router.get('events/disciplines', allDisciplines);
 
 module.exports = router;
