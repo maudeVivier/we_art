@@ -415,8 +415,8 @@ export default {
         if(this.prixLibre){
           this.prix = -1;
         }
-        const response = await axios.post('http://localhost:3000/api/events', {
-        // const response = await axios.post('https://we-art.onrender.com/api/events', {
+        //const response = await axios.post('http://localhost:3000/api/events', {
+        const response = await axios.post('https://we-art.onrender.com/api/events', {
           name: this.name,
           description: this.description,
           street: this.street,
