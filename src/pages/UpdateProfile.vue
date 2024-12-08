@@ -299,9 +299,7 @@
       async fetchPostalCodes(ville) {      
         if (ville.length >= 3) {
           try {
-            const response = await axios.get(
-              `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(ville)}&type=municipality`
-            );
+            const response = await axios.get(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(ville)}&type=municipality`);
 
             const places = response.data.features.map(feature => ({
               city: feature.properties.city,
