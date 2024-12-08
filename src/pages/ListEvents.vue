@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-container style="max-width: 100%;">
+      <v-container v-if="!showFiltersBox" style="max-width: 100%;">
         <v-row class="my-1 ml-1">
           <v-btn
             :to="{name : 'Home'}"
@@ -18,6 +18,7 @@
           <v-btn
             icon
             class="mr-2"
+            @click="showFilters"
           > 
           <!-- mettre  :to="{ name: 'XXX' }" pour afficher les filtres -->
           <v-icon>mdi-tune-variant</v-icon>
@@ -52,7 +53,7 @@
 
       </v-container>
 
-      <v-card v-if="mode==='map'">
+      <v-card v-if="mode==='map' && !showFiltersBox">
         <div class="map-container">
           <!-- Carte Leaflet -->
           <l-map :zoom="zoom" :center.sync="center" class="custom-map">
@@ -125,7 +126,7 @@
       </v-card>
       
       
-      <v-container v-if="mode==='list'">
+      <v-container v-if="mode==='list' && !showFiltersBox">
 
         <v-row class="event-list" v-if="mode==='list'">
           <v-col
@@ -193,11 +194,11 @@
      
         
       <!-- Loading Spinner -->
-      <v-col v-if="loading" cols="12" class="text-center">
+      <v-col v-if="loading && !showFiltersBox" cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
         <p>Chargement des événements...</p>
       </v-col>
-      <v-container style="margin: -50px;" v-if="this.userConnected && this.$store.getters.user.type === 'Organizer'">
+      <v-container style="margin: -50px;" v-if="this.userConnected && this.$store.getters.user.type === 'Organizer' && !showFiltersBox">
         <!-- Bouton Ajouter un Événement -->
         <v-row>
           <v-col cols="12" class="text-center">
@@ -213,6 +214,82 @@
           </v-col>
         </v-row>
       </v-container>
+
+      <v-container v-if="showFiltersBox && !loadingFilter" style="max-width: 100%;">
+        <h2>Filtres</h2>
+        <h3>Activités</h3>
+        <v-row class="mt-2" dense>
+          <v-col cols="6" v-for="(discipline, index) in disciplines" :key="index">
+            <v-checkbox
+              :label="discipline"
+              :value="discipline"
+              v-model="selectedDisciplines"
+              dense
+              class="compact-checkbox"
+            ></v-checkbox>
+          </v-col>
+        </v-row>
+
+        <!-- Filtre sur la date -->
+        <h3>Date</h3>
+        <!-- A VOIR SI ON MET UN PICKER DATE OU PAS 
+        <v-row class="mt-2">
+          <v-col cols="12" sm="6">
+            <v-date-picker
+              v-model="selectedDate"
+              no-title
+              @input="applyFilters"
+              dense
+            ></v-date-picker>
+          </v-col>
+        -->
+        <v-radio-group v-model="selectedDateFilter" row>
+          <v-radio label="Aujourd'hui" :value="'today'"></v-radio>
+          <v-radio label="Cette semaine" :value="'week'"></v-radio>
+          <v-radio label="Ce week-end" :value="'weekend'"></v-radio>
+          <v-radio label="Ce mois" :value="'month'"></v-radio>
+        </v-radio-group>
+
+
+
+        <!-- Filtre sur le prix -->
+        <h3>Prix</h3>
+        <div class="d-flex justify-center mt-4">
+          <v-radio-group v-model="selectedPrice" row>
+            <v-radio label="Gratuit" :value="0"></v-radio>
+            <v-radio label="Prix libre" :value="-1"></v-radio>
+          </v-radio-group>
+
+          <v-radio-group v-model="selectedPrice" row>
+            <v-radio label="Payant" :value="1"></v-radio>
+            <v-radio label="Inférieur à" :value="2"></v-radio>
+          </v-radio-group>
+        </div>
+
+          <!-- Si "Inférieur à" est sélectionné, afficher un champ de saisie -->
+          <v-text-field
+            v-if="selectedPrice === 2"
+            v-model="maxPrice"
+            label="Entrez un prix maximum"
+            type="number"
+            :disabled="loadingFilter"
+            dense
+          ></v-text-field>
+
+
+        <div class="d-flex justify-center mt-4">
+          <v-btn
+            color="primary"
+            dark
+            @click="applyFilters"
+            class="mt-4"
+          >
+            Confirmer
+          </v-btn>
+        </div>
+      </v-container>
+
+
     </v-main>
   </v-app>
 </template>
@@ -255,6 +332,15 @@ export default {
       showEventCards: false, // Nouvelle variable pour contrôler l'affichage des cartes
 
       scrollTimeout:null,
+
+      // FILTRES
+      showFiltersBox: false,
+      disciplines: [], // Liste des disciplines récupérées
+      selectedDisciplines: [], // Disciplines sélectionnées
+      loadingFilter: false, // Loading state for filters
+      selectedPrice: null, // Variable pour stocker la sélection du prix
+      maxPrice: null, // Variable pour stocker le prix maximum saisi (si "Inférieur à" est sélectionné)
+      selectedDateFilter: '',
     };
   },
   computed: {
@@ -312,6 +398,28 @@ export default {
     this.fetchEvents();
   },
   methods: {
+    async fetchDisciplines() {
+      try {
+        this.loadingFilter = true;
+        const response = await axios.get('http://localhost:3000/api/events/disciplines');
+        this.disciplines = response.data.map(d => d.discipline); // Map pour extraire les noms
+        console.log('Disciplines récupérées:', this.disciplines);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des disciplines:', error);
+      } finally {
+        this.loadingFilter = false;
+      }
+    },
+
+    showFilters() {
+      this.showFiltersBox = true;
+      this.fetchDisciplines();
+    },
+    applyFilters() {
+      this.showFiltersBox = false;
+      this.fetchEvents(); // Relancer la récupération des événements avec les disciplines sélectionnées
+    },
+
     toggleMode() {
       this.selectedEvent= null, // Événement sélectionné
       this.showEventCards= false,
@@ -338,8 +446,34 @@ export default {
     async fetchEvents() {
       this.loading = true; // Start loading
       try {
-        //const response = await axios.get('http://localhost:3000/api/events');
-        const response = await axios.get('https://we-art.onrender.com/api/events');
+        let queryParams = '';
+
+        // Ajouter le filtre de discipline si sélectionné
+        if (this.selectedDisciplines.length) {
+          queryParams += `?discipline=${this.selectedDisciplines.join(',')}`;
+        }
+
+        // Ajouter le filtre de prix
+        if (this.selectedPrice !== null) {
+          // Si "Inférieur à" est sélectionné, ajouter le paramètre maxPrice
+          if (this.selectedPrice === 2 && this.maxPrice) {
+            queryParams += queryParams ? `&prix_max=${this.maxPrice}` : `?prix_max=${this.maxPrice}`;
+          } else {
+            // Gérer les autres options (Gratuit, Prix libre, Payant)
+            if (queryParams) {
+              queryParams += `&prix=${this.selectedPrice}`;
+            } else {
+              queryParams += `?prix=${this.selectedPrice}`;
+            }
+          }
+        }
+
+        // Ajouter le filtre de date
+        if(this.selectedDateFilter){
+          queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
+        }
+        
+        const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
@@ -563,6 +697,11 @@ export default {
   white-space: nowrap; /* Empêche le retour à la ligne */
   gap: 10px;
 }
+.compact-checkbox {
+  margin-bottom: 0.5%; /* Ajustez l'espace entre les cases */
+  padding: 0;
+}
+
 
 
 

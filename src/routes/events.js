@@ -13,6 +13,6 @@ router.post('/events/:eventId/comments', addComment);
 router.post('/events/listWait/:eventId/users/:userId', addUserToListAttenteEvent);
 router.delete('/events/listWait/:eventId/users/:userId', removeUserFromListAttenteEvent); 
 router.get('/events/listWait/:eventId/users/:userId', checkUserListWait);
-router.get('events/disciplines', allDisciplines);
+router.get('/events/disciplines', allDisciplines);
 
 module.exports = router;

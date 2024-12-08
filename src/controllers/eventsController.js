@@ -1,6 +1,6 @@
 const pool = require('../config/database');
 const opencage = require('opencage-api-client');
-
+const moment = require('moment'); // Librairie pour manipuler les dates
 /**
  * @swagger
  * tags:
@@ -14,7 +14,12 @@ const opencage = require('opencage-api-client');
  * /api/events:
  *   get:
  *     summary: Récupérer tous les événements
- *     description: Retourne la liste de tous les événements dans la base de données avec le nombre de participants pour chaque événement.
+ *     description: >
+ *       Retourne la liste de tous les événements dans la base de données avec le nombre de participants pour chaque événement.
+ *       Les prix sont interprétés comme suit :
+ *       - `-1` : Prix libre
+ *       - `0` : Gratuit
+ *       - Supérieur à `0` : Montant en euros *     
  *     tags: [Events]
  *     parameters:
  *       - in: query
@@ -28,6 +33,20 @@ const opencage = require('opencage-api-client');
  *             `disciplines_types` de la base de données : Musique, Danse, Théâtre,
  *             Peinture, Dessin, Poterie, Arts textiles, Photographie, Création
  *             de bijoux, Gravure, Sculpture.
+ *       - in: query
+ *         name: prix
+ *         schema:
+ *           type: integer
+ *           description: >
+ *             Filtrer par prix :
+ *             - `-1` pour prix libre
+ *             - `0` pour gratuit
+ *             - Une valeur supérieure à 0 pour les événements payants
+ *       - in: query
+ *         name: prix_max
+ *         schema:
+ *           type: integer
+ *           description: Renvoi tous les événements dont le prix est inférieur ou égal à la valeur donnée
  *     responses:
  *       200:
  *         description: Liste des événements avec le nombre de participants.
@@ -127,7 +146,28 @@ exports.getAllEvents = async (req, res) => {
     const allowedDisciplines = allowedDisciplinesResult.rows.map(row => row.discipline);
     
     const disciplines = req.query.discipline ? req.query.discipline.split(',') : null;
+    const prix = req.query.prix ? parseInt(req.query.prix, 10) : null;
+    const prix_max = req.query.prix_max ? parseInt(req.query.prix_max, 10) : null;  
     
+    const dateFilter = req.query.date; // Ex: 'today', 'week', 'weekend', 'month'
+    let start_date = null;
+    let end_date = null;
+    console.log('dateFilter:', dateFilter);
+    if (dateFilter === 'today') {
+        start_date = moment().local().startOf('day').toDate(); // Début de la journée (locale)
+        end_date = moment().local().endOf('day').toDate(); // Fin de la journée (locale)
+    } else if (dateFilter === 'week') {
+        start_date = moment().local().startOf('week').toDate(); // Lundi de cette semaine (locale)
+        end_date = moment().local().endOf('week').toDate(); // Dimanche de cette semaine (locale)
+    } else if (dateFilter === 'weekend') {
+        start_date = moment().local().startOf('week').add(5, 'days').toDate(); // Samedi (locale)
+        end_date = moment(start_date).endOf('day').toDate(); // Dimanche soir (locale)
+    } else if (dateFilter === 'month') {
+        start_date = moment().local().startOf('month').toDate(); // Début du mois (locale)
+        end_date = moment().local().endOf('month').toDate(); // Fin du mois (locale)
+    }
+    console.log("start_date", start_date)
+    console.log("end_date", end_date)
     try {
         if (disciplines) {
             const invalidDisciplines = disciplines.filter(d => !allowedDisciplines.includes(d));
@@ -149,6 +189,27 @@ exports.getAllEvents = async (req, res) => {
             conditions.push(`e.discipline = ANY($${values.length + 1}::discipline_type[])`);
             values.push(disciplines); // Ajout direct en tant que tableau
         }
+
+        if (prix !== null) {
+            if (prix === -1) { // Prix libre
+                conditions.push(`e.prix = -1`);
+            } else if (prix === 0) { // Gratuit
+                conditions.push(`e.prix = 0`);
+            } else if (prix > 0) { // Payant
+                conditions.push(`e.prix > 0`);
+            }
+        }
+
+        if (prix_max !== null) {
+            conditions.push(`e.prix <= $${values.length + 1}`);
+            values.push(prix_max);
+        }   
+
+        if (start_date && end_date) {
+            conditions.push(`e.start_date >= $${values.length + 1} AND e.start_date <= $${values.length + 2}`);
+            values.push(new Date(start_date), new Date(end_date)); // Convertir les dates de filtre en objets Date
+          }
+
         if (conditions.length > 0) {
             query += ` WHERE ${conditions.join(' AND ')}`;
         }
