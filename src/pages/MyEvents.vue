@@ -70,7 +70,7 @@
                           </div> -->
                           <!-- La discipline -->
                           <div class="event-discipline">
-                            <v-icon class="mr-2">mdi-palette</v-icon>
+                            <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
                             {{ event.discipline }}
                           </div>
                         </div>

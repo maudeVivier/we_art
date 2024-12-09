@@ -179,9 +179,11 @@ exports.getAllEvents = async (req, res) => {
         }
         
         let query = `
-            SELECT e.*, COUNT(pe.id_user) AS participant_count
+            SELECT e.*, ds.icon as icon_discipline, COUNT(pe.id_user) AS participant_count
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
+            LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
+
         `;
         const conditions = [];
         const values = [];
@@ -213,7 +215,7 @@ exports.getAllEvents = async (req, res) => {
         if (conditions.length > 0) {
             query += ` WHERE ${conditions.join(' AND ')}`;
         }
-        query += ' GROUP BY e.id';
+        query += ' GROUP BY e.id, ds.icon';
         const result = await pool.query(query,values)
         res.json(result.rows);
     } catch (err) {
@@ -563,6 +565,7 @@ exports.getEventById = async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT e.*, 
+                ds.icon as icon_discipline
                 COUNT(pe.id_user) AS participant_count, 
                 e.deadline > NOW() AS is_deadline_valid,
                 e.start_date AS is_start_date_passed,
@@ -570,8 +573,9 @@ exports.getEventById = async (req, res) => {
                 e.nombre_de_participants_max > COUNT(pe.id_user) AS is_participant_limit_valid
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
+            LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
             WHERE e.id = $1
-            GROUP BY e.id `, [id]);
+            GROUP BY e.id, ds.icon `, [id]);
 
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Événement non trouvé' });
@@ -1253,7 +1257,7 @@ exports.addComment = async (req, res) => {
 // GET - recuperer toutes les disciplines
 exports.allDisciplines = async (req, res) => {
     try{
-        const result = await pool.query("SELECT unnest(enum_range(NULL::discipline_type)) AS discipline");
+        const result = await pool.query("SELECT * from discipline_metadata");
         console.log("resultat des disciplines : ", result.rows)
         res.json(result.rows);
     }catch(error){

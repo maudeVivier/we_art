@@ -106,7 +106,7 @@
                         </div>
                         <!-- La discipline -->
                         <div class="event-discipline">
-                          <v-icon class="mr-2">mdi-palette</v-icon>
+                          <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
                           {{ event.discipline }}
                         </div>
                       </div>
@@ -173,7 +173,7 @@
                       </div> -->
                       <!-- La discipline -->
                       <div class="event-discipline">
-                        <v-icon class="mr-2">mdi-palette</v-icon>
+                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
                         {{ event.discipline }}
                       </div>
                     </div>
@@ -221,12 +221,16 @@
         <v-row class="mt-2" dense>
           <v-col cols="6" v-for="(discipline, index) in disciplines" :key="index">
             <v-checkbox
-              :label="discipline"
-              :value="discipline"
+              :value="discipline.discipline"
               v-model="selectedDisciplines"
               dense
               class="compact-checkbox"
-            ></v-checkbox>
+            >
+              <template #label>
+                <v-icon class="mr-1">{{ discipline.icon }}</v-icon>
+                {{ discipline.discipline }}
+              </template>
+            </v-checkbox>
           </v-col>
         </v-row>
 
@@ -243,12 +247,23 @@
             ></v-date-picker>
           </v-col>
         -->
-        <v-radio-group v-model="selectedDateFilter" row>
-          <v-radio label="Aujourd'hui" :value="'today'"></v-radio>
-          <v-radio label="Cette semaine" :value="'week'"></v-radio>
-          <v-radio label="Ce week-end" :value="'weekend'"></v-radio>
-          <v-radio label="Ce mois" :value="'month'"></v-radio>
-        </v-radio-group>
+
+        <div class="d-flex justify-center mt-4">
+          <v-radio-group v-model="selectedDateFilter" row>
+            <v-radio label="Aujourd'hui" :value="'today'"></v-radio>
+            <v-radio label="Cette semaine" :value="'week'"></v-radio>
+          </v-radio-group>
+
+          <v-radio-group v-model="selectedDateFilter" row>
+
+            <v-radio label="Ce week-end" :value="'weekend'"></v-radio>
+            <v-radio label="Ce mois" :value="'month'"></v-radio>
+          </v-radio-group>
+        </div>
+
+       
+
+     
 
 
 
@@ -401,9 +416,9 @@ export default {
     async fetchDisciplines() {
       try {
         this.loadingFilter = true;
-        const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
-        this.disciplines = response.data.map(d => d.discipline); // Map pour extraire les noms
-        console.log('Disciplines récupérées:', this.disciplines);
+        const response = await axios.get('http://localhost:3000/api/events/disciplines');
+        this.disciplines = response.data // Map pour extraire les noms
+        console.log("Disciplines récupérées:", response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des disciplines:', error);
       } finally {
@@ -473,7 +488,7 @@ export default {
           queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
         }
         
-        const response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
+        const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
