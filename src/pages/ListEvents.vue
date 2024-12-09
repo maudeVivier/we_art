@@ -416,7 +416,7 @@ export default {
     async fetchDisciplines() {
       try {
         this.loadingFilter = true;
-        const response = await axios.get('http://localhost:3000/api/events/disciplines');
+        const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
         this.disciplines = response.data // Map pour extraire les noms
         console.log("Disciplines récupérées:", response.data);
       } catch (error) {
@@ -488,7 +488,7 @@ export default {
           queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
         }
         
-        const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
+        const response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
