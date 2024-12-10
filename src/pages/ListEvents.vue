@@ -446,6 +446,7 @@ export default {
   methods: {
     getUserLocation() {
       return new Promise((resolve) => {
+        console.log("je rentre dedans")
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -458,13 +459,25 @@ export default {
               resolve(this.center); // Résoudre la promesse avec les coordonnées
             },
             (error) => {
-              console.error("Erreur de géolocalisation : ", error);
               // Si la géolocalisation échoue, centrer sur Lyon (ou une autre valeur par défaut)
-              this.center = {
-                "lat" : 45.7640, 
-                "lng" : 4.8357
-              };
-              resolve(this.center); // Résoudre avec la valeur par défaut
+              if(this.$store.getters.user && this.$store.getters.user.latitude && this.$store.getters.user.longitude){
+                console.log("lutilisateur a dit non et on a ses coordonnées : ", this.$store.getters.user.latitude, this.$store.getters.user.longitude)
+                this.center = {
+                  "lat" : this.$store.getters.user.latitude, 
+                  "lng" : this.$store.getters.user.longitude
+                };
+                console.error("Erreur de géolocalisation : ", error);
+
+                resolve(this.center); // Résoudre avec les coordonnées de l'utilisateur
+              } else {
+                console.log("je rentre alors que non vu que je suis co : ", this.$store.getters.user)
+
+                this.center = {
+                  "lat" : 45.7640, 
+                  "lng" : 4.8357
+                };
+                resolve(this.center); // Résoudre avec la valeur par défaut
+              }
             }
           );
         } else {

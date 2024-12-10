@@ -87,7 +87,10 @@ export default {
           const user = {
             idUser: response.data.idUser,
             email: this.email,
-            type : response.data.type
+            type : response.data.type,
+            latitude : response.data.latitude,
+            longitude : response.data.longitude
+
           }
 
           await this.login(user);

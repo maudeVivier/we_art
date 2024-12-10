@@ -875,7 +875,10 @@ exports.loginUser = async (req, res) => { // Utilise POST au lieu de GET pour le
             res.json({
                 'msg' : "connecte",
                 'idUser' : user.id,
-                'type' : user.type
+                'type' : user.type,
+                'latitude' : user.latitude,
+                'longitude' : user.longitude
+
             });
         } else {
             res.status(401).json("non connecte");
