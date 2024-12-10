@@ -56,7 +56,7 @@
       <v-card v-if="mode==='map' && !showFiltersBox">
         <div class="map-container">
           <!-- Carte Leaflet -->
-          <l-map :zoom="zoom" :center.sync="center" class="custom-map">
+          <l-map ref="map" :zoom="zoom" :center.sync="center" class="custom-map" @moveend="fetchEventsMap" @zoomend="fetchEventsMap">
             <l-tile-layer :url="url" :attribution="attribution" />
             <l-marker
               v-for="event in filteredEvents"
@@ -64,6 +64,15 @@
               :lat-lng="[event.latitude, event.longitude]"
               :icon="customIcon"
               @click="selectEvent(event)" 
+            />
+            <!--Ajouter un cercle de rayon-->
+            <l-circle
+              v-if="radius && center"
+              :lat-lng="center"
+              :radius="radius * 1000" 
+              :color="'blue'"
+              :fill-color="'rgba(0, 0, 255, 0.2)'" 
+              :fill-opacity="0.4"
             />
           </l-map>
 
@@ -281,15 +290,31 @@
           </v-radio-group>
         </div>
 
-          <!-- Si "Inférieur à" est sélectionné, afficher un champ de saisie -->
-          <v-text-field
-            v-if="selectedPrice === 2"
-            v-model="maxPrice"
-            label="Entrez un prix maximum"
-            type="number"
-            :disabled="loadingFilter"
-            dense
-          ></v-text-field>
+        <!-- Si "Inférieur à" est sélectionné, afficher un champ de saisie -->
+        <v-text-field
+          v-if="selectedPrice === 2"
+          v-model="maxPrice"
+          label="Entrez un prix maximum"
+          type="number"
+          :disabled="loadingFilter"
+          dense
+        ></v-text-field>
+
+
+        <h3>Distance</h3>
+        <div>
+          <label for="radius">Rayon de recherche (en km) :</label>
+          <input 
+            type="range" 
+            id="radius" 
+            v-model="radius" 
+            min="5" 
+            max="100" 
+            step="5" 
+          />
+          <span>{{ radius }} km</span>
+        </div>
+
 
 
         <div class="d-flex justify-center mt-4">
@@ -311,7 +336,7 @@
 
 <script>
 import axios from 'axios';
-import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
+import { LMap, LTileLayer, LMarker, LCircle } from 'vue2-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet'; // Assurez-vous d'importer Leaflet
 import opencage from 'opencage-api-client'; // Importation d'opencage
@@ -321,6 +346,7 @@ export default {
     LMap,
     LTileLayer,
     LMarker,
+    LCircle
   },
   data() {
     return {
@@ -331,7 +357,7 @@ export default {
       mode: 'list', // 'list' ou 'map'
 
       zoom: 13,
-      center: [45.7640, 4.8357], // Coordonnées de Lyon
+      center: null, // Coordonnées de Lyon
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       defaultPhotoUrl: require('@/assets/evenementiel.jpg'),
@@ -356,6 +382,11 @@ export default {
       selectedPrice: null, // Variable pour stocker la sélection du prix
       maxPrice: null, // Variable pour stocker le prix maximum saisi (si "Inférieur à" est sélectionné)
       selectedDateFilter: '',
+
+      userLatitude: null,  // Latitude de l'utilisateur
+      userLongitude: null, // Longitude de l'utilisateur
+      radius : 10, // Rayon de recherche
+
     };
   },
   computed: {
@@ -413,12 +444,46 @@ export default {
     this.fetchEvents();
   },
   methods: {
+    getUserLocation() {
+      return new Promise((resolve) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              this.userLatitude = position.coords.latitude;
+              this.userLongitude = position.coords.longitude;
+              this.center = {
+                "lat" : this.userLatitude, 
+                "lng" : this.userLongitude
+              };
+              resolve(this.center); // Résoudre la promesse avec les coordonnées
+            },
+            (error) => {
+              console.error("Erreur de géolocalisation : ", error);
+              // Si la géolocalisation échoue, centrer sur Lyon (ou une autre valeur par défaut)
+              this.center = {
+                "lat" : 45.7640, 
+                "lng" : 4.8357
+              };
+              resolve(this.center); // Résoudre avec la valeur par défaut
+            }
+          );
+        } else {
+          alert("La géolocalisation n'est pas supportée par votre navigateur.");
+          this.center = {
+            "lat" : 45.7640, 
+            "lng" : 4.8357
+          };
+          resolve(this.center); // Résoudre avec la valeur par défaut
+        }
+      });
+
+    },
+    
     async fetchDisciplines() {
       try {
         this.loadingFilter = true;
         const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
         this.disciplines = response.data // Map pour extraire les noms
-        console.log("Disciplines récupérées:", response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des disciplines:', error);
       } finally {
@@ -431,7 +496,7 @@ export default {
       this.fetchDisciplines();
     },
     applyFilters() {
-      this.showFiltersBox = false;
+      this.showFiltercentersBox = false;
       this.fetchEvents(); // Relancer la récupération des événements avec les disciplines sélectionnées
     },
 
@@ -458,9 +523,19 @@ export default {
       });
       return time.replace(':', 'h'); // Remplace ':' par 'h'
     },
+    fetchEventsMap(){
+      this.fetchEvents();
+    },
     async fetchEvents() {
+
       this.loading = true; // Start loading
       try {
+        
+        if(!this.center){
+          await this.getUserLocation();
+        }
+
+
         let queryParams = '';
 
         // Ajouter le filtre de discipline si sélectionné
@@ -487,8 +562,15 @@ export default {
         if(this.selectedDateFilter){
           queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
         }
+
+        // Ajouter le filtre de distance
+        if(this.center && this.center.lat && this.center.lng && this.radius){
+          queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
+        }
         
         const response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
+
+
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
@@ -519,7 +601,10 @@ export default {
     
     centerMapOnEvent(event) {
       console.log('Clic sur la vignette', event); // Vérifie si cette méthode est appelée
-      this.center = [event.latitude, event.longitude]; // Centre la carte sur l'événement sélectionné
+      this.center = {
+        "lat" : event.latitude, 
+        "lng" : event.longitude
+      }; // Centre la carte sur l'événement sélectionné
       const index = this.nearbyEvents.findIndex(e => e.id === event.id);
       
       if (index !== -1) {

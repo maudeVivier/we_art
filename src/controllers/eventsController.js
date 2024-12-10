@@ -152,7 +152,11 @@ exports.getAllEvents = async (req, res) => {
     const dateFilter = req.query.date; // Ex: 'today', 'week', 'weekend', 'month'
     let start_date = null;
     let end_date = null;
-    console.log('dateFilter:', dateFilter);
+
+    const latitude = req.query.latitude ? parseFloat(req.query.latitude) : null;
+    const longitude = req.query.longitude ? parseFloat(req.query.longitude) : null;
+    const rayon = req.query.rayon ? parseFloat(req.query.rayon) : null;
+
     if (dateFilter === 'today') {
         start_date = moment().local().startOf('day').toDate(); // Début de la journée (locale)
         end_date = moment().local().endOf('day').toDate(); // Fin de la journée (locale)
@@ -166,8 +170,7 @@ exports.getAllEvents = async (req, res) => {
         start_date = moment().local().startOf('month').toDate(); // Début du mois (locale)
         end_date = moment().local().endOf('month').toDate(); // Fin du mois (locale)
     }
-    console.log("start_date", start_date)
-    console.log("end_date", end_date)
+
     try {
         if (disciplines) {
             const invalidDisciplines = disciplines.filter(d => !allowedDisciplines.includes(d));
@@ -210,8 +213,19 @@ exports.getAllEvents = async (req, res) => {
         if (start_date && end_date) {
             conditions.push(`e.start_date >= $${values.length + 1} AND e.start_date <= $${values.length + 2}`);
             values.push(new Date(start_date), new Date(end_date)); // Convertir les dates de filtre en objets Date
-          }
+        }
 
+        if (latitude !== null && longitude !== null && rayon !== null) {
+            conditions.push(`(6371 * acos(
+                cos(radians($${values.length + 1})) * cos(radians(e.latitude)) *
+                cos(radians(e.longitude) - radians($${values.length + 2})) + 
+                sin(radians($${values.length + 1})) * sin(radians(e.latitude))
+            )) <= $${values.length + 3}`);
+
+            values.push(latitude, longitude, rayon); // On passe les paramètres à la requête
+        }
+
+        
         if (conditions.length > 0) {
             query += ` WHERE ${conditions.join(' AND ')}`;
         }
@@ -565,7 +579,7 @@ exports.getEventById = async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT e.*, 
-                ds.icon as icon_discipline
+                ds.icon as icon_discipline,
                 COUNT(pe.id_user) AS participant_count, 
                 e.deadline > NOW() AS is_deadline_valid,
                 e.start_date AS is_start_date_passed,
