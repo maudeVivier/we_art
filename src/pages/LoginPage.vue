@@ -90,7 +90,6 @@ export default {
             type : response.data.type,
             latitude : response.data.latitude,
             longitude : response.data.longitude
-
           }
 
           await this.login(user);

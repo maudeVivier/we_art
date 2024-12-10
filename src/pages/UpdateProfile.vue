@@ -582,6 +582,14 @@
           try {
             // const response = await axios.patch(`http://localhost:3000/api/users/${this.user.id}`, this.user);
             const response = await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
+            this.$store.commit('updateUser', {
+              email: this.user.email,
+              type: this.user.type,
+              latitude: this.user.latitude,
+              longitude: this.user.longitude,
+            });   
+
+
             this.$router.push('/profile');
             console.log('Informations de l\'utilisateur modifié :', response.data);
           }catch(error){

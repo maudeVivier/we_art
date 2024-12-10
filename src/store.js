@@ -13,6 +13,13 @@ export default new Vuex.Store({
     setUser(state, user ) {
       state.user = user;
     },
+
+    updateUser(state, updatedFields) {
+      if (state.user) {
+        Object.assign(state.user, updatedFields); // Met à jour uniquement les champs modifiés
+      }
+    },
+    
     logout(state) {
       state.user = null;
     }
