@@ -496,8 +496,12 @@ export default {
       this.fetchDisciplines();
     },
     applyFilters() {
-      this.showFiltercentersBox = false;
+      console.log("filteer")
+      this.showFiltersBox = false;
+      console.log("showFiltersBox = ", this.showFiltersBox)
+
       this.fetchEvents(); // Relancer la récupération des événements avec les disciplines sélectionnées
+      console.log("fin de    ---- fetchEvents")
     },
 
     toggleMode() {
@@ -530,10 +534,11 @@ export default {
 
       this.loading = true; // Start loading
       try {
-        
+        console.log("ici 1")
         if(!this.center){
           await this.getUserLocation();
         }
+        console.log("ici 2")
 
 
         let queryParams = '';
