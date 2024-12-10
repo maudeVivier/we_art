@@ -446,7 +446,6 @@ export default {
   methods: {
     getUserLocation() {
       return new Promise((resolve) => {
-        console.log("je rentre dedans")
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -461,7 +460,6 @@ export default {
             (error) => {
               // Si la géolocalisation échoue, centrer sur Lyon (ou une autre valeur par défaut)
               if(this.$store.getters.user && this.$store.getters.user.latitude && this.$store.getters.user.longitude){
-                console.log("lutilisateur a dit non et on a ses coordonnées : ", this.$store.getters.user.latitude, this.$store.getters.user.longitude)
                 this.center = {
                   "lat" : this.$store.getters.user.latitude, 
                   "lng" : this.$store.getters.user.longitude
@@ -470,7 +468,6 @@ export default {
 
                 resolve(this.center); // Résoudre avec les coordonnées de l'utilisateur
               } else {
-                console.log("je rentre alors que non vu que je suis co : ", this.$store.getters.user)
 
                 this.center = {
                   "lat" : 45.7640, 
@@ -509,12 +506,9 @@ export default {
       this.fetchDisciplines();
     },
     applyFilters() {
-      console.log("filteer")
       this.showFiltersBox = false;
-      console.log("showFiltersBox = ", this.showFiltersBox)
 
       this.fetchEvents(); // Relancer la récupération des événements avec les disciplines sélectionnées
-      console.log("fin de    ---- fetchEvents")
     },
 
     toggleMode() {
@@ -547,11 +541,9 @@ export default {
 
       this.loading = true; // Start loading
       try {
-        console.log("ici 1")
         if(!this.center){
           await this.getUserLocation();
         }
-        console.log("ici 2")
 
 
         let queryParams = '';
@@ -618,7 +610,6 @@ export default {
     },
     
     centerMapOnEvent(event) {
-      console.log('Clic sur la vignette', event); // Vérifie si cette méthode est appelée
       this.center = {
         "lat" : event.latitude, 
         "lng" : event.longitude
