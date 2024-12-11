@@ -718,6 +718,8 @@ export default {
     max-height: 100% !important;
   }
   .no-shadow {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3)
+    box-shadow: none !important;
+    border-bottom: 1px solid rgba(138, 137, 137, 0.3) !important;
+    border-radius: 0 !important;
   }
 </style>
