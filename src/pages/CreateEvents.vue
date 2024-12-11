@@ -20,9 +20,18 @@
         <v-btn
           icon
           class="mr-2"
-        > 
-        </v-btn>
+        />
       </v-row>
+
+      <v-stepper v-model="currentStep" alt-labels class="no-shadow">
+        <v-stepper-header>
+          <v-stepper-step :complete="currentStep > 1" step="1">Informations de l'événement</v-stepper-step>
+          <v-divider></v-divider>
+          <v-stepper-step :complete="currentStep > 2" step="2">Dates et Heures</v-stepper-step>
+          <v-divider></v-divider>
+          <v-stepper-step :complete="currentStep > 3" step="3">Localisation et Détails</v-stepper-step>
+        </v-stepper-header>
+      </v-stepper>
 
     <v-main class="vertical-center">
       <v-card-text>
@@ -696,7 +705,6 @@ export default {
   .vertical-center{
     display: flex;
     height: 100%;
-    margin-top: 10%; /* poussé de la moitié de hauteur de viewport */;
   }
   .d-flex {
     display: flex;
@@ -706,7 +714,10 @@ export default {
   .column {
       width: 50%; /* Chaque colonne prend la moitié de la largeur */
   }
-  .dateHeure{
+  .dateHeure {
     max-height: 100% !important;
+  }
+  .no-shadow {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3)
   }
 </style>
