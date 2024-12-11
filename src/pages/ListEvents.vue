@@ -123,6 +123,7 @@
                   </v-card-text>
                   <v-img
                     :src="event.image_event_url"
+                    :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
                     alt="Image de l'événement"
                     class="event-image"
                   ></v-img>
@@ -190,6 +191,7 @@
                 </v-card-text>
                 <v-img
                   :src="event.image_event_url"
+                  :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
                   alt="Image de l'événement"
                   class="event-image"
                 ></v-img>

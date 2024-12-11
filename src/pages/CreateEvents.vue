@@ -664,8 +664,8 @@ export default {
     },
     async allDisciplines() {
             try {
-                const response = await axios.get('http://localhost:3000/api/events/disciplines');
-                // const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
+                //const response = await axios.get('http://localhost:3000/api/events/disciplines');
+                const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
                 this.disciplines = response.data.map(d => d.discipline); // Map pour extraire les noms
               } catch (error) {
                 console.error('Erreur lors de la récupération des disciplines:', error);
