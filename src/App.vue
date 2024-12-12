@@ -21,7 +21,7 @@
       <v-btn
         v-if="isAuthenticated" 
         :to="{ name: 'MyEvents' }"
-        :class="{ 'btn-active': active === 2 }"
+        :class="{ 'btn-active': active === 1 }"
         @click="fetchEventsCountNotifs"
       >
         <v-badge
@@ -71,11 +71,23 @@
 
       <v-btn
         :to="{ name: 'ListEvents' }"
-        :class="{ 'btn-active': active === 1 }"
+        :class="{ 'btn-active': active === 2 }"
         @click="fetchEventsCountNotifs"
       >
         <span>Explorer</span>
         <v-icon>mdi-earth</v-icon>
+      </v-btn>
+
+
+
+      <v-btn
+        v-if="isAuthenticated" 
+        :to="{ name: 'ListConvEvents' }"
+        :class="{ 'btn-active': active === 3 }"
+        @click="fetchEventsCountNotifs"
+      >
+        <span>Conversations</span>
+        <v-icon>mdi-forum</v-icon>
       </v-btn>
 
       <!-- Changer dynamiquement Connexion en Profil -->

@@ -1278,3 +1278,312 @@ exports.allDisciplines = async (req, res) => {
         console.error("Erreur lors de la récupération des disciplines : ", error)
     }
 }
+
+
+// POST - Ajouter un message à la conversation d'un événement
+/**
+ * @swagger
+ * /api/events/{eventId}/messages:
+ *   post:
+ *     summary: Ajouter un message à la conversation de l'événement
+ *     description: Ajoute un message à la conversation de l'événement spécifique.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement auquel le message est ajouté
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               texte:
+ *                 type: string
+ *                 example: "Ce message est un test."
+ *               userId:
+ *                 type: integer
+ *                 example: 1
+ *     responses:
+ *       201:
+ *         description: Message ajouté avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 idMessage:
+ *                   type: integer
+ *                   example: 1
+ *                 texte:
+ *                   type: string
+ *                   example: "Ce message est un test."
+ *                 idUser:
+ *                   type: integer
+ *                   example: 1
+ *                 idEvent:
+ *                   type: integer
+ *                   example: 1
+ *                 createdAt:
+ *                   type: string
+ *                   example: "2024-12-11T10:00:00Z"
+ *       404:
+ *         description: Utilisateur ou événement introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Utilisateur ou événement introuvable."
+ *       500:
+ *         description: Erreur interne lors de l'ajout du message.
+ */
+exports.postMessageConvEvent = async (req, res) => {
+    const { texte, userId } = req.body;
+    const { eventId } = req.params;
+
+    try {
+        // Vérifier si l'utilisateur existe
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ error: "Utilisateur introuvable." });
+        }
+
+        // Vérifier si l'événement existe
+        const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+        if (eventCheck.rowCount === 0) {
+            return res.status(404).json({ error: "Événement introuvable." });
+        }
+
+        // Insérer le message dans la base de données
+        const result = await pool.query(
+            'INSERT INTO conversationsEvents (texte, idUser, idEvent, dateHours) VALUES ($1, $2, $3, NOW()) RETURNING *',
+            [texte, userId, eventId]
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error("Erreur lors de l'ajout du message:", err);
+        res.status(500).send({ error: "Erreur lors de l'ajout du message." });
+    }
+};
+
+
+// GET - Récupérer tous les messages d'un événement
+/**
+ * @swagger
+ * /api/events/{eventId}/messages:
+ *   get:
+ *     summary: Récupérer tous les messages d'une conversation d'un événement
+ *     description: Récupère tous les messages associés à une conversation d'un événement spécifique.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'événement dont les messages doivent être récupérés
+ *     responses:
+ *       200:
+ *         description: Messages récupérés avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   idMessage:
+ *                     type: integer
+ *                     example: 1
+ *                   texte:
+ *                     type: string
+ *                     example: "Ce message est un test."
+ *                   idUser:
+ *                     type: integer
+ *                     example: 1
+ *                   firstname:
+ *                     type: string
+ *                     example: "John"
+ *                   lastname:
+ *                     type: string
+ *                     example: "Doe"
+ *                   idEvent:
+ *                     type: integer
+ *                     example: 1
+ *                   dateHours:
+ *                     type: string
+ *                     example: "2024-12-11T10:00:00Z"
+ *       404:
+ *         description: Événement introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Événement introuvable."
+ *       500:
+ *         description: Erreur interne lors de la récupération des messages.
+ */
+exports.getConvMessagesEvent = async (req, res) => {
+    const { eventId } = req.params;
+
+    try {
+        // Vérifier si l'événement existe
+        const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+        if (eventCheck.rowCount === 0) {
+            return res.status(404).json({ error: "Événement introuvable." });
+        }
+
+        // Récupérer tous les messages associés à cet événement
+        const result = await pool.query(
+            `SELECT 
+                c.idMessage, 
+                c.texte, 
+                c.idUser, 
+                c.idEvent, 
+                c.dateHours,
+                u.firstname, 
+                u.lastname 
+            FROM conversationsEvents c
+            INNER JOIN users u ON c.idUser = u.id
+            WHERE c.idEvent = $1
+            ORDER BY c.dateHours ASC`,
+            [eventId]
+        );
+
+        // Si aucun message n'est trouvé
+        //if (result.rowCount === 0) {
+        //    return res.status(404).json({ error: "Aucun message trouvé pour cet événement." });
+        //}
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error("Erreur lors de la récupération des messages:", err);
+        res.status(500).send({ error: "Erreur lors de la récupération des messages." });
+    }
+};
+
+
+
+/**
+ * @swagger
+ * /api/events/messages/users/{userId}:
+ *   get:
+ *     summary: Récupérer les conversations d'un utilisateur avec le dernier message pour chaque événement
+ *     description: Renvoie la liste des événements auxquels un utilisateur a participé, accompagnée du dernier message de la conversation associée.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur pour lequel les conversations doivent être récupérées
+ *     responses:
+ *       200:
+ *         description: Conversations récupérées avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_event:
+ *                     type: integer
+ *                     example: 5
+ *                   name:
+ *                     type: string
+ *                     example: "Conférence annuelle"
+ *                   image_event_url:
+ *                     type: string
+ *                     example: "https://example.com/event-image.jpg"
+ *                   start_date:
+ *                     type: string
+ *                     example: "2024-12-01T09:00:00Z"
+ *                   lastMessage:
+ *                     type: string
+ *                     example: "Dernière discussion de l'événement."
+ *                   lastMessageUserFirstname:
+ *                     type: string
+ *                     example: "Jane"
+ *                   lastMessageUserLastname:
+ *                     type: string
+ *                     example: "Doe"
+ *                   lastMessageDate:
+ *                     type: string
+ *                     example: "2024-12-10T15:30:00Z"
+ *       404:
+ *         description: Utilisateur trouvée.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Utilisateur introuvable."
+ *       500:
+ *         description: Erreur interne lors de la récupération des conversations.
+ */
+exports.getUserConversationsEvent = async (req, res) => {
+    const { userId } = req.params;  // Récupérer l'ID de l'utilisateur à partir des paramètres
+    try {
+
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ error: "Utilisateur introuvable." });
+        }
+
+        // Requête SQL pour récupérer les conversations et le dernier message
+        const result = await pool.query(
+            `SELECT 
+                pe.id_event,
+                e.name,
+                e.image_event_url,
+                e.start_date,
+                c.texte AS lastMessage,
+                u.firstname AS lastMessageUserFirstname,
+                u.lastname AS lastMessageUserLastname,
+                c.dateHours AS lastMessageDate
+            FROM 
+                participantsevents pe
+            INNER JOIN 
+                events e ON pe.id_event = e.id
+            INNER JOIN 
+                conversationsEvents c ON c.idevent = e.id
+            INNER JOIN 
+                users u ON c.iduser = u.id
+            WHERE 
+                pe.id_user = $1  -- Paramètre pour l'ID de l'utilisateur
+                AND c.idmessage = (
+                    SELECT idmessage
+                    FROM conversationsEvents 
+                    WHERE idevent = e.id 
+                    ORDER BY dateHours DESC 
+                    LIMIT 1
+                )
+            ORDER BY 
+                lastMessageDate DESC;`,
+            [userId]
+        );
+
+        // Renvoie les résultats
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error("Erreur lors de la récupération des conversations:", err);
+        res.status(500).send({ error: "Erreur lors de la récupération des conversations." });
+    }
+};
+
+
