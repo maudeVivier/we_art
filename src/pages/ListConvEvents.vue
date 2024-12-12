@@ -42,13 +42,13 @@
               >
               <v-card class="d-flex align-items-center">
                 <v-avatar size="64" class="mr-4 my-auto">
-                  <img :src="event.image_user" :alt="`${event.name}`" />
+                  <img :src="event.image_event_url" :alt="`${event.name}`" />
                 </v-avatar>
                 <v-card-text class="flex-grow-1">
                   <p class="mb-2">
                     <strong>{{ event.name }}</strong> du <strong>{{ event.start_date }}</strong>
                   </p>
-                  <p>
+                  <p class="truncate-text">
                     {{ event.lastmessageuserfirstname }} {{ event.lastmessageuserlastname }} : {{ event.lastmessage }}
                   </p>
                 </v-card-text>
@@ -62,7 +62,7 @@
       <!-- Loading Spinner -->
       <v-col v-if="loading" cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
-        <p>Chargement des événements...</p>
+        <p>Chargement des conversations...</p>
       </v-col>
 
     </v-main>
@@ -130,14 +130,18 @@ export default {
 
     goToConvEvent(event) {
       console.log("event.id", event.id_event);
-      //this.$router.push({ name: 'ConvEvent', params: { id: event.id } });
+      this.$router.push({ name: 'ConvEvent', params: { id: event.id_event } });
     },
   },
 };
 </script>
 
 <style scoped>
-
-
-
+.truncate-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;  /* Limiter à 2 lignes */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>

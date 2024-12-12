@@ -1325,6 +1325,12 @@ exports.allDisciplines = async (req, res) => {
  *                 idUser:
  *                   type: integer
  *                   example: 1
+ *                   firstname:
+ *                     type: string
+ *                     example: "John"
+ *                   lastname:
+ *                     type: string
+ *                     example: "Doe"
  *                 idEvent:
  *                   type: integer
  *                   example: 1
@@ -1345,8 +1351,11 @@ exports.allDisciplines = async (req, res) => {
  *         description: Erreur interne lors de l'ajout du message.
  */
 exports.postMessageConvEvent = async (req, res) => {
+    console.log("ici je rentre")
     const { texte, userId } = req.body;
     const { eventId } = req.params;
+    console.log("ici je 2 = ", texte, " et " , userId, " et encore ", eventId)
+
 
     try {
         // Vérifier si l'utilisateur existe
@@ -1355,19 +1364,31 @@ exports.postMessageConvEvent = async (req, res) => {
             return res.status(404).json({ error: "Utilisateur introuvable." });
         }
 
+        const user = userCheck.rows[0];
+        console.log("2")
+
+
         // Vérifier si l'événement existe
         const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
         if (eventCheck.rowCount === 0) {
             return res.status(404).json({ error: "Événement introuvable." });
         }
+        console.log("ici je 3")
 
         // Insérer le message dans la base de données
         const result = await pool.query(
             'INSERT INTO conversationsEvents (texte, idUser, idEvent, dateHours) VALUES ($1, $2, $3, NOW()) RETURNING *',
             [texte, userId, eventId]
         );
+        console.log("ici je 4")
 
-        res.status(201).json(result.rows[0]);
+        const message = result.rows[0];
+
+        res.status(201).json({
+            ...message,
+            firstname: user.firstname,
+            lastname: user.lastname,
+        });
     } catch (err) {
         console.error("Erreur lors de l'ajout du message:", err);
         res.status(500).send({ error: "Erreur lors de l'ajout du message." });
@@ -1381,7 +1402,7 @@ exports.postMessageConvEvent = async (req, res) => {
  * /api/events/{eventId}/messages:
  *   get:
  *     summary: Récupérer tous les messages d'une conversation d'un événement
- *     description: Récupère tous les messages associés à une conversation d'un événement spécifique.
+ *     description: Récupère tous les messages associés à une conversation d'un événement spécifique, ainsi que les informations sur l'événement et l'organisateur.
  *     tags: [Events]
  *     parameters:
  *       - in: path
@@ -1392,35 +1413,61 @@ exports.postMessageConvEvent = async (req, res) => {
  *         description: ID de l'événement dont les messages doivent être récupérés
  *     responses:
  *       200:
- *         description: Messages récupérés avec succès.
+ *         description: Messages récupérés avec succès, avec des informations supplémentaires sur l'événement et l'organisateur.
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   idMessage:
- *                     type: integer
- *                     example: 1
- *                   texte:
- *                     type: string
- *                     example: "Ce message est un test."
- *                   idUser:
- *                     type: integer
- *                     example: 1
- *                   firstname:
- *                     type: string
- *                     example: "John"
- *                   lastname:
- *                     type: string
- *                     example: "Doe"
- *                   idEvent:
- *                     type: integer
- *                     example: 1
- *                   dateHours:
- *                     type: string
- *                     example: "2024-12-11T10:00:00Z"
+ *               type: object
+ *               properties:
+ *                 idOrga:
+ *                   type: integer
+ *                   example: 1
+ *                 firstnameOrga:
+ *                   type: string
+ *                   example: "John"
+ *                 lastnameOrga:
+ *                   type: string
+ *                   example: "Doe"
+ *                 nomEvent:
+ *                   type: string
+ *                   example: "Concert de Noël"
+ *                 eventDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-12-25T20:00:00Z"
+ *                 eventCity:
+ *                   type: string
+ *                   example: "Paris"
+ *                 photoUrlOrga:
+ *                   type: string
+ *                   example: "https://example.com/photo.jpg"
+ *                 messages:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       idMessage:
+ *                         type: integer
+ *                         example: 1
+ *                       texte:
+ *                         type: string
+ *                         example: "Ce message est un test."
+ *                       idUser:
+ *                         type: integer
+ *                         example: 1
+ *                       firstname:
+ *                         type: string
+ *                         example: "Alice"
+ *                       lastname:
+ *                         type: string
+ *                         example: "Smith"
+ *                       idEvent:
+ *                         type: integer
+ *                         example: 1
+ *                       dateHours:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-12-11T10:00:00Z"
  *       404:
  *         description: Événement introuvable.
  *         content:
@@ -1433,19 +1480,43 @@ exports.postMessageConvEvent = async (req, res) => {
  *                   example: "Événement introuvable."
  *       500:
  *         description: Erreur interne lors de la récupération des messages.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération des messages."
  */
 exports.getConvMessagesEvent = async (req, res) => {
     const { eventId } = req.params;
 
     try {
         // Vérifier si l'événement existe
-        const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
+        const eventCheck = await pool.query(
+            `SELECT 
+                e.id AS idEvent, 
+                e.name AS nomEvent, 
+                e.start_date AS eventDate, 
+                e.city AS eventCity, 
+                u.id AS idOrga, 
+                u.firstname AS firstnameOrga, 
+                u.lastname AS lastnameOrga, 
+                u.image_user AS photoUrlOrga 
+            FROM events e
+            INNER JOIN users u ON e.id_organisateur = u.id
+            WHERE e.id = $1`,
+            [eventId]
+        );
+        
+        
         if (eventCheck.rowCount === 0) {
             return res.status(404).json({ error: "Événement introuvable." });
         }
 
         // Récupérer tous les messages associés à cet événement
-        const result = await pool.query(
+        const messagesResult = await pool.query(
             `SELECT 
                 c.idMessage, 
                 c.texte, 
@@ -1466,7 +1537,18 @@ exports.getConvMessagesEvent = async (req, res) => {
         //    return res.status(404).json({ error: "Aucun message trouvé pour cet événement." });
         //}
 
-        res.status(200).json(result.rows);
+        const response = {
+            idOrga: eventCheck.rows[0].idorga,
+            firstnameOrga: eventCheck.rows[0].firstnameorga,
+            lastnameOrga: eventCheck.rows[0].lastnameorga,
+            nomEvent: eventCheck.rows[0].nomevent,
+            eventDate: eventCheck.rows[0].eventdate,
+            eventCity: eventCheck.rows[0].eventcity,
+            photoUrlOrga: eventCheck.rows[0].photourlorga,
+            messages: messagesResult.rows
+        };
+
+        res.status(200).json(response);
     } catch (err) {
         console.error("Erreur lors de la récupération des messages:", err);
         res.status(500).send({ error: "Erreur lors de la récupération des messages." });
@@ -1565,7 +1647,8 @@ exports.getUserConversationsEvent = async (req, res) => {
             INNER JOIN 
                 users u ON c.iduser = u.id
             WHERE 
-                pe.id_user = $1  -- Paramètre pour l'ID de l'utilisateur
+                (pe.id_user = $1  -- Paramètre pour l'ID de l'utilisateur
+                OR e.id_organisateur = $1)  -- Ou l'utilisateur est l'organisateur de l'événement
                 AND c.idmessage = (
                     SELECT idmessage
                     FROM conversationsEvents 

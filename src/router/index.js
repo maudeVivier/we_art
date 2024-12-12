@@ -16,6 +16,7 @@ import MyEvents from '../pages/MyEvents.vue'
 
 
 import ListConvEvents from '../pages/ListConvEvents.vue'
+import ConvEvent from '../pages/ConvEvent.vue'
 
 
 Vue.use(Router);
@@ -48,6 +49,12 @@ const router = new Router({
       path: '/listConvEvents',
       name: 'ListConvEvents',
       component: ListConvEvents,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/convEvent/:id',
+      name: 'ConvEvent',
+      component: ConvEvent,
       meta: { requiresAuth: true }
     },
     {
