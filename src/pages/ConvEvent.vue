@@ -44,7 +44,7 @@
         </v-row>
 
         <v-row
-          style = "max-height: 60vh; overflow-y: auto;"
+          style = "max-height: 65vh; overflow-y: auto;"
           >
           <v-col
               v-for="msg in listMsg"
