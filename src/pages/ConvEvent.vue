@@ -68,22 +68,30 @@
           </v-col>
         </v-row>     
       <!-- Zone de saisie du message -->
-        <v-row class="fixed-bottom" style="position: fixed; bottom: 7.5%; left: 0; right: 0; z-index: 10; background-color: #f5f5f5f5; padding: 10px;">        <v-col>
-          <v-textarea
-            v-model="newMessage"
-            label="Écrivez votre message..."
-            rows="2"
-          ></v-textarea>
-          <v-btn
-            color="primary"
-            :disabled="loading || !newMessage.trim()"
-            @click="sendMessage"
-            style="float: right;" 
-          >
-            Envoyer
-          </v-btn>
-        </v-col>
-      </v-row>
+      <v-row
+  class="fixed-bottom"
+  style="position: fixed; bottom: 7.5%; left: 0; right: 0; z-index: 10; background-color: #f5f5f5f5; padding: 10px;"
+>
+  <v-col
+    cols="12"
+    style="display: flex; align-items: center;" 
+  >
+    <v-textarea
+      v-model="newMessage"
+      label="Écrivez votre message..."
+      rows="2"
+      style="flex-grow: 1; resize: none;"
+    ></v-textarea>
+    <v-btn
+      color="primary"
+      :disabled="loading || !newMessage.trim()"
+      @click="sendMessage"
+      style="margin-left: 10px;" 
+    >
+      Envoyer
+    </v-btn>
+  </v-col>
+</v-row>
 
       <!-- Loading Spinner -->
       <v-col v-if="loading" cols="12" class="text-center">
