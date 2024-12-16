@@ -1358,3 +1358,62 @@ exports.getUserNotifsCount = async (req, res) => {
         res.status(500).send({ error: "Erreur lors de la récupération du nombre de notifications." });
     }
 };
+
+/**
+ * @swagger
+ * /api/users/{userId}/interets:
+ *   get:
+ *     summary: Récupérer les disciplines d'un utilisateur
+ *     description: >
+ *       Retourne la liste des disciplines et leurs icônes auxquelles un utilisateur est intéressé.
+ *     tags: [User Interests]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: L'ID de l'utilisateur pour récupérer ses intérêts
+ *     responses:
+ *       200:
+ *         description: Liste des disciplines et icônes d'intérêt de l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   discipline:
+ *                     type: string
+ *                     example: "danse"
+ *                   icon:
+ *                     type: string
+ *                     example: "mdi-dance"
+ *       400:
+ *         description: L'ID de l'utilisateur est invalide ou manquant.
+ *       500:
+ *         description: Erreur interne lors de la récupération des données.
+ */
+exports.getUserInterests = async (req, res) => {
+    const userId = req.params.userId; // Récupère l'ID de l'utilisateur à partir des paramètres de la requête
+
+    try {
+        // Requête pour récupérer les disciplines et icônes d'un utilisateur
+        const query = `
+            SELECT ds.discipline, ds.icon
+            FROM interet ui
+            JOIN discipline_metadata ds ON ui.discipline = ds.discipline
+            WHERE ui.id_user = $1;
+        `;
+
+        // Exécution de la requête avec le userId comme paramètre
+        const result = await pool.query(query, [userId]);
+
+        // Retourner les disciplines et leurs icônes
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des intérêts de l\'utilisateur:', err);
+        res.status(500).send({ error: 'Erreur lors de la récupération des intérêts de l\'utilisateur' });
+    }
+};
