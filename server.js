@@ -5,6 +5,11 @@ const serveStatic = require('serve-static');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./src/utils/swagger');
+const pool = require('./src/config/database');
+
+const http = require('http'); // Importer le module HTTP
+const socketIo = require('socket.io'); // Importer Socket.IO
+
 
 // Importation des fichiers de routes
 const usersRoutes = require('./src/routes/users');
@@ -12,6 +17,17 @@ const eventsRoutes = require('./src/routes/events');
 
 // Création d'une instance d'application Express
 const app = express();
+
+// Création d'un serveur HTTP à partir d'Express
+const server = http.createServer(app);
+
+// Initialisation de Socket.IO
+const io = socketIo(server, {
+  cors: {
+    origin: '*', // Remplacez par l'URL de votre frontend
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+  },
+});
 
 // Configurer CORS pour autoriser les requêtes de localhost:8001
 const corsOptions = {
@@ -33,6 +49,54 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/api', usersRoutes);
 app.use('/api', eventsRoutes);
 
+
+// Gestion des connexions WebSocket conv event
+io.on('connection', (socket) => {
+  console.log(`Un utilisateur s'est connecté : ${socket.id}`);
+
+  // Rejoindre une "room" spécifique pour un événement
+  socket.on('joinEventRoom', (eventId) => {
+    socket.join(eventId);
+    console.log(`Utilisateur rejoint la room de l'événement : ${eventId}`);
+  });
+
+  // Gestion de l'envoi d'un message
+  socket.on('sendMessage', async (data) => {
+    const { texte, userId, eventId } = data;
+    console.log(`Message reçu : ${texte}, utilisateur : ${userId}, événement : ${eventId}`);
+
+    try {
+      // Insérer le message dans la base de données
+      const result = await pool.query(
+        'INSERT INTO conversationsEvents (texte, idUser, idEvent, dateHours) VALUES ($1, $2, $3, NOW()) RETURNING *',
+        [texte, userId, eventId]
+      );
+
+      const message = result.rows[0];
+
+      // Récupérer les infos utilisateur
+      const user = await pool.query('SELECT firstname, lastname, image_user FROM users WHERE id = $1', [userId]);
+
+      // Diffuser le message à tous les utilisateurs de la room
+      io.to(eventId).emit('newMessage', {
+        ...message,
+        firstname: user.rows[0].firstname,
+        lastname: user.rows[0].lastname,
+        image_user: user.rows[0].image_user
+      });
+
+      console.log('Message diffusé avec succès');
+    } catch (err) {
+      console.error('Erreur lors de l\'insertion du message :', err);
+    }
+  });
+
+  // Gestion de la déconnexion
+  socket.on('disconnect', () => {
+    console.log(`Un utilisateur s'est déconnecté : ${socket.id}`);
+  });
+});
+
 // Rediriger toutes les autres routes vers index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
@@ -41,6 +105,6 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 // Démarrage du serveur et écoute des requêtes
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Serveur en cours d'exécution sur http://localhost:${PORT}`);
 });

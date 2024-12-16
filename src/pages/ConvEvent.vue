@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 25vh); overflow-y: auto;">
+        <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 25vh); overflow-y: auto;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -121,10 +121,13 @@
 <script>
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
+import { io } from 'socket.io-client';
 
 export default {
   data() {
     return {
+      socket: null,
+
       listMsg: [],
       newMessage: "",
       loading: false, // Loading state
@@ -149,13 +152,41 @@ export default {
     },  
   },
   mounted() {
-    console.log("entrer ici : ", this.$route.params)
+   
+
     if(this.$route.params.id) {
       this.eventId = this.$route.params.id;
+      console.log("entrer ici : ", this.$route.params)
+
+      // Initialiser la connexion Socket.IO
+      //this.socket = io('http://localhost:3000');
+      this.socket = io('https://we-art.onrender.com');
+
+
+      // Rejoindre une room spécifique à l'événement
+      this.socket.emit('joinEventRoom', this.eventId);
+
+      console.log("identifant de l'event : ", this.eventId)
+      console.log("je suis connecté : ", this.socket.connected)
+
+      // Écouter les nouveaux messages
+      this.socket.on('newMessage', (message) => {
+        this.listMsg.push(message);
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      });
+
       this.fetchConvMsgEvents();
     }
   },
   methods: {
+    scrollToBottom() {
+      const container = this.$refs.messageContainer;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    },
     async fetchConvMsgEvents() {
       this.userId = this.$store.getters.user.id;
 
@@ -175,6 +206,9 @@ export default {
         this.cityEvent = response.data.eventCity;
 
         this.listMsg = response.data.messages;
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
         console.log("liste message : ", this.listMsg)
       } catch (error) {
         console.error('Erreur lors de la récupération des message de la conversations : ', error);
@@ -202,9 +236,10 @@ export default {
     },
     async sendMessage() {
       if (!this.newMessage.trim()) return; // Empêche l'envoi de messages vides
+      
       this.loading = true;
       try {
-        console.log("j'envoi le message : ", this.newMessage.trim())
+        /*console.log("j'envoi le message : ", this.newMessage.trim())
         console.log("avec cette event id : ", this.userConnected.idUser)
 
         const response = await axios.post(
@@ -219,13 +254,29 @@ export default {
         this.listMsg.push(response.data);
 
         // Réinitialiser la zone de saisie
-        this.newMessage = "";
+        this.newMessage = "";*/
+        const messageData = {
+          texte: this.newMessage,
+          userId: this.userConnected.idUser,
+          eventId: this.eventId,
+        };
+
+        // Envoyer le message via Socket.IO
+        this.socket.emit('sendMessage', messageData);
+
+        this.newMessage = '';
       } catch (error) {
         console.error("Erreur lors de l'envoi du message :", error);
       } finally {
         this.loading = false;
       }
     },
+    
+  },
+  beforeDestroy() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   },
 };
 </script>
