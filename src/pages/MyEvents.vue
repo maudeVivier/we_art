@@ -5,21 +5,18 @@
       <v-container>
         <v-card>
           <v-card-title>
-            <h1>Mes ateliers</h1>
+          <v-row class="my-1 ml-1">
+            <v-btn
+              :to="{name : 'Home'}"
+              exact
+              icon
+              class="mr-2"
+            > 
+            <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+            <h2>Mes ateliers</h2>
+          </v-row>
           </v-card-title>
-
-          <v-toolbar flat>
-            <v-spacer></v-spacer>
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Rechercher"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-toolbar>
-
-
 
           <!-- Notifications -->
           <div v-if="eventsNotifs.length > 0">
@@ -35,7 +32,7 @@
                   lg="4"
                 >
                   <v-card
-                    class="event-card flex-row"
+                    class="event-card-wait flex-row"
                     @click="showDetails(event)"
                     hover
                   >
@@ -63,11 +60,6 @@
                             <v-icon class="mr-2">mdi-currency-eur</v-icon>
                             {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                           </div>
-                          <!-- Nombre de participants -->
-                          <!-- <div class="event-participants">
-                            <v-icon class="mr-2">mdi-account-group</v-icon>
-                            {{ event.participant_count }} participants
-                          </div> -->
                           <!-- La discipline -->
                           <div class="event-discipline">
                             <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
@@ -75,18 +67,12 @@
                           </div>
                         </div>
                       </div>
-                     
-                      
-
                     </v-card-text>
                     <v-img
                       :src="event.image_event_url"
                       alt="Image de l'événement"
                       class="event-image"
                     ></v-img>
-
-                        
-                      
                   </v-card>
 
                   <v-btn color="primary" @click="participateEvent(event.id)">
@@ -99,69 +85,61 @@
             </v-row>
           </div>
 
-
-          <v-row>
-            <v-col cols="12">
-              <h2 class="sub-title">Je suis inscris</h2>
-            </v-col>
-          </v-row>
-
           <!-- A venir -->
           <v-row>
             <v-col cols="12">
-              <h2 class="sub-title">À venir</h2>
+              <h3 class="sub-title">À venir</h3>
             </v-col>
           </v-row>
           <v-row v-if="numberUpcomingEvents > 0 && upcomingEvents.length > 0" >
-
-           
             <v-col
               v-for="event in upcomingEvents"
               :key="event.id"
               cols="12"
+              sm="6"
               md="6"
               lg="4"
             >
               <v-card
-                class="d-flex flex-row"
-                max-width="100%"
+                class="event-card flex-row"
                 @click="showDetails(event)"
                 hover
               >
-                <v-card-text class="flex-grow-1">
-                  <!-- Titre de l'événement -->
-                  <v-card-title class="title">{{ event.name }}</v-card-title>
-
-                  <!-- Date et heure -->
-                  <p>
-                    <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
-                    {{ formatDate(event.start_date) }}
-                    <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
-                    {{ formatTime(event.start_date) }}
-                  </p>
-
-                  <!-- Adresse -->
-                  <p>
-                    <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
-                    {{ event.street }}, {{ event.city }}
-                  </p>
-
-                  <!-- Prix -->
-                  <p :class="[ event.prix === 0 ? 'free-price' : 'paid-price', 'price-container']">
-                    <v-icon class="mr-2">mdi-currency-eur</v-icon>
-                    {{ event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
-                  </p>
-
-                  <!-- Nombre de participants -->
-                  <p>
-                    <v-icon class="mr-2">mdi-account-group</v-icon>
-                    {{ event.participants }} participants
-                  </p>
+                <v-card-text class="flex-row-1 event-text">
+                  <div class="event-details">
+                    <p class="event-title">{{ event.name }}</p>
+                    <div class="event-info">
+                      <!-- Date et heure -->
+                      <div class="event-date-time">
+                        <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
+                        {{ formatDate(event.start_date) }}
+                        <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
+                        {{ formatTime(event.start_date) }}
+                      </div>
+                      <!-- Adresse -->
+                      <div class="event-location">
+                        <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+                        {{ event.street }}, {{ event.city }}
+                      </div>
+                      <!-- Prix -->
+                      <div :class="[
+                          event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
+                          'price-container'
+                        ]">
+                        <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                        {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                      </div>
+                      <!-- La discipline -->
+                      <div class="event-discipline">
+                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                        {{ event.discipline }}
+                      </div>
+                    </div>
+                  </div>
                 </v-card-text>
-
-                <!-- Image -->
                 <v-img
                   :src="event.image_event_url"
+                  :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
                   alt="Image de l'événement"
                   class="event-image"
                 ></v-img>
@@ -175,62 +153,61 @@
             </v-col>
           </v-row>
 
-          
-
           <!-- Passé -->
           <v-row>
             <v-col cols="12">
-              <h2 class="sub-title">Passé</h2>
+              <h3 class="sub-title">Passé</h3>
             </v-col>
           </v-row>
-          <v-row v-if="numberPastEvents > 0 && pastEvents >0">
+          <v-row v-if="numberPastEvents > 0 && pastEvents.length > 0">
             <v-col
               v-for="event in pastEvents"
               :key="event.id"
               cols="12"
+              sm="6"
               md="6"
               lg="4"
             >
               <v-card
-                class="d-flex flex-row"
-                max-width="100%"
+                class="event-card flex-row"
                 @click="showDetails(event)"
                 hover
               >
-                <v-card-text class="flex-grow-1">
-                  <!-- Titre de l'événement -->
-                  <v-card-title class="title">{{ event.name }}</v-card-title>
-
-                  <!-- Date et heure -->
-                  <p>
-                    <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
-                    {{ formatDate(event.start_date) }}
-                    <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
-                    {{ formatTime(event.start_date) }}
-                  </p>
-
-                  <!-- Adresse -->
-                  <p>
-                    <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
-                    {{ event.street }}, {{ event.city }}
-                  </p>
-
-                  <!-- Prix -->
-                  <p :class="[ event.prix === 0 ? 'free-price' : 'paid-price', 'price-container']">
-                    <v-icon class="mr-2">mdi-currency-eur</v-icon>
-                    {{ event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
-                  </p>
-
-                  <!-- Nombre de participants -->
-                  <p>
-                    <v-icon class="mr-2">mdi-account-group</v-icon>
-                    {{ event.participants }} participants
-                  </p>
+                <v-card-text class="flex-row-1 event-text">
+                  <div class="event-details">
+                    <p class="event-title">{{ event.name }}</p>
+                    <div class="event-info">
+                      <!-- Date et heure -->
+                      <div class="event-date-time">
+                        <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
+                        {{ formatDate(event.start_date) }}
+                        <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
+                        {{ formatTime(event.start_date) }}
+                      </div>
+                      <!-- Adresse -->
+                      <div class="event-location">
+                        <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+                        {{ event.street }}, {{ event.city }}
+                      </div>
+                      <!-- Prix -->
+                      <div :class="[
+                          event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
+                          'price-container'
+                        ]">
+                        <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                        {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                      </div>
+                      <!-- La discipline -->
+                      <div class="event-discipline">
+                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                        {{ event.discipline }}
+                      </div>
+                    </div>
+                  </div>
                 </v-card-text>
-
-                <!-- Image -->
                 <v-img
                   :src="event.image_event_url"
+                  :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
                   alt="Image de l'événement"
                   class="event-image"
                 ></v-img>
@@ -241,6 +218,73 @@
             <v-col cols="12" class="text-center">
               <p v-if="numberPastEvents <= 0">Vous n'avez participé à aucun événement</p>
               <p v-else>Aucun événements ne correspond à votre recherche</p>
+            </v-col>
+          </v-row>
+
+            <!-- Mes ateliers -->
+            <v-row>
+            <v-col cols="12">
+              <h3 class="sub-title">Organisés par moi</h3>
+            </v-col>
+          </v-row>
+          <v-row v-if="myEvents.length > 0">
+            <v-col
+              v-for="event in myEvents"
+              :key="event.id"
+              cols="12"
+              sm="6"
+              md="6"
+              lg="4"
+            >
+              <v-card
+                class="event-card flex-row"
+                @click="showDetails(event)"
+                hover
+              >
+                <v-card-text class="flex-row-1 event-text">
+                  <div class="event-details">
+                    <p class="event-title">{{ event.name }}</p>
+                    <div class="event-info">
+                      <!-- Date et heure -->
+                      <div class="event-date-time">
+                        <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
+                        {{ formatDate(event.start_date) }}
+                        <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
+                        {{ formatTime(event.start_date) }}
+                      </div>
+                      <!-- Adresse -->
+                      <div class="event-location">
+                        <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
+                        {{ event.street }}, {{ event.city }}
+                      </div>
+                      <!-- Prix -->
+                      <div :class="[
+                          event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
+                          'price-container'
+                        ]">
+                        <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                        {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                      </div>
+                      <!-- La discipline -->
+                      <div class="event-discipline">
+                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                        {{ event.discipline }}
+                      </div>
+                    </div>
+                  </div>
+                </v-card-text>
+                <v-img
+                  :src="event.image_event_url"
+                  :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
+                  alt="Image de l'événement"
+                  class="event-image"
+                ></v-img>
+              </v-card>
+            </v-col>
+          </v-row>
+          <v-row v-else>
+            <v-col cols="12" class="text-center">
+              <p>Vous n'avez créé aucun atelier.</p>
             </v-col>
           </v-row>
           <!-- Loading Spinner -->
@@ -265,6 +309,7 @@ export default {
       loading: false, // Loading state
       photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
       eventsNotifs: [],
+      myEvents : [],
     };
   },
   computed: {
@@ -280,7 +325,6 @@ export default {
     },
     pastEvents() {
       const now = new Date();
-      console.log(this.events)
       return this.events.filter((event) =>
         (event.name.toLowerCase().includes(this.search.toLowerCase()) ||
         event.city.toLowerCase().includes(this.search.toLowerCase()) ||
@@ -311,7 +355,6 @@ export default {
     },
 
     async participateEvent(eventId) {
-      console.log('participateEvent', eventId);
       if(this.userConnected){ // utilisateur connecté
         try {
           //const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
@@ -368,11 +411,23 @@ export default {
     async fetchEvents() {
       this.loading = true; // Start loading
       try {
-        //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/events`);
+        // const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/events`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
+      } finally {
+        this.loading = false; // End loading
+      }
+    },
+    async fetchMyEvents() {
+      this.loading = true; // Start loading
+      try {
+        // const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/myEvents`);
+        const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/myEvents`);
+        this.myEvents = response.data;
+      } catch (error) {
+        console.error('Erreur lors de la récupération de mes événements:', error);
       } finally {
         this.loading = false; // End loading
       }
@@ -396,6 +451,7 @@ export default {
   created() {
     if (this.userConnected) {
       this.fetchEvents(); // Appelez la fonction pour récupérer les détails utilisateur
+      this.fetchMyEvents();
       this.fetchEventsNotifs();
     }
   },
@@ -446,16 +502,22 @@ p {
   flex: 1;
 }
 
-.event-card {
+.event-card-wait {
   align-items: center;
   display: flex;
   flex-direction: row;
   width: 100vw;
   height: 18vh;
   background-color: rgb(224, 65, 65) !important;
-
 }
 
+.event-card {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 18vh;
+}
 .event-image {
   width: 35%;
   height: 90%;
@@ -493,6 +555,4 @@ p {
   border: 2px solid;
   background-color: rgb(143, 170, 143); /* Gris-vert */
 }
-
-
 </style>

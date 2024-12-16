@@ -1143,7 +1143,6 @@ exports.verifyEmail = async (req, res) => {
  */
 exports.getUserEvents = async (req, res) => {
     const { userId } = req.params;
-
     try {
         // Vérifier si l'utilisateur existe
         const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
@@ -1153,9 +1152,123 @@ exports.getUserEvents = async (req, res) => {
 
         // Récupérer tous les événements auxquels l'utilisateur participe
         const result = await pool.query(
-            `SELECT e.* FROM events e
+            `SELECT e.*, 
+            ds.icon as icon_discipline
+            FROM events e
             INNER JOIN participantsevents pe ON e.id = pe.id_event
+            INNER JOIN discipline_metadata ds ON e.discipline = ds.discipline
             WHERE pe.id_user = $1`,
+            [userId]
+        );
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error("Erreur lors de la récupération des événements de l'utilisateur:", err);
+        res.status(500).send({ error: "Erreur lors de la récupération des événements de l'utilisateur." });
+    }
+};
+
+// GET - Récupérer tous les événements organisés par un utilisateur
+/**
+ * @swagger
+ * /api/users/{userId}/events:
+ *   get:
+ *     summary: Récupérer tous les événements organisés par un utilisateur
+ *     description: Retourne la liste de tous les événements qu'un utilisateur spécifique a organisés.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *     responses:
+ *       200:
+ *         description: Liste des événements organisés par l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   idEvent:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Conférence Tech"
+ *                   description:
+ *                     type: string
+ *                     example: "Une conférence sur les nouvelles technologies."
+ *                   street:
+ *                     type: string
+ *                     example: "3 rue de la métallurgie"
+ *                   city:
+ *                     type: string
+ *                     example: "Lyon"
+ *                   postal_code:
+ *                     type: string
+ *                     example: "69003"
+ *                   country:
+ *                     type: string
+ *                     example: "France"
+ *                   start_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   end_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   created_date:
+ *                     type: string
+ *                     example: "2024-10-16T23:10:00.000Z"
+ *                   latitude:
+ *                     type: string
+ *                     example: "45.754205"
+ *                   longitude:
+ *                     type: string
+ *                     example: "4.869387"
+ *                   icon_discipline:
+ *                     type: string
+ *                     example: "tech_icon.png"
+ *       404:
+ *         description: Utilisateur introuvable.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur introuvable."
+ *       500:
+ *         description: Erreur interne lors de la récupération des événements de l'utilisateur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération des événements de l'utilisateur."
+ */
+exports.getMyEvents = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        // Vérifier si l'utilisateur existe
+        const userCheck = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+        if (userCheck.rowCount === 0) {
+            return res.status(404).json({ message: "Utilisateur introuvable." });
+        }
+
+        // Récupérer tous les événements auxquels l'utilisateur participe
+        const result = await pool.query(
+            `SELECT e.*, 
+            ds.icon as icon_discipline
+            FROM events e
+            INNER JOIN discipline_metadata ds ON e.discipline = ds.discipline
+            WHERE e.id_organisateur = $1`,
             [userId]
         );
 
