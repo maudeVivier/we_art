@@ -17,66 +17,43 @@
           </v-col>
         </v-row>
 
-        <v-row class="event-list">
-          <v-col
-              v-for="event in events"
-              :key="event.id"
-              cols="12"
-              sm="6"
-              md="6"
-              lg="4"
+        <v-carousel hide-delimiters :prev-icon="false" :next-icon="false" class="carousel">
+          <v-carousel-item
+            v-for="(event, index) in events"
+            :key="index"
+            @click="showDetails(event)"
+          >
+            <v-img
+              :src="event.image_event_url"
+              :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')"
+              alt="Image de l'événement"
+              class="imageCaroussel"
             >
-              <v-card
-                class="event-card flex-row"
-                @click="showDetails(event)"
-                hover
-              >
-                <v-card-text class="flex-row-1 event-text">
-                  <div class="event-details">
-                    <p class="event-title">{{ event.name }}</p>
-                    <div class="event-info">
-                      <!-- Date et heure -->
-                      <div class="event-date-time">
-                        <v-icon color="primary" class="mr-2">mdi-calendar-blank-outline</v-icon>
-                        {{ formatDate(event.start_date) }}
-                        <v-icon color="primary" class="ml-4 mr-2">mdi-clock-time-three-outline</v-icon>
-                        {{ formatTime(event.start_date) }}
-                      </div>
-                      <!-- Adresse -->
-                      <div class="event-location">
-                        <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
-                        {{ event.street }}, {{ event.city }}
-                      </div>
-                      <!-- Prix -->
-                      <div :class="[
-                          event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
-                          'price-container'
-                        ]">
-                        <v-icon class="mr-2">mdi-currency-eur</v-icon>
-                        {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
-                      </div>
-                      <!-- Nombre de participants -->
-                      <!-- <div class="event-participants">
-                        <v-icon class="mr-2">mdi-account-group</v-icon>
-                        {{ event.participant_count }} participants
-                      </div> -->
-                      <!-- La discipline -->
-                      <div class="event-discipline">
-                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
-                        {{ event.discipline }}
-                      </div>
-                    </div>
-                  </div>
-                </v-card-text>
-                <v-img
-                  :src="event.image_event_url"
-                  :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
-                  alt="Image de l'événement"
-                  class="event-image"
-                ></v-img>
-              </v-card>
-            </v-col>
-        </v-row>
+              <template v-slot:placeholder>
+                <v-row class="fill-height" align="center" justify="center">
+                  <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                </v-row>
+              </template>
+
+              <!-- Carré blanc avec les informations -->
+              <div class="event-info-card">
+                <div class="event-info-text">
+                  <p class="event-title">{{ event.name }}</p>
+                  <p class="event-date">{{ formatDate(event.start_date) }} - {{ formatTime(event.start_date) }}</p>
+                  <p class="event-price" :class="{
+                    'free-choice-price': event.prix === -1,
+                    'free-price': event.prix === 0,
+                    'paid-price': event.prix > 0
+                  }">
+                    <v-icon class="mr-2">mdi-currency-eur</v-icon>
+                    {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
+                  </p>
+                </div>
+              </div>
+            </v-img>
+          </v-carousel-item>
+        </v-carousel>
+
         <!-- Loading Spinner -->
         <v-col v-if="loading" cols="12" class="text-center">
           <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
@@ -145,7 +122,7 @@ export default {
 <style scoped>
   /* Styles personnalisés, adaptés depuis App.css et Connect.css */
   .logo {
-    max-width: 50%; /* Ensure the image is responsive */
+    max-width: 20%; /* Ensure the image is responsive */
     height: auto;    /* Maintain aspect ratio */
     width: 300px;    /* Set a fixed width */
     display: block;  /* Ensure it behaves like a block element */
@@ -262,5 +239,32 @@ export default {
   border: 2px solid;
   background-color: rgb(143, 170, 143); /* Gris-vert */
 }
+
+.event-info-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 8px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+.event-info-text {
+  color: black;
+}
+
+.imageCaroussel{
+  width: 100%;
+  height:60%;
+}
+
 
 </style>
