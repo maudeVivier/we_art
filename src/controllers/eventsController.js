@@ -1524,7 +1524,8 @@ exports.getConvMessagesEvent = async (req, res) => {
                 c.idEvent, 
                 c.dateHours,
                 u.firstname, 
-                u.lastname 
+                u.lastname,
+                u.image_user
             FROM conversationsEvents c
             INNER JOIN users u ON c.idUser = u.id
             WHERE c.idEvent = $1

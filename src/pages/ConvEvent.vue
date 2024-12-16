@@ -11,87 +11,108 @@
           > 
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
-          <h3 class="text-h6 ml-3" style="font-size: 1rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%;">
+          <h3 class="ml-3" style="font-size: 1rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%;">
             {{ nameEvent }}
           </h3>
-
-         
         </v-row>
 
         <v-row class="d-flex align-center justify-center" style="flex-wrap: nowrap;">
           <p  style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
-            {{ formatDateEvent(start_dateEvent) }}
+            {{ formatDate(start_dateEvent) }}
           </p>
 
-          <v-icon class="ml-2 mr-1">mdi-clock</v-icon>
+          <v-icon class="ml-2 mr-1">mdi-clock-outline</v-icon>
           <p style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline; display: flex; align-items: center;">
-            {{ formatHoursEvent(start_dateEvent) }}
+            {{ formatTime(start_dateEvent) }}
           </p>
 
           <p class="ml-2" style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
-            <v-icon class="mr-1">mdi-map-marker</v-icon>
+            <v-icon class="mr-1">mdi-map-marker-outline</v-icon>
             {{ cityEvent }}
           </p>
         </v-row>
 
-        <v-row class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 10px 0;">
+        <v-row class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%;">
           <v-avatar size="32" class="mr-2 ml-4">
             <img :src="photoOrga" :alt="`${firstnameOrga} ${lastnameOrga}`">
           </v-avatar>
-          <h3 class="text-h6" style="font-size: 1rem; margin: 0;">
+          <h5>
             {{ firstnameOrga }} {{ lastnameOrga }}
-          </h3>
+          </h5>
         </v-row>
 
-        <v-row
-          style = "max-height: 65vh; overflow-y: auto;"
-          >
+        <v-row style = "max-height: 65vh; overflow-y: auto;">
           <v-col
-              v-for="msg in listMsg"
-              :key="msg.idmessage"
-              cols="12"
-            >
-            <v-card
-              :class="msg.iduser === userConnected.idUser ? 'message-right' : 'message-left'"
-              class="pa-3 mb-2"
-            >
-            <div class="message-header">
-              <p class="mb-1"><strong>{{ msg.firstname }} {{ msg.lastname }}</strong></p>
-              <p class="mb-2" style="font-size: 0.9rem;">
-                <strong>{{ formatDate(msg.datehours) }}</strong>
-              </p>
-            </div>
-            <div class="message-body">
-              <p class="mb-0">{{ msg.texte }}</p>
-            </div>
-            </v-card>
+            v-for="msg in listMsg"
+            :key="msg.idmessage"
+            cols="12"
+          >
+            <v-row class="d-flex align-start" no-gutters>
+              <!-- Si c'est un message à gauche (message-left), photo à gauche et message à droite -->
+              <v-col v-if="msg.iduser !== userConnected.idUser" class="d-flex flex-column" cols="auto" :style="{ alignSelf: 'flex-end' }">
+                <v-avatar size="32" class="photo-left">
+                  <img :src="msg.image_user" />
+                </v-avatar>
+              </v-col>
+
+              <!-- Bloc de message (texte) -->
+              <v-col class="message-text flex-grow-1" :class="msg.iduser === userConnected.idUser ? 'message-right' : 'message-left'">
+                <div class="message-header">
+                  <p class="mb-1 font-weight-bold">
+                    {{ msg.firstname }} {{ msg.lastname }}
+                  </p>
+                  <p class="mb-2 font-weight-bold" style="font-size: 0.9rem;">
+                    {{ formatDate(msg.datehours) }} à {{ formatTime(msg.datehours) }}
+                  </p>
+                </div>
+                <div class="message-body">
+                  <p class="mb-0">{{ msg.texte }}</p>
+                </div>
+              </v-col>
+
+              <!-- Si c'est un message à droite (message-right), photo à droite et message à gauche -->
+              <v-col v-if="msg.iduser === userConnected.idUser" class="d-flex flex-column-reverse" cols="auto" :style="{ alignSelf: 'flex-end' }">
+                <v-avatar size="32" class="photo-right">
+                  <img :src="msg.image_user" />
+                </v-avatar>
+              </v-col>
+            </v-row>
           </v-col>
-        </v-row>     
-      <!-- Zone de saisie du message -->
+        </v-row>
+
+        <!-- Zone de saisie du message -->
       <v-row
-  class="fixed-bottom"
-  style="position: fixed; bottom: 7.5%; left: 0; right: 0; z-index: 10; background-color: #f5f5f5f5; padding: 10px;"
->
-  <v-col
-    cols="12"
-    style="display: flex; align-items: center;" 
-  >
-    <v-textarea
-      v-model="newMessage"
-      label="Écrivez votre message..."
-      rows="2"
-      style="flex-grow: 1; resize: none;"
-    ></v-textarea>
-    <v-btn
-      color="primary"
-      :disabled="loading || !newMessage.trim()"
-      @click="sendMessage"
-      style="margin-left: 10px;" 
-    >
-      Envoyer
-    </v-btn>
-  </v-col>
-</v-row>
+      class="message-input"
+      >
+        <v-col
+          cols="12"
+          style="display: flex; align-items: center;" 
+        >
+          <!-- <v-textarea
+            v-model="newMessage"
+            label="Écrivez votre message..."
+            rows="2"
+            class="flex-grow-1"
+            style="resize: none;"
+          ></v-textarea> -->
+          <v-textarea
+            v-model="newMessage"
+            label="Écrivez votre message..."
+            rows="4"
+            class="flex-grow-1"
+            outlined
+            auto-grow
+          />
+          <v-btn
+            color="primary"
+            :disabled="loading || !newMessage.trim()"
+            @click="sendMessage"
+            style="margin-left: 10px;" 
+          >
+            Envoyer
+          </v-btn>
+        </v-col>
+      </v-row>
 
       <!-- Loading Spinner -->
       <v-col v-if="loading" cols="12" class="text-center">
@@ -148,8 +169,8 @@ export default {
       console.log("ici je rentre : ", this.eventId)
       this.loading = true; // Start loading
       try {
-        const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
-        //const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
+        //const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
+        const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
         console.log("response : ", response.data)
         this.orgaId = response.data.idOrga;
         this.firstnameOrga = response.data.firstnameOrga;
@@ -161,45 +182,31 @@ export default {
         this.cityEvent = response.data.eventCity;
 
         this.listMsg = response.data.messages;
+        console.log("liste message : ", this.listMsg)
       } catch (error) {
         console.error('Erreur lors de la récupération des message de la conversations : ', error);
       } finally {
         this.loading = false; // End loading
       }
     },
-
-    formatDate(dateString) {
-      const date = new Date(dateString);
-
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Mois de 0 à 11
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    formatDate(date) {
+      if (!date || isNaN(new Date(date).getTime())) {
+        return '';
+      }
+      return new Intl.DateTimeFormat('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(date));
     },
-    formatHoursEvent(dateString) {
-      const date = new Date(dateString);
-
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-
-      return `${hours}:${minutes}`;
+    formatTime(dateTime) {
+      const time = new Date(dateTime).toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false, // Format 24 heures
+      });
+      return time.replace(':', 'h'); // Remplace ':' par 'h'
     },
-
-    formatDateEvent(dateString) {
-      const date = new Date(dateString);
-
-      const year = date.getFullYear();
-      const monthIndex = date.getMonth(); // Mois de 0 à 11
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const month = monthNames[monthIndex]; // Récupère l'abréviation du mois
-      const day = String(date.getDate()).padStart(2, '0');
-
-      return `${day} ${month} ${year}`;
-    },
-
     async sendMessage() {
       if (!this.newMessage.trim()) return; // Empêche l'envoi de messages vides
       this.loading = true;
@@ -231,39 +238,61 @@ export default {
 </script>
 
 <style scoped>
+/* Message de l'utilisateur connecté (droite) */
 .message-right {
   background-color: #e3f2fd !important; /* Bleu clair pour les messages de l'utilisateur */
   border-radius: 10px 10px 0 10px; /* Arrondi spécial pour bulle */
   color: #0d47a1 !important;
   text-align: left;
   margin-left: auto; /* Aligne à droite */
-  max-width: 60%; /* Largeur maximale */
+  max-width: 90%; /* Largeur maximale */
 }
 
+/* Message des autres utilisateurs (gauche) */
 .message-left {
   background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
   border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
   color: #424242 !important;
   text-align: left;
   margin-right: auto; /* Aligne à gauche */
-  max-width: 60%; /* Largeur maximale */
+  max-width: 90%; /* Largeur maximale */
 }
 
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-}
+  /* Avatar gauche */
+  .photo-left {
+    margin-right: 10px; /* Décale l'avatar à gauche */
+    order: 1; /* Met l'avatar avant le texte */
+  }
 
-.message-body {
-  font-size: 1rem;
-}
+  /* Avatar droite */
+  .photo-right {
+    margin-left: 10px; /* Décale l'avatar à droite */
+    order: 2; /* Met l'avatar après le texte */
+  }
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 0 10px;
 
-p {
-  margin: 0;
-}
+  }
 
-.text-caption {
-  font-size: 0.8rem;
-}
+  .message-body {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  p {
+    margin: 0;
+  }
+   .message-input{
+    /* height: calc(100vh - 65vh - 56px); */
+    position: fixed;
+    left: 0;
+    right: 0;
+    background-color: #f5f5f5f5;
+    z-index: 10;
+    padding: 10px;
+
+   }
 </style>

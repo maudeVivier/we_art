@@ -3,28 +3,11 @@
     <v-main>
       <v-container style="max-width: 100%;">
         <v-row class="my-1 ml-1">
-          <v-btn
-            :to="{name : 'Home'}"
-            exact
-            icon
-            class="mr-2"
-          > 
-          <v-icon>mdi-arrow-left</v-icon>
+          <v-btn @click="goBack" icon class="mr-2">
+            <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
-          <h2>Conversations des ateliers</h2>
+          <h2>Messages</h2>
         </v-row>
-
-        <v-toolbar flat>
-          <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="Rechercher une activité"
-            single-line
-            hide-details
-          ></v-text-field>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-
 
         <v-row class="event-conv-list">
           <v-col
@@ -34,25 +17,35 @@
               sm="6"
               md="6"
               lg="4"
+              style="padding: 8px;"
             >
               <v-card
-                class="event-conv-card flex-row"
+                class="event-conv-card no-shadow d-flex align-center"
                 @click="goToConvEvent(event)"
                 hover
               >
-              <v-card class="d-flex align-items-center">
-                <v-avatar size="64" class="mr-4 my-auto">
-                  <img :src="event.image_event_url" :alt="`${event.name}`" />
-                </v-avatar>
-                <v-card-text class="flex-grow-1">
-                  <p class="mb-2">
-                    <strong>{{ event.name }}</strong> du <strong>{{ event.start_date }}</strong>
-                  </p>
-                  <p class="truncate-text">
-                    {{ event.lastmessageuserfirstname }} {{ event.lastmessageuserlastname }} : {{ event.lastmessage }}
-                  </p>
-                </v-card-text>
-              </v-card>
+                <v-row>
+                  <!-- Colonne pour l'image -->
+                  <v-col cols="3" class="d-flex align-center justify-center">
+                    <v-avatar size="64">
+                      <img :src="event.image_event_url || photo_default_catalogue" :alt="event.name" />
+                    </v-avatar>
+                  </v-col>
+
+                  <v-col cols="9">
+                    <!-- Nom de l'événement -->
+                    <p class="text-left mb-1 font-weight-bold truncate-text">
+                      {{ event.name }}
+                      <br> 
+                      {{ formatDate(event.start_date) }} à {{ formatTime(event.start_date) }}
+                    </p>
+                    <!-- Dernier message -->
+                    <p class="text-left text-caption grey--text truncate-text">
+                      {{ event.lastmessageuserfirstname }} {{ event.lastmessageuserlastname }} : 
+                      {{ event.lastmessage }}
+                    </p>
+                  </v-col>
+                </v-row>
               </v-card>
             </v-col>
         </v-row>
@@ -103,7 +96,6 @@ export default {
       return new Intl.DateTimeFormat('fr-FR', {
         day: '2-digit',
         month: 'short',
-        year: 'numeric',
       }).format(new Date(date));
     },
     formatTime(dateTime) {
@@ -127,21 +119,44 @@ export default {
         this.loading = false; // End loading
       }
     },
-
     goToConvEvent(event) {
       console.log("event.id", event.id_event);
       this.$router.push({ name: 'ConvEvent', params: { id: event.id_event } });
+    },
+    goBack() {
+      this.$router.go(-1); // Retourne à la page précédente dans l'historique du navigateur
     },
   },
 };
 </script>
 
 <style scoped>
+.event-conv-card {
+  padding: 4px;
+  transition: box-shadow 0.2s ease;
+}
+
+.event-conv-card:hover {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
 .truncate-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;  /* Limiter à 2 lignes */
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
 }
+
+.truncate-text:nth-of-type(1) {
+  -webkit-line-clamp: 2; /* Nom de l'événement : 1 ligne */
+}
+
+.truncate-text:nth-of-type(2) {
+  -webkit-line-clamp: 1; /* Dernier message : 1 ligne */
+}
+.no-shadow {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
 </style>
