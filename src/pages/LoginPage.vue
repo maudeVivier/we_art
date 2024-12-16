@@ -95,7 +95,7 @@ export default {
           await this.login(user);
 
           // Rediriger après succès
-          this.$router.push('/profile');
+          this.$router.push('/');
         }
       } catch (error) {
         if (error.response) {

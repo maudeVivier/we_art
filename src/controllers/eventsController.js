@@ -1778,7 +1778,7 @@ exports.getUserConversationsEvent = async (req, res) => {
  */
 exports.getUpcomingEvents = async (req, res) => {
     try {
-        const nbElements = req.query.nbElements ? req.query.nbElements : 4;
+        const nbElements = req.query.nbElements ? req.query.nbElements : 3;
         // Requête pour récupérer les 4 derniers événements avec les conditions demandées
         const query = `
             SELECT e.*, ds.icon as icon_discipline, COUNT(pe.id_user) AS participant_count
