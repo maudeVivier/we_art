@@ -169,8 +169,8 @@ export default {
       console.log("ici je rentre : ", this.eventId)
       this.loading = true; // Start loading
       try {
-        //const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
-        const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
+        const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
+        // const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
         console.log("response : ", response.data)
         this.orgaId = response.data.idOrga;
         this.firstnameOrga = response.data.firstnameOrga;
