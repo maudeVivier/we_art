@@ -17,7 +17,7 @@
         </v-row>
 
         <v-row class="d-flex align-center justify-center" style="flex-wrap: nowrap;">
-          <p  style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
+          <p style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
             {{ formatDate(start_dateEvent) }}
           </p>
 
@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row style = "max-height: 40vh; overflow-y: auto;">
+        <v-row class="message-list" style="flex-grow: 1; height: calc(100vh - 35vh); overflow-y: auto;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
