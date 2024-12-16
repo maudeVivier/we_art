@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 15vh); overflow-y: auto;">
+        <v-row class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 25vh); overflow-y: auto;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
