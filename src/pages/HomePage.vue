@@ -11,39 +11,13 @@
           ></v-img>
         </div>
 
-        <v-row class="my-2">
-          <v-col>
-
-            <div
-              class="discipline-scroll-container d-flex align-center"
-              style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
-              <!-- Chaque bloc d'intérêt -->
-              <div
-                v-for="(discipline, index) in disciplines"
-                :key="index"
-                class="d-inline-flex flex-column align-center mx-3"
-                style="text-align: center;"
-                @click="fetchEvents(discipline.discipline)"
-              >
-                <v-icon size="36" color="#F2992C">{{ discipline.icon }}</v-icon>
-                <span style="font-size: 16px; color: #333; margin-top: 4px;">{{ discipline.discipline }}</span>
-              </div>
-            </div>
-          </v-col>
-        </v-row>
-
         <v-row v-if="events.length > 0">
           <v-col>
             <h5 class="sub-title">Des places sont encore disponible</h5>
           </v-col>
         </v-row>
-        <v-row v-else>
-          <v-col>
-            <h5 class="sub-title">Aucun événement disponible</h5>
-          </v-col>
-        </v-row>
 
-        <v-carousel v-if="events.length > 0" hide-delimiters :prev-icon="false" :next-icon="false" class="carousel">
+        <v-carousel hide-delimiters :prev-icon="false" :next-icon="false" class="carousel">
           <v-carousel-item
             v-for="(event, index) in events"
             :key="index"
@@ -101,25 +75,12 @@ export default {
       Logo,
       events: [],
       loading : false,
-      disciplines: [],
     };
   },
   mounted() {
-    this.fetchDisciplines();
     this.fetchEvents();
   },
   methods: {
-    async fetchDisciplines() {
-        try {
-          this.loadingFilter = true;
-          const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
-          this.disciplines = response.data // Map pour extraire les noms
-        } catch (error) {
-          console.error('Erreur lors de la récupération des disciplines:', error);
-        } finally {
-          this.loadingFilter = false;
-      }
-      },
     formatDate(date) {
       if (!date || isNaN(new Date(date).getTime())) {
         return '';
@@ -138,17 +99,11 @@ export default {
       });
       return time.replace(':', 'h'); // Remplace ':' par 'h'
     },
-    async fetchEvents(discipline = '') {
+    async fetchEvents() {
       this.loading = true; // Start loading
-      const disciplineQuery = discipline ? `?discipline=${discipline}` : '';
       try {
-        if(disciplineQuery === ""){
-          const response = await axios.get('https://we-art.onrender.com/api/events/upcomingEvents');
-          this.events = response.data;
-        }else{
-          const response = await axios.get(`https://we-art.onrender.com/api/events/upcomingEvents${disciplineQuery}`);
-          this.events = response.data;
-        }
+        const response = await axios.get(`https://we-art.onrender.com/api/events/upcomingEvents`);
+        this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
       } finally {

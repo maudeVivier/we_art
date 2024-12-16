@@ -82,7 +82,7 @@
 
         <!-- Zone de saisie du message -->
       <v-row
-      style = "max-height: 25vh; overflow-y: auto; background-color: gray;"
+      style = "width: 100%; max-height: 25vh; overflow-y: auto; background-color: gray; position: fixed;"
       >
         <v-col
           cols="12"
@@ -170,7 +170,7 @@ export default {
       this.loading = true; // Start loading
       try {
         const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
-        // const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
+        //const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
         console.log("response : ", response.data)
         this.orgaId = response.data.idOrga;
         this.firstnameOrga = response.data.firstnameOrga;
