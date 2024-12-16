@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 30vh); overflow-y: auto;">
+        <v-row class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 15vh); overflow-y: auto;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -82,26 +82,19 @@
 
         <!-- Zone de saisie du message -->
       <v-row
-      style = "width: 100%; max-height: 15vh; overflow-y: auto; background-color: gray; position: fixed;"
+      class="message-input"
       >
         <v-col
           cols="12"
-          style="width: 100%; display: flex; align-items: center; margin-bottom: 56px;" 
+          style="display: flex; align-items: center; background-color: #f5f5f5f5;" 
         >
-          <!-- <v-textarea
+          <v-textarea
             v-model="newMessage"
             label="Écrivez votre message..."
             rows="2"
             class="flex-grow-1"
-            style="resize: none;"
-          ></v-textarea> -->
-          <v-textarea
-            v-model="newMessage"
-            label="Écrivez votre message..."
-            rows="4"
-            class="flex-grow-1"
             outlined
-            auto-grow
+            no-resize
           />
           <v-btn
             color="primary"
@@ -286,10 +279,10 @@ export default {
   }
 
   .message-input{
-    /* height: calc(100vh - 65vh - 56px); */
+    max-height: 15vh;
+    overflow-y: auto;
     position: fixed;
     left: 0;
     right: 0;
-    background-color: #f5f5f5f5;
    }
 </style>
