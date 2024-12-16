@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-container style="max-width: 100%;">
+      <v-container style="max-width: 100%">
         <v-row class="mt-1 ml-1">
           <v-btn
             :to="{name : 'Home'}"
@@ -82,7 +82,6 @@
 
         <!-- Zone de saisie du message -->
       <v-row
-      class="message-input"
       >
         <v-col
           cols="12"
@@ -96,9 +95,11 @@
             style="resize: none;"
           ></v-textarea> -->
           <v-textarea
+          style="background-color: #f5f5f5f5;"
+
             v-model="newMessage"
             label="Écrivez votre message..."
-            rows="4"
+            rows="3"
             class="flex-grow-1"
             outlined
             auto-grow
@@ -120,7 +121,6 @@
         <p>Chargement des messages...</p>
       </v-col>
     </v-container>
-
     </v-main>
   </v-app>
 </template>
@@ -238,25 +238,25 @@ export default {
 </script>
 
 <style scoped>
-/* Message de l'utilisateur connecté (droite) */
-.message-right {
-  background-color: #e3f2fd !important; /* Bleu clair pour les messages de l'utilisateur */
-  border-radius: 10px 10px 0 10px; /* Arrondi spécial pour bulle */
-  color: #0d47a1 !important;
-  text-align: left;
-  margin-left: auto; /* Aligne à droite */
-  max-width: 90%; /* Largeur maximale */
-}
+  /* Message de l'utilisateur connecté (droite) */
+  .message-right {
+    background-color: #e3f2fd !important; /* Bleu clair pour les messages de l'utilisateur */
+    border-radius: 10px 10px 0 10px; /* Arrondi spécial pour bulle */
+    color: #0d47a1 !important;
+    text-align: left;
+    margin-left: auto; /* Aligne à droite */
+    max-width: 90%; /* Largeur maximale */
+  }
 
-/* Message des autres utilisateurs (gauche) */
-.message-left {
-  background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
-  border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
-  color: #424242 !important;
-  text-align: left;
-  margin-right: auto; /* Aligne à gauche */
-  max-width: 90%; /* Largeur maximale */
-}
+  /* Message des autres utilisateurs (gauche) */
+  .message-left {
+    background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
+    border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
+    color: #424242 !important;
+    text-align: left;
+    margin-right: auto; /* Aligne à gauche */
+    max-width: 90%; /* Largeur maximale */
+  }
 
   /* Avatar gauche */
   .photo-left {
@@ -269,12 +269,12 @@ export default {
     margin-left: 10px; /* Décale l'avatar à droite */
     order: 2; /* Met l'avatar après le texte */
   }
-  .message-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-    padding: 0 10px;
 
+ .message-header {
+   display: flex;
+   justify-content: space-between;
+   margin-bottom: 5px;
+   padding: 0 10px;
   }
 
   .message-body {
@@ -286,7 +286,7 @@ export default {
     margin: 0;
   }
    .message-input{
-    /* height: calc(100vh - 65vh - 56px); */
+    height: calc(100vh - 65vh - 112px);
     position: fixed;
     left: 0;
     right: 0;
