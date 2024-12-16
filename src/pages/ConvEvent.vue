@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main style="max-height: calc(100% - 56px);">
+    <v-main>
       <v-container style="max-width: 100%;">
         <v-row class="mt-1 ml-1">
           <v-btn
@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row class="message-list" style="flex-grow: 1; height: calc(100vh - 35vh); overflow-y: auto;">
+        <v-row class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 30vh); overflow-y: auto;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -82,11 +82,11 @@
 
         <!-- Zone de saisie du message -->
       <v-row
-      style = "width: 100%; max-height: 25vh; overflow-y: auto; background-color: gray; position: fixed;"
+      style = "width: 100%; max-height: 15vh; overflow-y: auto; background-color: gray; position: fixed;"
       >
         <v-col
           cols="12"
-          style="width: 100%; display: flex; align-items: center; padding-bottom: 56px;" 
+          style="width: 100%; display: flex; align-items: center; margin-bottom: 56px;" 
         >
           <!-- <v-textarea
             v-model="newMessage"
