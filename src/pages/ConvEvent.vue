@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row style = "max-height: 65vh; overflow-y: auto;">
+        <v-row style = "max-height: 40vh; overflow-y: auto;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -86,7 +86,7 @@
       >
         <v-col
           cols="12"
-          style="display: flex; align-items: center;" 
+          style="width: 100%; display: flex; align-items: center; padding-bottom: 56px;" 
         >
           <!-- <v-textarea
             v-model="newMessage"
