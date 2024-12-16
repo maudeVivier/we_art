@@ -1,10 +1,11 @@
 const express = require('express');
-const { getEventById, getAllEvents, createEvent, addUserToEvent, checkUserParticipation, removeUserFromEvent, addComment, addUserToListAttenteEvent, removeUserFromListAttenteEvent, checkUserListWait, allDisciplines, postMessageConvEvent, getConvMessagesEvent, getUserConversationsEvent} = require('../controllers/eventsController');
+const { getEventById, getAllEvents, createEvent, addUserToEvent, checkUserParticipation, removeUserFromEvent, addComment, addUserToListAttenteEvent, removeUserFromListAttenteEvent, checkUserListWait, allDisciplines, postMessageConvEvent, getConvMessagesEvent, getUserConversationsEvent, getUpcomingEvents} = require('../controllers/eventsController');
 
 const router = express.Router();
 
 router.get('/eventDetails/:id', getEventById);
 router.get('/events', getAllEvents);
+router.get('/events/upcomingEvents', getUpcomingEvents);
 router.get('/events/listWait/:eventId/users/:userId', checkUserListWait);
 router.get('/events/messages/users/:userId', getUserConversationsEvent);
 router.get('/events/disciplines', allDisciplines);

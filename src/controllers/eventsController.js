@@ -1556,7 +1556,7 @@ exports.getConvMessagesEvent = async (req, res) => {
 };
 
 
-
+// GET - Récupérer les conversations d'un utilisateur avec le dernier message pour chaque événement
 /**
  * @swagger
  * /api/events/messages/users/{userId}:
@@ -1670,3 +1670,136 @@ exports.getUserConversationsEvent = async (req, res) => {
 };
 
 
+// GET - Récupérer les prochains événements ou il reste de la place 
+/**
+ * @swagger
+ * /api/upcoming-events:
+ *   get:
+ *     summary: Récupérer les prochains événements où il reste des places
+ *     description: >
+ *       Retourne la liste des événements à venir où il reste encore des places disponibles. 
+ *       Les événements doivent avoir une `start_date` dans le futur et une `deadline` non dépassée.
+ *       Les événements sont triés par `start_date` décroissante, et vous pouvez limiter le nombre de résultats retournés avec le paramètre `nbElements`.
+ *     tags: [Events]
+ *     parameters:
+ *       - in: query
+ *         name: nbElements
+ *         schema:
+ *           type: integer
+ *           description: Nombre d'événements à récupérer (par défaut 4 si non précisé)
+ *           example: 4
+ *     responses:
+ *       200:
+ *         description: Liste des événements à venir avec des places disponibles.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   name:
+ *                     type: string
+ *                     example: "Conférence sur l'innovation"
+ *                   description:
+ *                     type: string
+ *                     example: "Une conférence sur les nouvelles technologies."
+ *                   street:
+ *                     type: string
+ *                     example: "123 rue de la Technologie"
+ *                   city:
+ *                     type: string
+ *                     example: "Paris"
+ *                   postal_code:
+ *                     type: string
+ *                     example: "75001"
+ *                   country:
+ *                     type: string
+ *                     example: "France"
+ *                   start_date:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-12-20T09:00:00.000Z"
+ *                   end_date:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-12-20T18:00:00.000Z"
+ *                   deadline:
+ *                     type: string
+ *                     format: date-time
+ *                     example: "2024-12-19T23:59:00.000Z"
+ *                   latitude:
+ *                     type: string
+ *                     example: "48.8566"
+ *                   longitude:
+ *                     type: string
+ *                     example: "2.3522"
+ *                   discipline:
+ *                     type: string
+ *                     example: "Technologie"
+ *                   niveau:
+ *                     type: string
+ *                     example: "Intermédiaire"
+ *                   prix:
+ *                     type: integer
+ *                     example: 50
+ *                   nombre_de_participants_max:
+ *                     type: integer
+ *                     example: 100
+ *                   participant_count:
+ *                     type: integer
+ *                     example: 30
+ *                   icon_discipline:
+ *                     type: string
+ *                     example: "tech_icon.png"
+ *       400:
+ *         description: Paramètre de requête invalide.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Le paramètre nbElements doit être un nombre entier positif."
+ *       500:
+ *         description: Erreur interne lors de la récupération des événements.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la récupération des événements à venir."
+ */
+exports.getUpcomingEvents = async (req, res) => {
+    try {
+        const nbElements = req.query.nbElements ? req.query.nbElements : 4;
+        // Requête pour récupérer les 4 derniers événements avec les conditions demandées
+        const query = `
+            SELECT e.*, ds.icon as icon_discipline, COUNT(pe.id_user) AS participant_count
+            FROM events e
+            LEFT JOIN participantsevents pe ON e.id = pe.id_event
+            LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
+            WHERE e.start_date > NOW()
+            AND e.deadline > NOW()    
+            GROUP BY e.id, ds.icon
+            HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
+            ORDER BY e.start_date DESC 
+            LIMIT $1;
+        `;
+        
+        // Exécution de la requête
+        const result = await pool.query(query, [nbElements]);
+
+        // Retourner les résultats
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erreur lors de la récupération des derniers événements à venir:', err);
+        res.status(500).send({ error: 'Erreur lors de la récupération des derniers événements à venir' });
+    }
+};
