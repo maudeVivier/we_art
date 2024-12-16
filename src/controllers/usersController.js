@@ -860,10 +860,9 @@ exports.updateUser = async (req, res) => {
 
         // Si des intérêts sont fournis, on les gère
         console.log("interests = ", interests)
-        if (interests && interests.length > 0) {
+        if (interests) {
             // Suppression des anciens intérêts
             await pool.query('DELETE FROM interet WHERE id_user = $1', [id]);
-
             // Ajout des nouveaux intérêts
             for (let i = 0; i < interests.length; i++) {
                 const discipline = interests[i];

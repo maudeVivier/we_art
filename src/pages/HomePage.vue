@@ -108,18 +108,37 @@ export default {
     this.fetchDisciplines();
     this.fetchEvents();
   },
+  computed : {
+    userConnected() {
+      return this.$store.getters.user;
+    }
+  },
   methods: {
     async fetchDisciplines() {
-        try {
-          this.loadingFilter = true;
+      try {
+        this.loadingFilter = true;
+        if(this.userConnected){
+          console.log("userConnected", this.userConnected)
+          const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/interets`);
+          if(response.data.length > 0){
+            this.disciplines = response.data // Map pour extraire les noms
+          }else{
+            const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
+            this.disciplines = response.data // Map pour extraire les noms
+          }
+
+
+        }else{
           const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
           this.disciplines = response.data // Map pour extraire les noms
-        } catch (error) {
-          console.error('Erreur lors de la récupération des disciplines:', error);
-        } finally {
+        }
+       
+      } catch (error) {
+        console.error('Erreur lors de la récupération des disciplines:', error);
+      } finally {
           this.loadingFilter = false;
       }
-      },
+    },
     formatDate(date) {
       if (!date || isNaN(new Date(date).getTime())) {
         return '';
