@@ -1789,7 +1789,7 @@ exports.getUpcomingEvents = async (req, res) => {
             AND e.deadline > NOW()    
             GROUP BY e.id, ds.icon
             HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
-            ORDER BY e.start_date DESC 
+            ORDER BY e.start_date ASC 
             LIMIT $1;
         `;
         
