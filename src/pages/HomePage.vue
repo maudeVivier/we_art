@@ -14,22 +14,21 @@
         <v-row class="my-2">
           <v-col>
 
-          <div
-            class="discipline-scroll-container d-flex align-center"
-            style="overflow-x: auto; white-space: nowrap;"
-          >
-            <!-- Chaque bloc d'intérêt -->
             <div
-              v-for="(discipline, index) in disciplines"
-              :key="index"
-              class="d-inline-flex flex-column align-center mx-3"
-              style="text-align: center;"
-              @click="fetchEvents(discipline.discipline)"
-            >
-              <v-icon size="36" color="#F2992C">{{ discipline.icon }}</v-icon>
-              <span style="font-size: 16px; color: #333; margin-top: 4px;">{{ discipline.discipline }}</span>
-          </div>
-      </div>
+              class="discipline-scroll-container d-flex align-center"
+              style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+              <!-- Chaque bloc d'intérêt -->
+              <div
+                v-for="(discipline, index) in disciplines"
+                :key="index"
+                class="d-inline-flex flex-column align-center mx-3"
+                style="text-align: center;"
+                @click="fetchEvents(discipline.discipline)"
+              >
+                <v-icon size="36" color="#F2992C">{{ discipline.icon }}</v-icon>
+                <span style="font-size: 16px; color: #333; margin-top: 4px;">{{ discipline.discipline }}</span>
+              </div>
+            </div>
           </v-col>
         </v-row>
 
