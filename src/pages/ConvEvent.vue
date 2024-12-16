@@ -1,7 +1,7 @@
 <template>
   <v-app>
-    <v-main>
-      <v-container style="max-width: 100%; max-height: calc(100% - 56px);">
+    <v-main style="max-height: calc(100% - 56px);">
+      <v-container style="max-width: 100%;">
         <v-row class="mt-1 ml-1">
           <v-btn
             :to="{name : 'Home'}"
@@ -82,7 +82,7 @@
 
         <!-- Zone de saisie du message -->
       <v-row
-      class="message-input"
+      style = "max-height: 25vh; overflow-y: auto; background-color: gray;"
       >
         <v-col
           cols="12"
@@ -291,6 +291,5 @@ export default {
     left: 0;
     right: 0;
     background-color: #f5f5f5f5;
-    z-index: 10;
    }
 </style>
