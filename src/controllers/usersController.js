@@ -156,6 +156,17 @@ exports.getUsers = async (req, res) => {
  *                 a_propos:
  *                   type: string
  *                   example: "Artiste peintre passionné par l'abstrait, exposant régulièrement dans des galeries internationales."
+ *                 interets:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       discipline:
+ *                         type: string
+ *                         example: "Football"
+ *                       icon:
+ *                         type: string
+ *                         example: "mdi-soccer"
  *       404:
  *         description: Utilisateur non trouvé
  *       500:
@@ -164,16 +175,32 @@ exports.getUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
     const userId = parseInt(req.params.id, 10); // Conversion de l'identifiant en entier
     try {
-        const result = await pool.query(
+        const userResult = await pool.query(
             'SELECT id, firstname, lastname, birthday, sex, phone, email, password, type, image_user, is_verified, ville, code_postal, pays, latitude, longitude, a_propos FROM users WHERE id = $1',
             [userId]
         );
         
-        if (result.rows.length === 0) {
+        if (userResult.rows.length === 0) {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
-        res.json(result.rows[0]);
+        const interetResult = await pool.query(
+            'SELECT i.discipline, dm.icon ' +
+            'FROM interet i ' +
+            'INNER JOIN discipline_metadata dm ON i.discipline = dm.discipline ' +
+            'WHERE i.id_user = $1',
+            [userId]
+        );
+
+        // Ajouter le tableau des intérêts (discipline + icône) à l'utilisateur
+        const user = userResult.rows[0];
+        user.interets = interetResult.rows.map(row => ({
+            discipline: row.discipline,
+            icon: row.icon
+        }));
+
+
+        res.json(user);
     } catch (err) {
         console.error('Erreur lors de la récupération de l\'utilisateur:', err);
         res.status(500).send({ error: 'Erreur lors de la récupération de l\'utilisateur' });
@@ -223,41 +250,61 @@ exports.getUserById = async (req, res) => {
  *               phone:
  *                 type: string
  *                 example: "0612345678"
+ *               image_url:
+ *                 type: string
+ *                 example: "https://example.com/images/john-doe.jpg"
+ *               ville:
+ *                 type: string
+ *                 example: "Paris"
+ *               code_postal:
+ *                 type: string
+ *                 example: "75001"
+ *               pays:
+ *                 type: string
+ *                 example: "France"
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *                 example: 48.8566
+ *               longitude:
+ *                 type: number
+ *                 format: float
+ *                 example: 2.3522
+ *               a_propos:
+ *                 type: string
+ *                 example: "Je suis un passionné de sport."
+ *               interests:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   example: "Football"
+ *                   description: "Liste des disciplines d'intérêt de l'utilisateur"
  *     responses:
  *       201:
- *         description: Utilisateur créé avec succès.
+ *         description: Utilisateur créé avec succès et email de vérification envoyé.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   example: 1
- *                 firstName:
+ *                 message:
  *                   type: string
- *                   example: "John"
- *                 lastName:
- *                   type: string
- *                   example: "Doe"
- *                 email:
- *                   type: string
- *                   example: "john.doe@example.com"
- *                 birthday:
- *                   type: string
- *                   format: date
- *                   example: "2000-12-01"
- *                 sex:
- *                   type: string
- *                   enum: [Man, Woman, Non-binary, Not Specified]
- *                   example: "Man"
- *                 phone:
- *                   type: string
- *                   example: "0612345678"
- *                 type:
- *                   type: string
- *                   enum: [Organizer, Participant]
- *                   example: "Participant"
+ *                   example: "Utilisateur créé avec succès. Un email de vérification a été envoyé."
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     firstName:
+ *                       type: string
+ *                       example: "John"
+ *                     lastName:
+ *                       type: string
+ *                       example: "Doe"
+ *                     email:
+ *                       type: string
+ *                       example: "john.doe@example.com"
  *       400:
  *         description: Valeur invalide pour sex ou type.
  *         content:
@@ -269,16 +316,6 @@ exports.getUserById = async (req, res) => {
  *                   type: string
  *                   enum: [Invalid sex value, Invalid type value]
  *                   example: "Invalid sex value"  
- *       409:
- *         description: L'email est déjà utilisé.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Cet email est déjà utilisé."
  *       500:
  *         description: Erreur interne du serveur.
  *         content:
@@ -291,7 +328,7 @@ exports.getUserById = async (req, res) => {
  *                   example: "Une erreur interne est survenue."
  */
 exports.createUser = async (req, res) => {
-    const { firstName, lastName, email, password, birthday, sex, type, phone, image_url, ville, code_postal, pays, latitude, longitude, a_propos} = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstName, lastName, email, password, birthday, sex, type, phone, image_url, ville, code_postal, pays, latitude, longitude, a_propos, interests} = req.body;  // Modifications pour correspondre aux colonnes
     const bcrypt = require('bcrypt');
     const saltRounds = 10;
     const hash = bcrypt.hashSync(password, saltRounds);
@@ -341,10 +378,32 @@ exports.createUser = async (req, res) => {
         const newUser = result.rows[0];
         console.log('Nouvel utilisateur inséré :', newUser);
 
+        if (interests && interests.length > 0) {
+            for (let i = 0; i < interests.length; i++) {
+                const discipline = interests[i];
+
+                // Vérification de l'existence de la discipline dans discipline_metadata
+                const disciplineResult = await pool.query(
+                    `SELECT 1 FROM discipline_metadata WHERE discipline = $1`,
+                    [discipline]
+                );
+
+                if (disciplineResult.rows.length > 0) {
+                    // La discipline existe, on peut insérer l'intérêt dans la table 'interet'
+                    await pool.query(
+                        `INSERT INTO interet (id_user, discipline) 
+                        VALUES ($1, $2)`,
+                        [newUser.id, discipline]
+                    );
+                }
+            }
+        }
+
+
         // Envoi de l'email de vérification
         await sendVerificationEmail(email, firstName, lastName, verificationToken);
 
-        res.status(200).json({
+        res.status(201).json({
             message: 'Utilisateur créé avec succès. Un email de vérification a été envoyé.',
             user: {
                 id: newUser.id,
@@ -654,6 +713,12 @@ exports.deleteUser = async (req, res) => {
  *               a_propos:
  *                 type: string
  *                 example: "Artiste passionné par la peinture abstraite et la sculpture moderne."
+ *               interests:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["Peinture", "Sculpture"]
+ *                 description: Liste des disciplines ou intérêts de l'utilisateur (par exemple : "Peinture", "Sculpture")
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour avec succès.
@@ -735,7 +800,7 @@ exports.deleteUser = async (req, res) => {
  */
 exports.updateUser = async (req, res) => {    
     const { id } = req.params;
-    const { firstname, lastname, birthday, sex, phone, email, password, type, image_user, ville, code_postal, pays, latitude, longitude, a_propos} = req.body;  // Modifications pour correspondre aux colonnes
+    const { firstname, lastname, birthday, sex, phone, email, password, type, image_user, ville, code_postal, pays, latitude, longitude, a_propos, interests} = req.body;  // Modifications pour correspondre aux colonnes
     var result;
 
     var sexEnglish = sex;
@@ -790,7 +855,35 @@ exports.updateUser = async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
-        res.json(result.rows[0]);
+
+        const updatedUser = result.rows[0];
+
+        // Si des intérêts sont fournis, on les gère
+        if (interests && interests.length > 0) {
+            // Suppression des anciens intérêts
+            await pool.query('DELETE FROM interet WHERE id_user = $1', [id]);
+
+            // Ajout des nouveaux intérêts
+            for (let i = 0; i < interests.length; i++) {
+                const discipline = interests[i];
+
+                // Vérification si la discipline existe dans la table discipline_metadata
+                const disciplineResult = await pool.query(
+                    `SELECT 1 FROM discipline_metadata WHERE discipline = $1`,
+                    [discipline]
+                );
+
+                if (disciplineResult.rows.length > 0) {
+                    // Insertion de l'intérêt dans la table 'interet'
+                    await pool.query(
+                        `INSERT INTO interet (id_user, discipline) VALUES ($1, $2)`,
+                        [updatedUser.id, discipline]
+                    );
+                }
+            }
+        }
+
+        res.json(updatedUser);
     } catch (err) {
         console.error('Erreur lors de la mise à jour de l\'utilisateur:', err);
         res.status(500).send({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
