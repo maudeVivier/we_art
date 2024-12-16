@@ -1680,6 +1680,7 @@ exports.getUserConversationsEvent = async (req, res) => {
  *       Retourne la liste des événements à venir où il reste encore des places disponibles. 
  *       Les événements doivent avoir une `start_date` dans le futur et une `deadline` non dépassée.
  *       Les événements sont triés par `start_date` décroissante, et vous pouvez limiter le nombre de résultats retournés avec le paramètre `nbElements`.
+ *       Vous pouvez aussi filtrer les événements par discipline en utilisant le paramètre `discipline`.
  *     tags: [Events]
  *     parameters:
  *       - in: query
@@ -1688,6 +1689,12 @@ exports.getUserConversationsEvent = async (req, res) => {
  *           type: integer
  *           description: Nombre d'événements à récupérer (par défaut 4 si non précisé)
  *           example: 4
+*       - in: query
+ *         name: discipline
+ *         schema:
+ *           type: string
+ *           description: Filtrer les événements par discipline (facultatif)
+ *           example: "Danse"
  *     responses:
  *       200:
  *         description: Liste des événements à venir avec des places disponibles.
@@ -1779,22 +1786,36 @@ exports.getUserConversationsEvent = async (req, res) => {
 exports.getUpcomingEvents = async (req, res) => {
     try {
         const nbElements = req.query.nbElements ? req.query.nbElements : 3;
+        const discipline = req.query.discipline; 
         // Requête pour récupérer les 4 derniers événements avec les conditions demandées
-        const query = `
+        let query = `
             SELECT e.*, ds.icon as icon_discipline, COUNT(pe.id_user) AS participant_count
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
             LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
             WHERE e.start_date > NOW()
             AND e.deadline > NOW()    
+        `;
+
+        if (discipline) {
+            query += ` AND e.discipline = $1`;
+            query += `
             GROUP BY e.id, ds.icon
             HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
             ORDER BY e.start_date ASC 
-            LIMIT $1;
-        `;
-        
-        // Exécution de la requête
-        const result = await pool.query(query, [nbElements]);
+            LIMIT $2`;
+        }else{
+            query += `
+            GROUP BY e.id, ds.icon
+            HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
+            ORDER BY e.start_date ASC 
+            LIMIT $1`;
+        }
+
+      
+
+        const values = discipline ? [discipline, nbElements] : [nbElements];
+        const result = await pool.query(query, values);
 
         // Retourner les résultats
         res.json(result.rows);
