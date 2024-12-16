@@ -423,8 +423,16 @@ exports.createEvent = async (req, res) => {
                 [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur, image_url]
             );
 
+           
+
             const newEvent = result.rows[0];
             console.log('(server.js) New Event:', newEvent);
+
+            const text = "Vous êtes inscrit à l'événement " + name;
+            await pool.query(
+                'INSERT INTO conversationsEvents (texte, idUser, idEvent, dateHours) VALUES ($1, $2, $3, NOW()) RETURNING *',
+                [text, id_organisateur, newEvent.id]
+            );
 
             res.status(201).json(newEvent);
         } else {
@@ -1657,6 +1665,7 @@ exports.getUserConversationsEvent = async (req, res) => {
                     ORDER BY dateHours DESC 
                     LIMIT 1
                 )
+            GROUP BY pe.id_event, e.name, e.image_event_url, e.start_date, lastMessage, lastMessageUserFirstname, lastMessageUserLastname, lastMessageDate
             ORDER BY 
                 lastMessageDate DESC;`,
             [userId]
