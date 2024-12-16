@@ -386,7 +386,7 @@
       },
       editInfos() {
         this.editedUser = { ...this.user }; // recupere les infos de l'utilisateur connecté
-
+        console.log("edited user = ", this.editedUser.interets)
         //Manipulations pour afficher les champs non texte
         //Avoir la date de naissance dans le bon format pour l'afficher
         this.editedUser.birthday = (new Intl.DateTimeFormat('fr-FR', {
@@ -401,7 +401,8 @@
         this.editedUser.sex = this.genders.find(g => g.value === this.user.sex);
         this.editedUser.type = this.types.find(g => g.value === this.user.type);
         this.editedUser.password = '';
-        this.suggestedVilles.push(this.user.ville)
+        this.suggestedVilles.push(this.user.ville);
+        this.editedUser.interests = this.user.interets.map((item) => item.discipline);     
       },
       cancelInfos() {
         this.$router.push('/profile');
@@ -642,8 +643,8 @@
       async fetchUserDetails() {
         try {
           this.loading = true
-          // const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
-          const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
+          const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
+          //const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
           this.user = response.data;          
           this.editInfos();
         } catch (error) {

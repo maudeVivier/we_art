@@ -58,9 +58,26 @@
 
         <v-row class="profile-interet">
           <v-col>
-            <p color="primary" style="font-size:26px; margin-bottom: 3px; color: #F2992C;">Interêts</p>
+            <p color="primary" style="font-size:26px; margin-bottom: 12px; color: #F2992C;">Intérêts</p>
+
+            <!-- Conteneur flex pour les disciplines -->
+            <div class="d-flex flex-wrap justify-center">
+              <!-- Chaque bloc d'intérêt -->
+              <div
+                v-for="(discipline, index) in user.interets"
+                :key="index"
+                class="d-flex flex-column align-center ma-3"
+                style="width: 80px; text-align: center;"
+              >
+                <!-- Icône au-dessus -->
+                <v-icon size="36">{{ discipline.icon }}</v-icon>
+                <!-- Texte en dessous -->
+                <span style="font-size: 16px; color: #333; margin-top: 4px;">{{ discipline.discipline }}</span>
+              </div>
+            </div>
           </v-col>
         </v-row>
+
 
         <v-btn color="primary" @click="handleLogout">Déconnexion</v-btn>
       </v-container>
@@ -93,8 +110,9 @@ export default {
     async fetchUserDetails() {
       try {
         this.loading=true
-        //const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
-        const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
+        const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
+        //const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
+        console.log("la reponse est = ", response)
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
