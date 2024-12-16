@@ -217,6 +217,36 @@
               />
             </v-col>
           </v-row>
+          <v-row>
+            <v-col>
+              <v-autocomplete
+                v-model="editedUser.interests" 
+                :items="disciplines"        
+                item-value="discipline"             
+                item-text="discipline"             
+                label="Centres d'intérêt"     
+                multiple                       
+                chips                        
+                clearable                      
+                hint="Sélectionnez vos centres d'intérêt"
+                persistent-hint
+              >
+                <!-- Personnalisation de l'affichage des items dans la liste -->
+                <template v-slot:item="{ item }">
+                  <v-icon class="mr-1">{{ item.icon }}</v-icon>
+                  {{ item.discipline }}
+                </template>
+
+                <!-- Personnalisation de l'affichage des valeurs sélectionnées -->
+                <template v-slot:selection="{ item }">
+                  <v-chip color="primary" small>
+                    <v-icon class="mr-1">{{ item.icon }}</v-icon>
+                    {{ item.discipline }}
+                  </v-chip>
+                </template>
+              </v-autocomplete>
+            </v-col>
+          </v-row>
 
           <v-row class="align-center justify-space-around">
             <v-btn class="btn" color="primary" @click="saveInfos()">
@@ -273,6 +303,8 @@
         suggestedVilles: [],
         editedUser: {},
         loading : true,
+
+        disciplines : []
       };
 
     },
@@ -339,6 +371,17 @@
           this.suggestedVilles = [];
           this.codePostal = '';
           this.pays = '';
+        }
+      },
+      async fetchDisciplines() {
+        try {
+          this.loadingFilter = true;
+          const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
+          this.disciplines = response.data // Map pour extraire les noms
+        } catch (error) {
+          console.error('Erreur lors de la récupération des disciplines:', error);
+        } finally {
+          this.loadingFilter = false;
         }
       },
       editInfos() {
@@ -564,6 +607,7 @@
           this.user.longitude = this.longitude;
           this.user.pays = this.pays;
           this.user.a_propos = this.editedUser.a_propos;
+          this.user.interests = this.editedUser.interests;
 
           if(this.user.image_user !== this.editedUser.image_user){
             const formData = new FormData();
@@ -578,8 +622,8 @@
           }
 
           try {
-            // const response = await axios.patch(`http://localhost:3000/api/users/${this.user.id}`, this.user);
-            const response = await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
+            const response = await axios.patch(`http://localhost:3000/api/users/${this.user.id}`, this.user);
+            //const response = await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
             this.$store.commit('updateUser', {
               email: this.user.email,
               type: this.user.type,
@@ -612,6 +656,7 @@
     },
     created() {
       if (this.userConnected) {
+        this.fetchDisciplines();
         this.fetchUserDetails(); // Appelez la fonction pour récupérer les détails utilisateur
       }
     },   

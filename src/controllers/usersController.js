@@ -718,7 +718,7 @@ exports.deleteUser = async (req, res) => {
  *                 items:
  *                   type: string
  *                 example: ["Peinture", "Sculpture"]
- *                 description: Liste des disciplines ou intérêts de l'utilisateur (par exemple : "Peinture", "Sculpture")
+ *                 description: Liste des disciplines ou intérêts de l'utilisateur
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour avec succès.
@@ -859,6 +859,7 @@ exports.updateUser = async (req, res) => {
         const updatedUser = result.rows[0];
 
         // Si des intérêts sont fournis, on les gère
+        console.log("interests = ", interests)
         if (interests && interests.length > 0) {
             // Suppression des anciens intérêts
             await pool.query('DELETE FROM interet WHERE id_user = $1', [id]);
