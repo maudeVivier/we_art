@@ -244,6 +244,14 @@
           </v-col>
         </v-row>
 
+        <!-- Filtre sur les levels -->
+        <v-select
+          v-model="selectedLevel"
+          label="Choissisez un niveau"
+          :items="['Débutant', 'Intermédiaire', 'Professionnel', 'Tous niveaux']"
+          clearable
+        ></v-select>
+
         <!-- Filtre sur la date -->
         <h3>Date</h3>
         <!-- A VOIR SI ON MET UN PICKER DATE OU PAS 
@@ -379,6 +387,7 @@ export default {
       showFiltersBox: false,
       disciplines: [], // Liste des disciplines récupérées
       selectedDisciplines: [], // Disciplines sélectionnées
+      selectedLevel : null, //Level selectionnne
       loadingFilter: false, // Loading state for filters
       selectedPrice: null, // Variable pour stocker la sélection du prix
       maxPrice: null, // Variable pour stocker le prix maximum saisi (si "Inférieur à" est sélectionné)
@@ -567,6 +576,11 @@ export default {
               queryParams += `?prix=${this.selectedPrice}`;
             }
           }
+        }
+
+        //Ajouter le filtre niveau 
+        if(this.selectedLevel){
+          queryParams += queryParams ? `&level=${this.selectedLevel}` : `?level=${this.selectedLevel}`;
         }
 
         // Ajouter le filtre de date

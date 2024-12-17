@@ -157,6 +157,8 @@ exports.getAllEvents = async (req, res) => {
     const longitude = req.query.longitude ? parseFloat(req.query.longitude) : null;
     const rayon = req.query.rayon ? parseFloat(req.query.rayon) : null;
 
+    const level = req.query.level;
+
     if (dateFilter === 'today') {
         start_date = moment().local().startOf('day').toDate(); // Début de la journée (locale)
         end_date = moment().local().endOf('day').toDate(); // Fin de la journée (locale)
@@ -213,6 +215,11 @@ exports.getAllEvents = async (req, res) => {
         if (start_date && end_date) {
             conditions.push(`e.start_date >= $${values.length + 1} AND e.start_date <= $${values.length + 2}`);
             values.push(new Date(start_date), new Date(end_date)); // Convertir les dates de filtre en objets Date
+        }
+
+        if (level) {
+            conditions.push(`e.niveau = $${values.length + 1}`);
+            values.push(level);
         }
 
         if (latitude !== null && longitude !== null && rayon !== null) {
