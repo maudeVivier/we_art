@@ -227,8 +227,23 @@
       </v-container>
 
       <v-container v-if="showFiltersBox && !loadingFilter" style="max-width: 100%;">
-        <h2>Filtres</h2>
+        <v-row>
+          
+          <v-col style="display: flex; justify-content: space-between;">
+            <h2>Filtres</h2>
+
+
+            <v-btn
+              icon
+              @click="showFiltersBox = false"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+        
         <h3>Activités</h3>
+
         <v-row class="mt-2" dense>
           <v-col cols="6" v-for="(discipline, index) in disciplines" :key="index">
             <v-checkbox
