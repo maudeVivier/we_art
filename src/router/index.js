@@ -10,6 +10,8 @@ import ListEvents from '../pages/ListEvents.vue'
 import EventDetails from '../pages/EventDetails.vue'; // Page de détails
 import AddFakeData from '../pages/AddFakeData.vue'
 import UserProfile from '../pages/Profile.vue'; // Import du composant Profile
+import ProfilOtherUser from '../pages/ProfilOtherUser.vue'; // Import du composant Profile
+
 import UpdateProfile from '../pages/UpdateProfile.vue'
 import store from '../store.js';
 import MyEvents from '../pages/MyEvents.vue'
@@ -78,6 +80,11 @@ const router = new Router({
       path: '/addFakeData',
       name: 'addFakeData',
       component: AddFakeData
+    },
+    {
+      path: '/profilOtherUser',
+      name: 'ProfilOtherUser',
+      component: ProfilOtherUser
     },
     {
       path: '/profile',
