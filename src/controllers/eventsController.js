@@ -430,6 +430,12 @@ exports.createEvent = async (req, res) => {
                 [name, description, street, postal_code, city, country, start_date, end_date, latitude, longitude, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur, image_url]
             );
 
+
+            // Ajouter l'organisateur à la liste des participants
+            await pool.query(
+                'INSERT INTO participantsevents (id_user, id_event, notif) VALUES ($1, $2, $3)',
+                [id_organisateur, result.rows[0].id, 1]
+            );
            
 
             const newEvent = result.rows[0];
@@ -1663,8 +1669,7 @@ exports.getUserConversationsEvent = async (req, res) => {
             INNER JOIN 
                 users u ON c.iduser = u.id
             WHERE 
-                (pe.id_user = $1  -- Paramètre pour l'ID de l'utilisateur
-                OR e.id_organisateur = $1)  -- Ou l'utilisateur est l'organisateur de l'événement
+                (pe.id_user = $1)  
                 AND c.idmessage = (
                     SELECT idmessage
                     FROM conversationsEvents 
