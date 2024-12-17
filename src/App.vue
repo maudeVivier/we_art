@@ -153,7 +153,7 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;700&family=Aboreto&display=swap');
 
 /* Si tu veux une barre de navigation fixe en bas de l'écran */
-v-bottom-navigation {
+.v-bottom-navigation {
   position: fixed !important;
   bottom: 0;
   left: 0;
@@ -211,10 +211,6 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 600px) {
   v-bottom-navigation {
     height: 60px; /* Ajuste la hauteur pour les petits écrans */
-  }
-
-  .v-btn {
-    font-size: 10px; /* Réduit la taille du texte */
   }
 
   .v-icon {

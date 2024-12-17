@@ -5,17 +5,24 @@
       <v-container>
         <v-card>
           <v-card-title>
-          <v-row class="my-1 ml-1">
-            <v-btn
-              :to="{name : 'Home'}"
-              exact
-              icon
-              class="mr-2"
-            > 
-            <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
-            <h2>Mes ateliers</h2>
-          </v-row>
+            <v-row class="my-1 ml-1" style="justify-content: space-between;">
+              <v-btn
+                :to="{name : 'Home'}"
+                exact
+                icon
+                class="mr-2"
+              > 
+              <v-icon>mdi-arrow-left</v-icon>
+              </v-btn>
+              <h2>Mes ateliers</h2>
+              <v-btn
+                v-if="this.userConnected && this.$store.getters.user.type === 'Organizer'"
+                color="primary"
+                @click="goToCreateEvent"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>   
+            </v-row>          
           </v-card-title>
 
           <!-- Notifications -->
@@ -353,7 +360,16 @@ export default {
       // Simulez ici la mise à jour des notifications
       this.$emit('update-notifications'); // Émettre un événement pour signaler le changement
     },
-
+    goToCreateEvent() {
+      if(this.$store.getters.isAuthenticated){
+        this.$router.push('/createEvents');
+      }else{
+        this.$router.push('/login');
+      }
+      this.$nextTick(() => {
+        window.scrollTo(0, 0);
+      });
+    },
     async participateEvent(eventId) {
       if(this.userConnected){ // utilisateur connecté
         try {

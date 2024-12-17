@@ -209,22 +209,6 @@
         <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
         <p>Chargement des événements...</p>
       </v-col>
-      <v-container style="margin: -50px;" v-if="this.userConnected && this.$store.getters.user.type === 'Organizer' && !showFiltersBox">
-        <!-- Bouton Ajouter un Événement -->
-        <v-row>
-          <v-col cols="12" class="text-center">
-            <v-btn
-              color="primary"
-              dark
-              @click="goToCreateEvent"
-              large
-              class="mt-4 fixed-button"
-            >
-              <v-icon >mdi-plus</v-icon>
-            </v-btn>   
-          </v-col>
-        </v-row>
-      </v-container>
 
       <v-container v-if="showFiltersBox && !loadingFilter" style="max-width: 100%;">
         <v-row>
@@ -609,16 +593,6 @@ export default {
       // Redirect to the event details page with the event ID
       this.$router.push({ path: `/eventDetails/${event.id}` });
     },
-    goToCreateEvent() {
-      if(this.$store.getters.isAuthenticated){
-        this.$router.push('/createEvents');
-      }else{
-        this.$router.push('/login');
-      }
-      this.$nextTick(() => {
-        window.scrollTo(0, 0);
-      });
-    },
     selectEvent(event) {
       this.selectedEvent = event;
       this.currentScrollIndex = 0; // Réinitialiser l'index de défilement
@@ -697,14 +671,6 @@ export default {
 </script>
 
 <style scoped>
-.fixed-button {
-  position: fixed;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-}
-
 .event-text {
   padding: 4px;
 }
