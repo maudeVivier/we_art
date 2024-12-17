@@ -40,7 +40,7 @@
           </h5>
         </v-row>
 
-        <v-row class="row-4"><!-- <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:80%; overflow-y: auto; align-content: flex-start;"> -->
+        <v-row ref="messageContainer" class="row-4 message-list"><!-- <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:80%; overflow-y: auto; align-content: flex-start;"> -->
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -80,7 +80,7 @@
         </v-row>
 
         <!-- Zone de saisie du message -->
-        <v-row class="row-5"><!-- <v-row class="message-input" style="height: 20%; position: fixed !important; bottom: 56; left: 0; width: 100%; z-index: 10000;"> -->
+        <v-row class="row-5 message-input"><!-- <v-row class="message-input" style="height: 20%; position: fixed !important; bottom: 56; left: 0; width: 100%; z-index: 10000;"> -->
         <v-col
           cols="12"
           style="display: flex; align-items: center;" 
@@ -90,7 +90,6 @@
             v-model="newMessage"
             label="Écrivez votre message..."
             rows="2"
-            class="flex-grow-1"
             outlined
             no-resize
           />
@@ -329,13 +328,13 @@ export default {
     margin: 0;
   }
 
-  .message-input{
+  /* .message-input{
     max-height: 15vh;
     overflow-y: auto;
     position: fixed;
     left: 0;
     right: 0;
-   }
+   } */
 
   .v-row {
     display: flex;
@@ -344,66 +343,68 @@ export default {
     text-align: center;
   }
   .row-1 {
-  flex: 0.5;
-  background-color: #ffcccc; /* Couleur de fond pour la ligne 1 */
-}
-
-.row-2 {
-  flex: 0.5;
-  background-color: #ffcc99; /* Couleur de fond pour la ligne 2 */
-}
-
-.row-3 {
-  flex: 0.5;
-  background-color: #ffff99; /* Couleur de fond pour la ligne 3 */
-  border-top: 1px solid black; 
-  border-bottom: 1px solid black; 
-  padding: 5px 10%; 
-  cursor: pointer;
-}
-
-.row-4 {
-  flex: 4; /* La 4ème ligne occupe 80% de la hauteur du container */
-  background-color: #99ff99; /* Couleur de fond pour la ligne 4 */
-  overflow-y: auto;
-}
-
-.row-5 {
-  flex: 1;
-  background-color: #99ccff; /* Couleur de fond pour la ligne 5 */
-}
-
-.my-container {
-  height: calc(100vh - 56px); /* Le container occupe 80% de la hauteur de la fenêtre */
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; /* Si nécessaire, ajoute une barre de défilement */
-  max-width: 100%;
-}
-
-.v-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-/* Adaptation pour différents écrans */
-@media (max-width: 1024px) { /* Tablette */
-  .my-container {
-    height: calc(90vh - 56px); /* Réduit la hauteur du container pour les tablettes */
+    flex: 0.2;
+    align-content: center;
+    background-color: #ffcccc; /* Couleur de fond pour la ligne 1 */
   }
+
+  .row-2 {
+    flex: 0.2;
+    background-color: #ffcc99; /* Couleur de fond pour la ligne 2 */
+  }
+
+  .row-3 {
+    flex: 0.2;
+    background-color: #ffff99; /* Couleur de fond pour la ligne 3 */
+    border-top: 1px solid black; 
+    border-bottom: 1px solid black; 
+    padding: 5px 10%; 
+    cursor: pointer;
+  }
+
   .row-4 {
-    flex: 3; /* Réduit la hauteur de la ligne 4 */
+    flex: 4; /* La 4ème ligne occupe 80% de la hauteur du container */
+    background-color: #99ff99; /* Couleur de fond pour la ligne 4 */
+    overflow-y: auto;
+    align-content: flex-start;
   }
-}
 
-@media (max-width: 600px) { /* Téléphone */
+  .row-5 {
+    flex: 0.5;
+    background-color: #99ccff; /* Couleur de fond pour la ligne 5 */
+  }
+
   .my-container {
-    height: calc(80vh - 56px); /* Réduit davantage la hauteur du container pour les téléphones */
+    height: calc(100vh - 56px); /* Le container occupe 80% de la hauteur de la fenêtre */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Si nécessaire, ajoute une barre de défilement */
+    max-width: 100%;
   }
-  .row-4 {
-    flex: 2; /* Réduit encore plus la ligne 4 */
+
+  .v-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
-}
+
+  /* Adaptation pour différents écrans */
+  @media (max-width: 1024px) { /* Tablette */
+    .my-container {
+      height: calc(95vh - 56px); /* Réduit la hauteur du container pour les tablettes */
+    }
+    .row-4 {
+      flex: 3.5; /* Réduit la hauteur de la ligne 4 */
+    }
+  }
+
+  @media (max-width: 600px) { /* Téléphone */
+    .my-container {
+      height: calc(90vh - 56px); /* Réduit davantage la hauteur du container pour les téléphones */
+    }
+    .row-4 {
+      flex: 3; /* Réduit encore plus la ligne 4 */
+    }
+  }
 </style>
