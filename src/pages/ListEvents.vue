@@ -130,7 +130,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </v-card>
       
@@ -197,7 +196,6 @@
         </v-row>
       </v-container>
      
-        
       <!-- Loading Spinner -->
       <v-col v-if="loading && !showFiltersBox" cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
@@ -209,7 +207,6 @@
           
           <v-col style="display: flex; justify-content: space-between;">
             <h2>Filtres</h2>
-
 
             <v-btn
               icon
@@ -250,18 +247,6 @@
 
         <!-- Filtre sur la date -->
         <h3>Date</h3>
-        <!-- A VOIR SI ON MET UN PICKER DATE OU PAS 
-        <v-row class="mt-2">
-          <v-col cols="12" sm="6">
-            <v-date-picker
-              v-model="selectedDate"
-              no-title
-              @input="applyFilters"
-              dense
-            ></v-date-picker>
-          </v-col>
-        -->
-
         <div class="d-flex justify-center mt-4">
           <v-radio-group v-model="selectedDateFilter" row>
             <v-radio label="Aujourd'hui" :value="'today'"></v-radio>
@@ -274,12 +259,6 @@
             <v-radio label="Ce mois" :value="'month'"></v-radio>
           </v-radio-group>
         </div>
-
-       
-
-     
-
-
 
         <!-- Filtre sur le prix -->
         <h3>Prix</h3>
@@ -305,7 +284,6 @@
           dense
         ></v-text-field>
 
-
         <h3>Distance</h3>
         <div>
           <label for="radius">Rayon de recherche (en km) :</label>
@@ -320,9 +298,15 @@
           <span>{{ radius }} km</span>
         </div>
 
-
-
-        <div class="d-flex justify-center mt-4">
+        <div class="d-flex justify-space-between mt-4">
+          <v-btn
+            color="red"
+            dark
+            @click="removeFilters"
+            class="mt-4"
+          >
+            Supprimer les filtres
+          </v-btn>
           <v-btn
             color="primary"
             dark
@@ -333,8 +317,6 @@
           </v-btn>
         </div>
       </v-container>
-
-
     </v-main>
   </v-app>
 </template>
@@ -360,7 +342,7 @@ export default {
       loading: false, // Loading state
       photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
       mode: 'list', // 'list' ou 'map'
-
+      clearFilters: false,
       zoom: 13,
       center: null, // Coordonnées de Lyon
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -438,12 +420,9 @@ export default {
         this.calculateDistance(this.selectedEvent.latitude, this.selectedEvent.longitude, event.latitude, event.longitude) < 1 // distance en km
       );
     },
-
-
-    
   },
   mounted() {
-    this.fetchEvents();
+    this.fetchEvents(this.clearFilters);
   },
   methods: {
     getUserLocation() {
@@ -488,7 +467,6 @@ export default {
           resolve(this.center); // Résoudre avec la valeur par défaut
         }
       });
-
     },
     
     async fetchDisciplines() {
@@ -510,7 +488,14 @@ export default {
     applyFilters() {
       this.showFiltersBox = false;
 
-      this.fetchEvents(); // Relancer la récupération des événements avec les disciplines sélectionnées
+      this.fetchEvents(this.clearFilters); // Relancer la récupération des événements avec les disciplines sélectionnées
+    },
+    removeFilters() {
+      this.showFiltersBox = false;
+      this.clearFilters = true;
+
+      this.fetchEvents(this.clearFilters); // Relancer la récupération des événements avec les disciplines sélectionnées
+      this.clearFilters = false;
     },
 
     toggleMode() {
@@ -537,58 +522,66 @@ export default {
       return time.replace(':', 'h'); // Remplace ':' par 'h'
     },
     fetchEventsMap(){
-      this.fetchEvents();
+      this.fetchEvents(this.clearFilters);
     },
-    async fetchEvents() {
-
+    async fetchEvents(cleanFilters = false) {
       this.loading = true; // Start loading
+
+      // Si cleanFilters est true, réinitialiser tous les filtres
+      if (cleanFilters) {
+        this.selectedDisciplines = [];
+        this.selectedPrice = null;
+        this.selectedLevel = null;
+        this.selectedDateFilter = null;
+        this.radius = 10;
+      }
       try {
-        if(!this.center){
+        if (!this.center) {
           await this.getUserLocation();
         }
 
-
         let queryParams = '';
 
-        // Ajouter le filtre de discipline si sélectionné
-        if (this.selectedDisciplines.length) {
-          queryParams += `?discipline=${this.selectedDisciplines.join(',')}`;
-        }
+        // Si cleanFilters est true, ignorer les filtres et faire une recherche classique
+        if (!cleanFilters) {
+          // Ajouter le filtre de discipline si sélectionné
+          if (this.selectedDisciplines.length) {
+            queryParams += `?discipline=${this.selectedDisciplines.join(',')}`;
+          }
 
-        // Ajouter le filtre de prix
-        if (this.selectedPrice !== null) {
-          // Si "Inférieur à" est sélectionné, ajouter le paramètre maxPrice
-          if (this.selectedPrice === 2 && this.maxPrice) {
-            queryParams += queryParams ? `&prix_max=${this.maxPrice}` : `?prix_max=${this.maxPrice}`;
-          } else {
-            // Gérer les autres options (Gratuit, Prix libre, Payant)
-            if (queryParams) {
-              queryParams += `&prix=${this.selectedPrice}`;
+          // Ajouter le filtre de prix
+          if (this.selectedPrice !== null) {
+            // Si "Inférieur à" est sélectionné, ajouter le paramètre maxPrice
+            if (this.selectedPrice === 2 && this.maxPrice) {
+              queryParams += queryParams ? `&prix_max=${this.maxPrice}` : `?prix_max=${this.maxPrice}`;
             } else {
-              queryParams += `?prix=${this.selectedPrice}`;
+              // Gérer les autres options (Gratuit, Prix libre, Payant)
+              if (queryParams) {
+                queryParams += `&prix=${this.selectedPrice}`;
+              } else {
+                queryParams += `?prix=${this.selectedPrice}`;
+              }
             }
           }
-        }
 
-        //Ajouter le filtre niveau 
-        if(this.selectedLevel){
-          queryParams += queryParams ? `&level=${this.selectedLevel}` : `?level=${this.selectedLevel}`;
-        }
+          // Ajouter le filtre niveau
+          if (this.selectedLevel) {
+            queryParams += queryParams ? `&level=${this.selectedLevel}` : `?level=${this.selectedLevel}`;
+          }
 
-        // Ajouter le filtre de date
-        if(this.selectedDateFilter){
-          queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
-        }
+          // Ajouter le filtre de date
+          if (this.selectedDateFilter) {
+            queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
+          }
 
-        // Ajouter le filtre de distance
-        if(this.center && this.center.lat && this.center.lng && this.radius){
-          queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
+          // Ajouter le filtre de distance
+          if (this.center && this.center.lat && this.center.lng && this.radius) {
+            queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
+          }
         }
-        
-        //const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
+        // Effectuer la requête avec ou sans filtres selon cleanFilters
+        // const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
         const response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
-
-
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
@@ -620,7 +613,6 @@ export default {
       }
     },
 
-
     scrollRight() {
       if (this.moreEventsAvailable) {
         this.currentScrollIndex += 1; // Augmente l'index de défilement
@@ -639,7 +631,6 @@ export default {
         transition: 'transform 0.5s ease' // Animation douce pour le défilement
       };
     },
-
 
     calculateDistance(lat1, lon1, lat2, lon2) {
       const R = 6371; // Rayon de la Terre en km
@@ -701,8 +692,7 @@ export default {
 
 .event-location,
 .event-date-time,
-.event-discipline,
-.event-niveau {
+.event-discipline {
   flex: 1;
 }
 
@@ -752,17 +742,7 @@ export default {
   background-color: rgb(143, 170, 143); /* Gris-vert */
 }
 
-
-
-
-
-
-
-
-
 /* Style pour la map */
-
-
 .map-container {
   display: flex;
   flex-direction: column; /* Disposition verticale */
@@ -770,7 +750,6 @@ export default {
   width: 100vw; /* Largeur totale */
   z-index: 1;
 }
-
 
 .custom-map {
   flex: 1; /* La carte prend tout l'espace disponible */
@@ -801,8 +780,4 @@ export default {
   margin-bottom: 0.5%; /* Ajustez l'espace entre les cases */
   padding: 0;
 }
-
-
-
-
 </style>
