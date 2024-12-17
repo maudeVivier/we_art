@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <v-main>
-      <v-container style="max-width: 100%; height:75vh;">
-        <v-row class="mt-1 ml-1">
+      <v-container style="max-width: 100%; height:90vh; display: flex; flex-direction: column;">
+        <v-row class="row-1"><!-- <v-row class="mt-1 ml-1"> -->
           <v-btn
             :to="{name : 'Home'}"
             exact
@@ -16,7 +16,7 @@
           </h3>
         </v-row>
 
-        <v-row class="d-flex align-center justify-center" style="flex-wrap: nowrap;">
+        <v-row class="row-2 align-center justify-center"><!-- <v-row class="d-flex align-center justify-center"> -->
           <p style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
             {{ formatDate(start_dateEvent) }}
           </p>
@@ -32,7 +32,7 @@
           </p>
         </v-row>
 
-        <v-row @click="goToUserPage(orgaId)" class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%; cursor: pointer;">
+        <v-row @click="goToUserPage(orgaId)" class="row-3 align-center"><!-- <v-row @click="goToUserPage(orgaId)" class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%; cursor: pointer;"> -->
           <v-avatar size="32" class="mr-2 ml-4">
             <img :src="photoOrga" :alt="`${firstnameOrga} ${lastnameOrga}`">
           </v-avatar>
@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:80%; overflow-y: auto; align-content: flex-start;">
+        <v-row class="row-4"><!-- <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:80%; overflow-y: auto; align-content: flex-start;"> -->
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -81,14 +81,12 @@
         </v-row>
 
         <!-- Zone de saisie du message -->
-      <v-row
-      class="message-input"
-      style="height: 20;"
-      >
+        <v-row class="row-5"><!-- <v-row class="message-input" style="height: 20%; position: fixed !important; bottom: 56; left: 0; width: 100%; z-index: 10000;"> -->
         <v-col
           cols="12"
-          style="display: flex; align-items: center; background-color: #f5f5f5f5;" 
+          style="display: flex; align-items: center;" 
         >
+          <!-- background-color: #f5f5f5f5; -->
           <v-textarea
             v-model="newMessage"
             label="Écrivez votre message..."
@@ -114,7 +112,6 @@
         <p>Chargement des messages...</p>
       </v-col>
     </v-container>
-
     </v-main>
   </v-app>
 </template>
@@ -341,4 +338,40 @@ export default {
     left: 0;
     right: 0;
    }
+
+  .v-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .row-1 {
+  flex: 0.5;
+  background-color: #ffcccc; /* Couleur de fond pour la ligne 1 */
+}
+
+.row-2 {
+  flex: 0.5;
+  background-color: #ffcc99; /* Couleur de fond pour la ligne 2 */
+}
+
+.row-3 {
+  flex: 0.5;
+  background-color: #ffff99; /* Couleur de fond pour la ligne 3 */
+  border-top: 1px solid black; 
+  border-bottom: 1px solid black; 
+  padding: 5px 10%; 
+  cursor: pointer;
+}
+
+.row-4 {
+  flex: 4; /* La 4ème ligne occupe 80% de la hauteur du container */
+  background-color: #99ff99; /* Couleur de fond pour la ligne 4 */
+  overflow-y: auto;
+}
+
+.row-5 {
+  flex: 1;
+  background-color: #99ccff; /* Couleur de fond pour la ligne 5 */
+}
 </style>
