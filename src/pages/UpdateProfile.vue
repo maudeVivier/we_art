@@ -595,6 +595,13 @@
                       this.validateAPropos();
 
         if (verif) {
+          let updateType;
+          if(this.editedUser.type.value == this.user.type){
+            updateType = this.editedUser.type.value
+          }
+          else{
+            updateType = this.editedUser.type
+          }
           this.user.firstname = this.editedUser.firstname;
           this.user.lastname = this.editedUser.lastname;
           this.user.birthday = this.editedUser.birthday;
@@ -627,7 +634,7 @@
             const response = await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
             this.$store.commit('updateUser', {
               email: this.user.email,
-              type: this.user.type,
+              type: updateType,
               latitude: this.user.latitude,
               longitude: this.user.longitude,
             });   

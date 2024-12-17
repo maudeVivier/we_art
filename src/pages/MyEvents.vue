@@ -21,6 +21,11 @@
                 @click="goToCreateEvent"
               >
                 <v-icon>mdi-plus</v-icon>
+              </v-btn>
+              <v-btn
+                v-else
+                icon
+              >
               </v-btn>   
             </v-row>          
           </v-card-title>
