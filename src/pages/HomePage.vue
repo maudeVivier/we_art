@@ -1,6 +1,5 @@
 <template>
   <v-app>
-
     <v-main>
       <v-container fluid class="text-center my-5">
         <!-- Section Logos -->
