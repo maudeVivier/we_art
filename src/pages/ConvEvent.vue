@@ -1,7 +1,6 @@
 <template>
   <v-app>
-    <v-main>
-      <v-container style="max-width: 100%; height:90vh; display: flex; flex-direction: column;">
+      <v-container class="my-container" style="overflow-y: none !important">
         <v-row class="row-1"><!-- <v-row class="mt-1 ml-1"> -->
           <v-btn
             :to="{name : 'Home'}"
@@ -112,7 +111,6 @@
         <p>Chargement des messages...</p>
       </v-col>
     </v-container>
-    </v-main>
   </v-app>
 </template>
 
@@ -373,5 +371,39 @@ export default {
 .row-5 {
   flex: 1;
   background-color: #99ccff; /* Couleur de fond pour la ligne 5 */
+}
+
+.my-container {
+  height: calc(100vh - 56px); /* Le container occupe 80% de la hauteur de la fenêtre */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Si nécessaire, ajoute une barre de défilement */
+  max-width: 100%;
+}
+
+.v-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Adaptation pour différents écrans */
+@media (max-width: 1024px) { /* Tablette */
+  .my-container {
+    height: calc(90vh - 56px); /* Réduit la hauteur du container pour les tablettes */
+  }
+  .row-4 {
+    flex: 3; /* Réduit la hauteur de la ligne 4 */
+  }
+}
+
+@media (max-width: 600px) { /* Téléphone */
+  .my-container {
+    height: calc(80vh - 56px); /* Réduit davantage la hauteur du container pour les téléphones */
+  }
+  .row-4 {
+    flex: 2; /* Réduit encore plus la ligne 4 */
+  }
 }
 </style>
