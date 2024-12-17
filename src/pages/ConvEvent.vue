@@ -281,6 +281,9 @@ export default {
 </script>
 
 <style scoped>
+html, body {
+  overflow: hidden; /* Empêche le défilement de la page entière */
+}
 /* Message de l'utilisateur connecté (droite) */
 .message-right {
   background-color: #e3f2fd !important; /* Bleu clair pour les messages de l'utilisateur */
@@ -327,14 +330,6 @@ export default {
   p {
     margin: 0;
   }
-
-  /* .message-input{
-    max-height: 15vh;
-    overflow-y: auto;
-    position: fixed;
-    left: 0;
-    right: 0;
-   } */
 
   .v-row {
     display: flex;
