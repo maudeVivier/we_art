@@ -85,7 +85,6 @@
           cols="12"
           style="display: flex; align-items: center;" 
         >
-          <!-- background-color: #f5f5f5f5; -->
           <v-textarea
             v-model="newMessage"
             label="Écrivez votre message..."
@@ -340,17 +339,14 @@ html, body {
   .row-1 {
     flex: 0.2;
     align-content: center;
-    background-color: #ffcccc; /* Couleur de fond pour la ligne 1 */
   }
 
   .row-2 {
     flex: 0.2;
-    background-color: #ffcc99; /* Couleur de fond pour la ligne 2 */
   }
 
   .row-3 {
     flex: 0.2;
-    background-color: #ffff99; /* Couleur de fond pour la ligne 3 */
     border-top: 1px solid black; 
     border-bottom: 1px solid black; 
     padding: 5px 10%; 
@@ -359,14 +355,13 @@ html, body {
 
   .row-4 {
     flex: 4; /* La 4ème ligne occupe 80% de la hauteur du container */
-    background-color: #99ff99; /* Couleur de fond pour la ligne 4 */
     overflow-y: auto;
     align-content: flex-start;
   }
 
   .row-5 {
     flex: 0.5;
-    background-color: #99ccff; /* Couleur de fond pour la ligne 5 */
+    background-color: #f5f5f5f5;
   }
 
   .my-container {
