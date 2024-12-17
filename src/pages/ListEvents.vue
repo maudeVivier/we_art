@@ -261,6 +261,8 @@
         </v-row>
 
         <!-- Filtre sur les levels -->
+        <h3>Niveau</h3>
+
         <v-select
           v-model="selectedLevel"
           label="Choissisez un niveau"
@@ -609,6 +611,7 @@ export default {
           queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
         }
         
+        //const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
         const response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
 
 
