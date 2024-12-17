@@ -50,7 +50,6 @@
             <v-icon>mdi-format-list-bulleted</v-icon>
           </v-btn>
         </v-toolbar>
-
       </v-container>
 
       <v-card v-if="mode==='map' && !showFiltersBox">
@@ -135,9 +134,7 @@
         </div>
       </v-card>
       
-      
       <v-container v-if="mode==='list' && !showFiltersBox">
-
         <v-row class="event-list" v-if="mode==='list'">
           <v-col
               v-for="event in filteredEvents"
@@ -176,15 +173,15 @@
                         <v-icon class="mr-2">mdi-currency-eur</v-icon>
                         {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                       </div>
-                      <!-- Nombre de participants -->
-                      <!-- <div class="event-participants">
-                        <v-icon class="mr-2">mdi-account-group</v-icon>
-                        {{ event.participant_count }} participants
-                      </div> -->
-                      <!-- La discipline -->
-                      <div class="event-discipline">
-                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
-                        {{ event.discipline }}
+                      <!-- La discipline et le niveau -->
+                      <div class="event-discipline" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                          <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                          {{ event.discipline }}
+                        </div>
+                        <div>
+                          <strong>{{ event.niveau }}</strong>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -196,11 +193,8 @@
                   class="event-image"
                 ></v-img>
               </v-card>
-            </v-col>
+          </v-col>
         </v-row>
-
-      
-        
       </v-container>
      
         
@@ -707,7 +701,8 @@ export default {
 
 .event-location,
 .event-date-time,
-.event-discipline {
+.event-discipline,
+.event-niveau {
   flex: 1;
 }
 

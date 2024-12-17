@@ -40,6 +40,17 @@
           </v-col>
         </v-row>
 
+        <!-- Discipline et niveau -->
+        <v-row class="event-info justify-space-between">
+          <v-col>
+            <v-icon color="primary" class="mr-2">{{ event.icon_discipline }}</v-icon>
+            {{ event.discipline }}
+          </v-col>
+            <v-col>
+            <strong>{{ event.niveau }}</strong>
+          </v-col>
+        </v-row>
+
         <v-row class="justify-space-between">
           <!-- Prix -->
           <v-col :class="[

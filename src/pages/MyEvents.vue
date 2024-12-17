@@ -72,10 +72,15 @@
                             <v-icon class="mr-2">mdi-currency-eur</v-icon>
                             {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                           </div>
-                          <!-- La discipline -->
-                          <div class="event-discipline">
-                            <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
-                            {{ event.discipline }}
+                          <!-- La discipline et le niveau -->
+                          <div class="event-discipline" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center;">
+                              <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                              {{ event.discipline }}
+                            </div>
+                            <div>
+                              <strong>{{ event.niveau }}</strong>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -141,10 +146,15 @@
                         <v-icon class="mr-2">mdi-currency-eur</v-icon>
                         {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                       </div>
-                      <!-- La discipline -->
-                      <div class="event-discipline">
-                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
-                        {{ event.discipline }}
+                      <!-- La discipline et le niveau -->
+                      <div class="event-discipline" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                          <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                          {{ event.discipline }}
+                        </div>
+                        <div>
+                          <strong>{{ event.niveau }}</strong>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -209,10 +219,15 @@
                         <v-icon class="mr-2">mdi-currency-eur</v-icon>
                         {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                       </div>
-                      <!-- La discipline -->
-                      <div class="event-discipline">
-                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
-                        {{ event.discipline }}
+                      <!-- La discipline et le niveau -->
+                      <div class="event-discipline" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                          <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                          {{ event.discipline }}
+                        </div>
+                        <div>
+                          <strong>{{ event.niveau }}</strong>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -277,10 +292,15 @@
                         <v-icon class="mr-2">mdi-currency-eur</v-icon>
                         {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
                       </div>
-                      <!-- La discipline -->
-                      <div class="event-discipline">
-                        <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
-                        {{ event.discipline }}
+                      <!-- La discipline et le niveau -->
+                      <div class="event-discipline" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                          <v-icon class="mr-2">{{ event.icon_discipline }}</v-icon>
+                          {{ event.discipline }}
+                        </div>
+                        <div>
+                          <strong>{{ event.niveau }}</strong>
+                        </div>
                       </div>
                     </div>
                   </div>
