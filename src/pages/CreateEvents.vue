@@ -395,7 +395,6 @@ export default {
         reader.readAsDataURL(file);
       }
       this.imageEvent = event.target.files[0];
-      // this.validateImage();
     },
     // Récupération des suggestions d'adresses
     async fetchAddresses(adresse) {
@@ -652,6 +651,7 @@ export default {
         this.errorMessage = 'Échec de l\'upload de l\'image, veuillez réessayer.';
       } finally {
         this.loading = false;
+        this.$router.push('/myEvents');
       }
     },
     resetForm() {
