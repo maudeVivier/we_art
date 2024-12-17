@@ -54,6 +54,16 @@ app.use('/api', eventsRoutes);
 io.on('connection', (socket) => {
   console.log(`Un utilisateur s'est connecté : ${socket.id}`);
 
+  socket.on('joinUserNotif', (userId) => {
+
+    if (userId) {
+      socket.join(`user_${userId}`);
+      console.log(`Utilisateur ${userId} connecté et ajouté à sa room personnelle user_${userId}`);
+    }
+  });
+
+  
+
   // Rejoindre une "room" spécifique pour un événement
   socket.on('joinEventRoom', (eventId) => {
     socket.join(eventId);
@@ -83,6 +93,33 @@ io.on('connection', (socket) => {
         firstname: user.rows[0].firstname,
         lastname: user.rows[0].lastname,
         image_user: user.rows[0].image_user
+      });
+
+
+      const participants = await pool.query(
+        `
+          SELECT id_user FROM participantsevents WHERE id_event = $1
+          UNION
+          SELECT id_organisateur AS id_user FROM events WHERE id = $1
+        `, [eventId]
+      );
+
+      // Filtrer les utilisateurs connectés à leur room personnelle `user_${userId}`
+      participants.rows.forEach(participant => {
+
+        const participantId = participant.id_user;
+
+        const notification = {
+          type: 'message',
+          id_event : eventId,
+          lastFirstName: user.rows[0].firstname,
+          lastLastName: user.rows[0].lastname,
+          msg: texte
+        };
+
+        io.to(`user_${participantId}`).emit('notification', notification);
+        console.log(`Notification envoyée à l'utilisateur ${participantId}`);
+      
       });
 
       console.log('Message diffusé avec succès');
