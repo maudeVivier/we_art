@@ -111,6 +111,7 @@ export default {
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);
+        this.$router.push({ name: 'Home' });
       }
       finally {
         this.loading=false
