@@ -65,10 +65,13 @@
 <script>
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
+import { io } from 'socket.io-client';
+
 
 export default {
   data() {
     return {
+      socket: null,
       search: '',
       events: [],
       loading: false, // Loading state
@@ -87,6 +90,33 @@ export default {
   },
   mounted() {
     this.fetchConvEvents();
+
+    //this.socket = io('http://localhost:3000');
+    this.socket = io('https://we-art.onrender.com');
+
+    this.socket.emit('joinUserNotif', this.userConnected.idUser);
+
+    // Écouter les notifications
+    this.socket.on('notification', (notif) => {
+      // notif contient le l'id de l'événement, le nom et prenom du dernier utilisateur a envoyer le msg et le text
+      // on modifie l'event correspondant avec ces infos
+      const event = this.events.find((event) => {
+        return event.id_event === parseInt(notif.id_event); 
+      });
+      if (event) {
+        event.lastmessage = notif.msg;
+        event.lastmessageuserfirstname = notif.lastFirstName;
+        event.lastmessageuserlastname = notif.lastLastName;
+
+        // on remonte le message tous en haut de la liste
+        this.events = this.events.filter((e) => e.id_event !== parseInt(notif.id_event));
+        this.events.unshift(event);
+      }
+    
+     
+
+    });
+    
   },
   methods: {
     formatDate(date) {
@@ -120,12 +150,16 @@ export default {
       }
     },
     goToConvEvent(event) {
-      console.log("event.id", event.id_event);
       this.$router.push({ name: 'ConvEvent', params: { id: event.id_event } });
     },
     goBack() {
       this.$router.go(-1); // Retourne à la page précédente dans l'historique du navigateur
     },
+  },
+  beforeDestroy() {
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   },
 };
 </script>
