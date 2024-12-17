@@ -43,7 +43,7 @@
           </v-col>
         </v-row>
 
-        <v-carousel v-if="events.length > 0" hide-delimiters :prev-icon="false" :next-icon="false" class="carousel">
+        <v-carousel v-if="events.length > 0" hide-delimiters class="carousel">
           <v-carousel-item
             v-for="(event, index) in events"
             :key="index"
