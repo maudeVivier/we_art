@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <v-container style="max-width: 100%;">
+      <v-container style="max-width: 100%; height:75vh;">
         <v-row class="mt-1 ml-1">
           <v-btn
             :to="{name : 'Home'}"
@@ -41,7 +41,7 @@
           </h5>
         </v-row>
 
-        <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:calc(100vh - 80px - 56px - 25vh); overflow-y: auto;">
+        <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:80%; overflow-y: auto; align-content: flex-start;">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -83,6 +83,7 @@
         <!-- Zone de saisie du message -->
       <v-row
       class="message-input"
+      style="height: 20;"
       >
         <v-col
           cols="12"
