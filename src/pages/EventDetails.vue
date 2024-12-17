@@ -296,6 +296,7 @@ export default {
           console.log('utilisateur ajouté a l evenement :', response.data);
           this.successMessageParticipe = true; // Affiche le message de succès
           this.alreadyParticipating = true;
+          this.fetchEventDetails(this.event.id);
         } catch (error) {
           console.error('Erreur lors de l\'ajout de l\'utilisateur à l\'évènement', error);
           this.successMessageParticipe = false; // Affiche le message de succès
@@ -317,6 +318,7 @@ export default {
             console.log('utilisateur supprimer a l evenement :', response.data);
             this.successMessageDesinscire = true; // Affiche le message de succès
             this.alreadyParticipating = false;
+            this.fetchEventDetails(this.event.id);
           } catch (error) {
             console.error('Erreur lors de la suppression de l\'utilisateur à l\'évènement', error);
             this.successMessageDesinscire = false; // Affiche le message de succès
