@@ -1653,6 +1653,7 @@ exports.getUserConversationsEvent = async (req, res) => {
         const result = await pool.query(
             `SELECT 
                 pe.id_event,
+                pe.notif,
                 e.name,
                 e.image_event_url,
                 e.start_date,
@@ -1677,7 +1678,7 @@ exports.getUserConversationsEvent = async (req, res) => {
                     ORDER BY dateHours DESC 
                     LIMIT 1
                 )
-            GROUP BY pe.id_event, e.name, e.image_event_url, e.start_date, lastMessage, lastMessageUserFirstname, lastMessageUserLastname, lastMessageDate
+            GROUP BY pe.id_event, e.name, e.image_event_url, e.start_date, lastMessage, lastMessageUserFirstname, lastMessageUserLastname, lastMessageDate, pe.notif
             ORDER BY 
                 lastMessageDate DESC;`,
             [userId]

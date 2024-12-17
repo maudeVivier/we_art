@@ -153,8 +153,8 @@ export default {
       console.log("entrer ici : ", this.$route.params)
 
       // Initialiser la connexion Socket.IO
-      //this.socket = io('http://localhost:3000');
-      this.socket = io('https://we-art.onrender.com');
+      this.socket = io('http://localhost:3000');
+      //this.socket = io('https://we-art.onrender.com');
 
 
       // Rejoindre une room spécifique à l'événement
@@ -166,15 +166,25 @@ export default {
       // Écouter les nouveaux messages
       this.socket.on('newMessage', (message) => {
         this.listMsg.push(message);
+        this.reinitNotif();
         this.$nextTick(() => {
           this.scrollToBottom();
         });
       });
 
+      this.reinitNotif();
+
       this.fetchConvMsgEvents();
     }
   },
   methods: {
+    async reinitNotif(){
+      console.log("je rentre dans la fonction reinitNotif")
+
+      //await axios.patch(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
+      await axios.patch(`http://localhost:3000/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
+
+    },
 
     goToUserPage(userId){
       this.$router.push({name:'ProfilOtherUser', params:{idUser:userId}})

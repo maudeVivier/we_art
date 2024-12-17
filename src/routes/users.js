@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUsers, createUser, updateUser, deleteUser, loginUser, verifyEmail, getUserEvents, getUserById, checkEmail, resendCode, getUserNotifsEvents, getUserNotifsCount, getUserInterests, getMyEvents} = require('../controllers/usersController');
+const { getUsers, createUser, updateUser, deleteUser, loginUser, verifyEmail, getUserEvents, getUserById, checkEmail, resendCode, getUserNotifsEvents, getUserNotifsCount, getUserInterests, getMyEvents, resetNotif} = require('../controllers/usersController');
 
 const router = express.Router();
 
@@ -18,7 +18,11 @@ router.post('/users/sendEmailCode', resendCode);
 router.post('/users/:id', getUserById);
 
 
+
+
 router.patch('/users/:id', updateUser);
+router.patch('/users/:userId/events/:eventId/resetnotif', resetNotif);
+
 
 
 

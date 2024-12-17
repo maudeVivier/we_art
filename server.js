@@ -98,12 +98,19 @@ io.on('connection', (socket) => {
 
       const participants = await pool.query(
         `
-          SELECT id_user FROM participantsevents WHERE id_event = $1
-        `, [eventId]
+          SELECT id_user FROM participantsevents WHERE id_event = $1 AND id_user != $2
+        `, [eventId, userId]
       );
 
       // Filtrer les utilisateurs connectés à leur room personnelle `user_${userId}`
       participants.rows.forEach(participant => {
+
+        // Augmenter de +1 notif de la table partipantsevents
+        pool.query(
+          `
+            UPDATE participantsevents SET notif = notif + 1 WHERE id_event = $1 AND id_user = $2
+          `, [eventId, participant.id_user]
+        );
 
         const participantId = participant.id_user;
 

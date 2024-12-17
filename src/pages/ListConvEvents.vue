@@ -23,6 +23,7 @@
                 class="event-conv-card no-shadow d-flex align-center"
                 @click="goToConvEvent(event)"
                 hover
+                :style="{ backgroundColor: event.notif > 0 ? '#e3f2fd' : '' }"
               >
                 <v-row>
                   <!-- Colonne pour l'image -->
@@ -35,7 +36,7 @@
                   <v-col cols="9">
                     <!-- Nom de l'événement -->
                     <p class="text-left mb-1 font-weight-bold truncate-text">
-                      {{ event.name }}
+                      {{ event.name }} <span v-if="event.notif>0">({{ event.notif }})</span>
                       <br> 
                       {{ formatDate(event.start_date) }} à {{ formatTime(event.start_date) }}
                     </p>
@@ -91,8 +92,8 @@ export default {
   mounted() {
     this.fetchConvEvents();
 
-    //this.socket = io('http://localhost:3000');
-    this.socket = io('https://we-art.onrender.com');
+    this.socket = io('http://localhost:3000');
+    //this.socket = io('https://we-art.onrender.com');
 
     this.socket.emit('joinUserNotif', this.userConnected.idUser);
 
@@ -107,6 +108,7 @@ export default {
         event.lastmessage = notif.msg;
         event.lastmessageuserfirstname = notif.lastFirstName;
         event.lastmessageuserlastname = notif.lastLastName;
+        event.notif = event.notif + 1;
 
         // on remonte le message tous en haut de la liste
         this.events = this.events.filter((e) => e.id_event !== parseInt(notif.id_event));
@@ -140,8 +142,8 @@ export default {
     async fetchConvEvents() {
       this.loading = true; // Start loading
       try {
-        const response = await axios.get(`https://we-art.onrender.com/api/events/messages/users/${this.userConnected.idUser}`);
-        //const response = await axios.get(`http://localhost:3000/api/events/messages/users/${this.userConnected.idUser}`);
+        //const response = await axios.get(`https://we-art.onrender.com/api/events/messages/users/${this.userConnected.idUser}`);
+        const response = await axios.get(`http://localhost:3000/api/events/messages/users/${this.userConnected.idUser}`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des conversations des événements:', error);

@@ -1529,3 +1529,74 @@ exports.getUserInterests = async (req, res) => {
         res.status(500).send({ error: 'Erreur lors de la récupération des intérêts de l\'utilisateur' });
     }
 };
+
+
+
+// PATCH - Remet a zero les notifs dans la table eventparticipate pour un userId et un eventId 
+/**
+ * @swagger
+ * /api/users/{userId}/events/{eventId}/resetnotif:
+ *   patch:
+ *     summary: Remet a zero les notifs dans la table eventparticipate pour un userId et un eventId
+ *     description: Remet a zero les notifs dans la table eventparticipate pour un userId et un eventId
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'utilisateur
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'evenement
+ *     responses:
+ *       200:
+ *         description: Notifs remises a zero avec succès.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Notifs remises a zero avec succès"
+ *       404:
+ *         description: Utilisateur ou evenement non trouvé.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Utilisateur ou evenement non trouvé"
+ *       500:
+ *         description: Erreur interne lors de la remise a zero des notifs.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Erreur lors de la remise a zero des notifs."
+ */
+exports.resetNotif = async (req, res) => {
+    const { userId, eventId } = req.params;
+    try {
+        // Remet juste a zero les notifs dans la table eventparticipate pour un userId et un eventId mais ne supprime pas
+        const result = await pool.query('UPDATE participantsevents SET notif = 0 WHERE id_user = $1 AND id_event = $2 RETURNING *', [userId, eventId]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Utilisateur ou evenement non trouvé' });
+        }
+        res.json({ message: 'Notifs remises a zero avec succès' });
+    } catch (err) {
+        console.error('Erreur lors de la remise a zero des notifs:', err);
+        res.status(500).send({ error: 'Erreur lors de la remise a zero des notifs' });
+    }
+}
