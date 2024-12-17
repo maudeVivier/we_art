@@ -32,7 +32,7 @@
           </p>
         </v-row>
 
-        <v-row @click="goToUserPage(idOrga)" class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%;">
+        <v-row @click="goToUserPage(orgaId)" class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%; cursor: pointer;">
           <v-avatar size="32" class="mr-2 ml-4">
             <img :src="photoOrga" :alt="`${firstnameOrga} ${lastnameOrga}`">
           </v-avatar>
@@ -49,7 +49,7 @@
           >
             <v-row class="d-flex align-start" no-gutters>
               <!-- Si c'est un message à gauche (message-left), photo à gauche et message à droite -->
-              <v-col v-if="msg.iduser !== userConnected.idUser" class="d-flex flex-column" cols="auto" :style="{ alignSelf: 'flex-end' }">
+              <v-col @click="goToUserPage(msg.iduser)" v-if="msg.iduser !== userConnected.idUser" class="d-flex flex-column" cols="auto" :style="{ alignSelf: 'flex-end', cursor: 'pointer' }">
                 <v-avatar size="32" class="photo-left">
                   <img :src="msg.image_user" />
                 </v-avatar>
@@ -58,7 +58,7 @@
               <!-- Bloc de message (texte) -->
               <v-col class="message-text flex-grow-1" :class="msg.iduser === userConnected.idUser ? 'message-right' : 'message-left'">
                 <div class="message-header">
-                  <p class="mb-1 font-weight-bold">
+                  <p @click="goToUserPage(msg.iduser)" class="mb-1 font-weight-bold" style="cursor:pointer">
                     {{ msg.firstname }} {{ msg.lastname }}
                   </p>
                   <p class="mb-2 font-weight-bold" style="font-size: 0.9rem;">
@@ -71,7 +71,7 @@
               </v-col>
 
               <!-- Si c'est un message à droite (message-right), photo à droite et message à gauche -->
-              <v-col v-if="msg.iduser === userConnected.idUser" class="d-flex flex-column-reverse" cols="auto" :style="{ alignSelf: 'flex-end' }">
+              <v-col @click="goToUserPage(msg.iduser)" v-if="msg.iduser === userConnected.idUser" class="d-flex flex-column-reverse" cols="auto" :style="{ alignSelf: 'flex-end', cursor: 'pointer' }">
                 <v-avatar size="32" class="photo-right">
                   <img :src="msg.image_user" />
                 </v-avatar>
@@ -183,7 +183,7 @@ export default {
   methods: {
 
     goToUserPage(userId){
-      this.$router.push({name:'ProfilOtherUser', params:{id:userId}})
+      this.$router.push({name:'ProfilOtherUser', params:{idUser:userId}})
     },
     scrollToBottom() {
       const container = this.$refs.messageContainer;

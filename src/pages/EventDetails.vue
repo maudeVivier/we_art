@@ -89,7 +89,7 @@
 
         <!-- Liste des participants -->
         <v-row>
-          <v-col v-for="participant in event.participants" :key="participant.id" class="d-flex flex-column align-center">
+          <v-col @click="goToUserPage(participant.id)" v-for="participant in event.participants" :key="participant.id" class="d-flex flex-column align-center" style="cursor: pointer;">
             <!-- Image du participant -->
             <v-avatar size="64" class="mb-2">
               <img :src="participant.image_user" :alt="`${participant.firstname} ${participant.lastname}`" />
@@ -186,6 +186,10 @@ export default {
       },
     },
   methods: {
+    goToUserPage(userId){
+      this.$router.push({name:'ProfilOtherUser', params:{idUser:userId}})
+    },
+
     async fetchEventDetails(id) {
       this.loading = true;
       try {

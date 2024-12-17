@@ -2,7 +2,7 @@
   <v-app>
     <v-main>
       <v-container v-if="!loading">
-        <v-row class="my-1 ml-1 align-center justify-space-between">
+        <v-row class="my-1 ml-1 align-center">
           <v-btn @click="goBack" icon class="mr-2">
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
