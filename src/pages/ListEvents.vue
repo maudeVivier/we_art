@@ -420,10 +420,6 @@ export default {
         event.description.toLowerCase().includes(this.search.toLowerCase())
       );
     },
-    userConnected() {
-      return this.$store.getters.isAuthenticated;
-    },
-
     displayedEvents() {
       // S'assurer que l'événement sélectionné soit toujours affiché en premier
       const events = this.nearbyEvents.slice(this.currentScrollIndex, this.currentScrollIndex + 2);

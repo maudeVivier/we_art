@@ -17,6 +17,7 @@ export default new Vuex.Store({
     updateUser(state, updatedFields) {
       if (state.user) {
         Object.assign(state.user, updatedFields); // Met à jour uniquement les champs modifiés
+        localStorage.setItem('user', JSON.stringify(state.user));
       }
     },
     
