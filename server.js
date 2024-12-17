@@ -31,10 +31,10 @@ const io = socketIo(server, {
 
 // Configurer CORS pour autoriser les requêtes de localhost:8001
 const corsOptions = {
-    origin: '*', // Remplacez par l'URL de votre frontend
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  };
+  origin: '*', // Remplacez par l'URL de votre frontend
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
   
 // Utiliser CORS avec les options spécifiées
 app.use(cors(corsOptions));
@@ -99,8 +99,6 @@ io.on('connection', (socket) => {
       const participants = await pool.query(
         `
           SELECT id_user FROM participantsevents WHERE id_event = $1
-          UNION
-          SELECT id_organisateur AS id_user FROM events WHERE id = $1
         `, [eventId]
       );
 
