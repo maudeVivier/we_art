@@ -92,6 +92,12 @@ export default {
       idSearchUser : null,
     };
   },
+  mounted(){
+    this.idSearchUser = this.$route.params.idUser
+    if (this.idSearchUser){
+      this.fetchUserDetails(); // Appelez la fonction pour récupérer les détails utilisateur
+    }
+  },
   methods: {
     
     ...mapActions(['logout']), // Importation de l'action logout de Vuex
@@ -122,7 +128,6 @@ export default {
     },
   },
   created() {
-    this.fetchUserDetails(); // Appelez la fonction pour récupérer les détails utilisateur
   },
   
 };

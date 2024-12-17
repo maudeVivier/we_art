@@ -32,7 +32,7 @@
           </p>
         </v-row>
 
-        <v-row class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%;">
+        <v-row @click="goToUserPage(idOrga)" class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%;">
           <v-avatar size="32" class="mr-2 ml-4">
             <img :src="photoOrga" :alt="`${firstnameOrga} ${lastnameOrga}`">
           </v-avatar>
@@ -181,6 +181,10 @@ export default {
     }
   },
   methods: {
+
+    goToUserPage(userId){
+      this.$router.push({name:'ProfilOtherUser', params:{id:userId}})
+    },
     scrollToBottom() {
       const container = this.$refs.messageContainer;
       if (container) {

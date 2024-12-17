@@ -82,7 +82,7 @@ const router = new Router({
       component: AddFakeData
     },
     {
-      path: '/profilOtherUser',
+      path: '/profilOtherUser/:idUser',
       name: 'ProfilOtherUser',
       component: ProfilOtherUser
     },
