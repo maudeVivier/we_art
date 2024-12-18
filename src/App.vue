@@ -85,9 +85,31 @@
         :to="{ name: 'ListConvEvents' }"
         :class="{ 'btn-active': active === 3 }"
         @click="fetchEventsCountNotifs"
-      >
-        <span>Conversations</span>
-        <v-icon>mdi-forum</v-icon>
+      > 
+
+        <v-badge
+          v-if="numberNotifConv > 0"
+          :content="numberNotifConv"
+          color="red"
+          overlap
+          bordered
+          class="notification-badge"
+        >
+          <template v-slot:badge>
+            <span class="badge-content">{{ numberNotifConv }}</span>
+          </template>
+          
+          <span>Conversations</span>
+          <v-icon>mdi-forum</v-icon>
+        </v-badge>
+
+
+        <template v-else>
+          <span>Conversations</span>
+          <v-icon>mdi-forum</v-icon>
+        </template>
+
+
       </v-btn>
 
       <!-- Changer dynamiquement Connexion en Profil -->
@@ -114,6 +136,7 @@ export default {
     return {
       active: null, // Gère l'état actif du bottom navigation
       numberNotif : 0,
+      numberNotifConv : 0,
     };
   },
   computed: {
@@ -131,6 +154,7 @@ export default {
           const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/notifscount`);
           console.log('Réponse de la requête:', response);
           this.numberNotif = response.data.count;
+          this.numberNotifConv = response.data.countNotifConv;
         } catch (error) {
           console.error('Erreur lors de la récupération des événements notifications:', error);
         }

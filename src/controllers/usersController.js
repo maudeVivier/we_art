@@ -1157,7 +1157,8 @@ exports.getUserEvents = async (req, res) => {
             FROM events e
             INNER JOIN participantsevents pe ON e.id = pe.id_event
             INNER JOIN discipline_metadata ds ON e.discipline = ds.discipline
-            WHERE pe.id_user = $1`,
+            WHERE pe.id_user = $1
+            AND e.id_organisateur != $1`,
             [userId]
         );
 
@@ -1462,9 +1463,20 @@ exports.getUserNotifsCount = async (req, res) => {
             )`,
             [userId]
         );
-
         const notifCount = result.rows[0].count || 0; // Par défaut 0 si aucun résultat
-        res.status(200).json({ count: notifCount });
+
+        // Compter la somme des notifications dans participantsevents
+        const result2 = await pool.query(
+            `SELECT SUM(notif) AS countNotif
+            FROM participantsevents pe
+            WHERE pe.id_user = $1`,
+            [userId]
+        );
+
+        const notifCount2 = result2.rows[0].countnotif || 0; // Par défaut 0 si aucun résultat
+
+
+        res.status(200).json({ count: notifCount, countNotifConv: notifCount2 });
     } catch (err) {
         console.error("Erreur lors de la récupération du nombre de notifications :", err);
         res.status(500).send({ error: "Erreur lors de la récupération du nombre de notifications." });

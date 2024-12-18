@@ -398,7 +398,7 @@ export default {
     async participateEvent(eventId) {
       if(this.userConnected){ // utilisateur connecté
         try {
-          //const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
+          //const response = await axios.post(`http://localhost:3000/api/events/${eventId}/users/${this.userConnected.idUser}`);
           const response = await axios.post(`https://we-art.onrender.com/api/events/${eventId}/users/${this.userConnected.idUser}`);
 
           console.log('utilisateur ajouté a l evenement :', response.data);
@@ -452,7 +452,7 @@ export default {
     async fetchEvents() {
       this.loading = true; // Start loading
       try {
-        // const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/events`);
+        //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/events`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events`);
         this.events = response.data;
       } catch (error) {
