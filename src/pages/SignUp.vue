@@ -37,8 +37,7 @@
         <v-btn v-if="currentStep === 1"
           icon
           class="mr-2"
-        > 
-        </v-btn>
+        />
         <h2 v-if="currentStep < 6">Inscription</h2>
         <h2 v-if="currentStep === 6">Récapitulatif</h2>        
 
@@ -46,8 +45,7 @@
         <v-btn
           icon
           class="mr-2"
-        > 
-        </v-btn>
+        />
       </v-row>
 
       <v-main class="vertical-center">
@@ -166,7 +164,7 @@
                 alt="Logo"
                 class="ma-5 mx-auto"
                 style=" width: 40%; height:100%; object-fit: cover;"
-              ></v-img>
+              />
 
               <v-autocomplete
                 v-model="ville"
@@ -219,9 +217,39 @@
                 required
               >
               <br>
-                <v-radio label="Amateur (je veux participer à des ateliers)" value="Participant"></v-radio>
-                <v-radio label="Pro (je veux créer et participer à des ateliers)" value="Organisateur"></v-radio>
+                <v-radio label="Participant (je veux participer à des ateliers)" value="Participant"></v-radio>
+                <v-radio label="Organisateur (je veux créer et participer à des ateliers)" value="Organisateur"></v-radio>
               </v-radio-group>
+
+              <v-autocomplete
+                v-model="interests" 
+                :items="disciplines"        
+                item-value="discipline"             
+                item-text="discipline"             
+                label="Centres d'intérêt"     
+                multiple                       
+                chips                        
+                clearable                      
+                hint="Sélectionnez vos centres d'intérêt"
+                persistent-hint
+                :error-messages="interestsError"
+                @blur="validateInterests"
+                required
+              >
+                <!-- Personnalisation de l'affichage des items dans la liste -->
+                <template v-slot:item="{ item }">
+                  <v-icon class="mr-1">{{ item.icon }}</v-icon>
+                  {{ item.discipline }}
+                </template>
+
+                <!-- Personnalisation de l'affichage des valeurs sélectionnées -->
+                <template v-slot:selection="{ item }">
+                  <v-chip color="primary" small>
+                    <v-icon class="mr-1">{{ item.icon }}</v-icon>
+                    {{ item.discipline }}
+                  </v-chip>
+                </template>
+              </v-autocomplete>
             </div>
 
             <div v-if="currentStep === 5" style="text-align: center;">
@@ -387,6 +415,27 @@
                   <v-list-item>
                     <v-list-item-content>
                       <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">Centres d'intérêt :</span>
+                        <!-- Affichage des centres d'intérêt sélectionnés -->
+                        <div>
+                          <v-chip v-for="(interest, index) in interests" 
+                                  :key="index" 
+                                  color="primary" 
+                                  small 
+                                  class="mr-1">
+                            {{ interest }}
+                          </v-chip>
+                        </div>
+                        <v-btn icon @click="editField('interest')" class="icon-pencil">
+                          <v-icon>mdi-pencil</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-list-item-content>
+                  </v-list-item>
+
+                  <v-list-item>
+                    <v-list-item-content>
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-weight: bold;">Ville:</span>
                         <span>{{ ville }}</span>
                         <v-btn icon @click="editField('ville')" class="icon-pencil">
@@ -417,8 +466,6 @@
                       </div>
                     </v-list-item-content>
                   </v-list-item>
-
-
                 </v-list>
               </v-card-text>
             </div>
@@ -516,6 +563,8 @@ export default {
       longitude: '',
       suggestedVilles: [],
       aPropos: '',
+      disciplines : [],
+      interests: [],
       // Erreurs de validation
       nameError: '',
       firstNameError: '',
@@ -532,6 +581,7 @@ export default {
       userTypeError: '',
       genderError: '',
       phoneNumberError: '',
+      interestsError: '',
       dialog: false, // Pour le popup de confirmation
       successMessage: '', // Pour le message de succès
       successResendMail:'',
@@ -541,8 +591,21 @@ export default {
       errorEmailExist : false,
     };
   },
-  
+  mounted() {
+    this.fetchDisciplines();
+  },
   methods: {
+    async fetchDisciplines() {
+      try {
+        this.loadingFilter = true;
+        const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
+        this.disciplines = response.data // Map pour extraire les noms
+      } catch (error) {
+        console.error('Erreur lors de la récupération des disciplines:', error);
+      } finally {
+        this.loadingFilter = false;
+      }
+    },
     handleAction() {
       if (this.successMessage) {
         this.$router.push('/login'); // Rediriger vers la page de connexion en cas de succès
@@ -604,7 +667,8 @@ export default {
         case 'phoneNumber':
           this.currentStep = 3;
           break;
-        case 'userType':
+          case 'interest':
+          case 'userType':
           this.currentStep = 4;
           break;
         case 'photo':
@@ -616,7 +680,7 @@ export default {
     async validateCurrentStep() {
       switch (this.currentStep) {
         case 1:
-          return await  this.validateFirstName() && this.validateName() && this.validateBirthDate() && this.validateGender();
+          return await this.validateFirstName() && this.validateName() && this.validateBirthDate() && this.validateGender();
         case 2:{
           const isPasswordValid = this.validatePassword(true);
           const isPasswordConfirmValid = this.validatePasswordConfirm();
@@ -625,7 +689,7 @@ export default {
         case 3:
           return this.validateVille() && this.validatePhoneNumber();
         case 4:
-          return this.validateUserType();
+          return this.validateUserType() && this.validateInterests();
         case 5:
           return this.validateImage() && this.validateAPropos();
         case 6:
@@ -782,19 +846,35 @@ export default {
 
       if (!this.birthDate) {
         this.birthDateError = 'Veuillez remplir le champ.';
-      }
+      } 
       else if (birthDate > today) {
-        this.birthDateError = 'Veuillez saisir une date de naissance valide.La date ne peut pas être dans le futur.';
-      }
+        this.birthDateError = 'Veuillez saisir une date de naissance valide. La date ne peut pas être dans le futur.';
+      } 
+      // Vérification si l'utilisateur a au moins 18 ans
       else {
-        this.birthDateError = '';
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const hasHadBirthdayThisYear = 
+          today.getMonth() > birthDate.getMonth() || 
+          (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+        
+        if (age < 18 || (age === 18 && !hasHadBirthdayThisYear)) {
+          this.birthDateError = 'Vous devez avoir au moins 18 ans.';
+        } else {
+          this.birthDateError = '';
+        }
       }
-
       return !this.birthDateError;
     },
     validateUserType() {
       this.userTypeError = this.userType ? '' : 'Veuillez sélectionner un type d\'utilisateur.';
       return !this.userTypeError;
+    },
+    validateInterests() {
+      if(this.interests.length == 0){
+        this.interestsError = 'Veuillez sélectionner au moins un centre d\'interêt.';
+        return false;
+      }
+      return true;
     },
     validateGender() {
       this.genderError = this.gender ? '' : 'Veuillez remplir le champ.';
@@ -903,10 +983,10 @@ export default {
       formData.append("upload_preset", process.env.VUE_APP_PRESET);
       this.loading = true
       try {
-        /*const response_image = await axios.post(
+        const response_image = await axios.post(
           `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
           formData
-        );*/
+        );
         //const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
@@ -917,14 +997,14 @@ export default {
           birthday: this.birthDate,
           sex: this.gender,
           type: this.userType,
-          image_url: null,
-          //image_url: response_image.data.secure_url,
+          image_url: response_image.data.secure_url,
           ville: this.ville,
           code_postal: this.codePostal,
           pays: this.pays,
           latitude: this.latitude,
           longitude: this.longitude,
           a_propos: this.aPropos,
+          interests: this.interests,
         });
         console.log('Utilisateur ajouté avec succès:', response.data);
 
@@ -1039,6 +1119,7 @@ export default {
       this.longitude = '';
       this.pays = '';
       this.aPropos = '';
+      this.interests = [];
       //Erreur
       this.nameError = '';
       this.firstNameError = '';
@@ -1052,6 +1133,7 @@ export default {
       this.phoneNumberError = '';
       this.villeError = '';
       this.aProposError = '';
+      this.interestsError = '';
     },
   },
 };
