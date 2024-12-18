@@ -90,24 +90,22 @@
             {{ event.description }}
           </v-col>
         </v-row>
-
         <!-- Participants -->
         <v-row>
           <v-col>
-            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants ? event.participants.length : 0 }}/{{ event.nombre_de_participants_max }})</p>
+            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants ? event.participants.length-1 : 0 }}/{{ event.nombre_de_participants_max }})</p>
           </v-col>
         </v-row>
-
         <!-- Liste des participants -->
         <v-row>
           <v-col @click="goToUserPage(participant.id)" v-for="participant in event.participants" :key="participant.id" class="d-flex flex-column align-center" style="cursor: pointer;">
             <!-- Image du participant -->
-            <v-avatar size="64" class="mb-2">
+            <v-avatar  v-if="participant.idUser != participant.id_organisateur" size="64" class="mb-2">
               <img :src="participant.image_user" :alt="`${participant.firstname} ${participant.lastname}`" />
             </v-avatar>
 
             <!-- Nom et prénom du participant -->
-            <p style="font-size:16px; text-align: center; margin: 0;">
+            <p  v-if="participant.idUser != participant.id_organisateur" style="font-size:16px; text-align: center; margin: 0;">
               {{ participant.firstname }} {{ participant.lastname }}
             </p>
           </v-col>
