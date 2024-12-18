@@ -51,9 +51,9 @@
           </v-col>
         </v-row>
 
-        <v-row class="justify-space-between">
+        <v-row class="event-info justify-space-between">
           <!-- Prix -->
-          <v-col :class="[
+          <v-col cols="6" :class="[
               event.prix === -1 ? 'free-choice-price' : event.prix === 0 ? 'free-price' : 'paid-price',
               'price-container'
             ]">
@@ -61,7 +61,8 @@
             {{ event.prix === -1 ? 'Prix libre' : event.prix === 0 ? 'Gratuit' : `${event.prix} €` }}
           </v-col>
 
-            <!-- Bouton d'inscription/désinscription -->
+          <!-- Bouton d'inscription/désinscription -->
+          <v-col cols="6" v-if="event.id_organisateur !== this.$store.getters.user.idUser">
             <template v-if="alreadyParticipating && event.is_start_date_passed">
               <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
             </template>
@@ -79,6 +80,7 @@
                 <v-btn color="red" @click="unlistWaitFromEvent">Ne plus être notifié</v-btn>
               </template>
             </template>
+          </v-col>
         </v-row>
 
         <v-row><br></v-row>
@@ -205,6 +207,8 @@ export default {
         //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
         const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
+        console.log("id de l'organisateur: ", this.event.id_organisateur)
+        console.log("id connecte: ", this.$store.getters.user.idUser)
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
         await this.checkListeWait();
@@ -369,47 +373,6 @@ export default {
 
 };
 </script>
-
-<!-- <style scoped>
-.event-card {
-  margin-top: 20px;
-  padding: 20px;
-  border: none; /* Supprime la bordure */
-}
-
-.title-left {
-  font-size: 20px;
-  font-weight: bold;
-  text-align: left;
-}
-
-.event-image {
-  width: 100%;
-  height: 300px;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.event-details {
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-.date-time {
-  display: flex;
-  align-items: center;
-}
-
-.description {
-  text-align: left;
-  line-height: 1.6;
-}
-
-.text-info {
-  color: rgb(120, 189, 68);
-  font-weight: bold;
-}
-</style> -->
 
 <style scoped>
 .event-title {
