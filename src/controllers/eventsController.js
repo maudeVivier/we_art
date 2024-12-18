@@ -1808,36 +1808,42 @@ exports.getUserConversationsEvent = async (req, res) => {
  */
 exports.getUpcomingEvents = async (req, res) => {
     try {
-        const nbElements = req.query.nbElements ? req.query.nbElements : 3;
+        const nbElements = req.query.nbElements ? req.query.nbElements : 5;
         const discipline = req.query.discipline; 
-        // Requête pour récupérer les 4 derniers événements avec les conditions demandées
+        const idUser = req.query.idUser;
+
+        // Requête pour récupérer les 5 derniers événements avec les conditions demandées
         let query = `
             SELECT e.*, ds.icon as icon_discipline, COUNT(pe.id_user) AS participant_count
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
             LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
             WHERE e.start_date > NOW()
-            AND e.deadline > NOW()    
+            AND e.deadline > NOW()  
+            AND e.id_organisateur != $1
+            AND e.id NOT IN (
+                SELECT id_event
+                FROM participantsevents
+                WHERE id_user = $1
+            )
         `;
 
         if (discipline) {
-            query += ` AND e.discipline = $1`;
+            query += ` AND e.discipline = $2`;
             query += `
             GROUP BY e.id, ds.icon
             HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
             ORDER BY e.start_date ASC 
-            LIMIT $2`;
+            LIMIT $3`;
         }else{
             query += `
             GROUP BY e.id, ds.icon
             HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
             ORDER BY e.start_date ASC 
-            LIMIT $1`;
+            LIMIT $2`;
         }
 
-      
-
-        const values = discipline ? [discipline, nbElements] : [nbElements];
+        const values = discipline ? [idUser, discipline, nbElements] : [idUser, nbElements];
         const result = await pool.query(query, values);
 
         // Retourner les résultats
