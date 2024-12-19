@@ -150,58 +150,118 @@
 
           <div v-if="currentStep === 2" style="text-align: center;">   <!-- Date et Heure de Début et de fin -->
             <!-- Date et heure de début -->
-            <v-text-field
-              v-model="debutDateTime"
-              label="Date et Heure de Début"
-              readonly
-              outlined
-              prepend-icon="mdi-calendar-clock"
-              @click:prepend="debutOpenDateTime"
-            />
+            <p>Date et heure de début de l'évènement</p>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="debutDateFormatted"
+                  label="Date de Début"
+                  readonly
+                  outlined
+                  prepend-icon="mdi-calendar"
+                  @click:prepend="debutDateDialog = true"
+                />
 
-            <v-dialog v-model="debutFormatted" persistent max-width="290px" class="dateHeure">
-              <v-date-picker v-model="debutDate" locale="fr" style="height: 50%;"/>
-              <v-time-picker v-model="debutTime" locale="fr" format="24hr" style="height: 50%;"/>
+                <v-dialog v-model="debutDateDialog" persistent max-width="290px">
+                  <v-date-picker v-model="debutDate" locale="fr" :first-day-of-week="1"/>
+                  <v-btn  color="primary" @click="formattedDebutDate">OK</v-btn>
+                  <v-btn  color="secondary" @click="debutDateDialog = false">Annuler</v-btn>
+                </v-dialog>
+              </v-col>
 
-              <v-btn text @click="debutSaveDateTime">OK</v-btn>
-              <v-btn text @click="debutFormatted = false">Annuler</v-btn>
-            </v-dialog>
+              <v-col>
+                <v-text-field
+                  v-model="debutTimeFormatted"
+                  label="Heure de Début"
+                  readonly
+                  outlined
+                  prepend-icon="mdi-clock"
+                  @click:prepend="debutTimeDialog = true"
+                />
+
+                <v-dialog v-model="debutTimeDialog" persistent max-width="290px">
+                  <v-time-picker v-model="debutTime" locale="fr" format="24hr" />
+                  <v-btn  color="primary" @click="formattedDebutTime">OK</v-btn>
+                  <v-btn  color="secondary" @click="debutTimeDialog = false">Annuler</v-btn>
+                </v-dialog>
+              </v-col>
+            </v-row>
+
 
             <!-- Date et heure de fin -->
-            <v-text-field
-              v-model="finDateTime"
-              label="Date et Heure de Fin"
-              readonly
-              outlined
-              prepend-icon="mdi-calendar-clock"
-              @click:prepend="finOpenDateTime"
-            />
+             <p>Date et heure de fin de l'évènement</p>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="finDateFormatted"
+                  label="Date de Fin"
+                  readonly
+                  outlined
+                  prepend-icon="mdi-calendar"
+                  @click:prepend="finDateDialog = true"
+                />
 
-            <v-dialog v-model="finFormatted" persistent max-width="290px" class="dateHeure">
-              <v-date-picker v-model="finDate" locale="fr" style="height: 50%;"/>
-              <v-time-picker v-model="finTime" locale="fr" format="24hr" style="height: 50%;"/>
+                <v-dialog v-model="finDateDialog" persistent max-width="290px">
+                  <v-date-picker v-model="finDate" locale="fr" :first-day-of-week="1"/>
+                  <v-btn  color="primary" @click="formattedFinDate">OK</v-btn>
+                  <v-btn  color="secondary" @click="finDateDialog = false">Annuler</v-btn>
+                </v-dialog>
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="finTime"
+                  label="Heure de Fin"
+                  readonly
+                  outlined
+                  prepend-icon="mdi-clock"
+                  @click:prepend="finTimeDialog = true"
+                />
 
-              <v-btn text @click="finSaveDateTime">OK</v-btn>
-              <v-btn text @click="finFormatted = false">Annuler</v-btn>
-            </v-dialog>
+                <v-dialog v-model="finTimeDialog" persistent max-width="290px">
+                  <v-time-picker v-model="finTime" locale="fr" format="24hr" />
+                  <v-btn  color="primary" @click="formattedFinTime">OK</v-btn>
+                  <v-btn  color="secondary" @click="finTimeDialog = false">Annuler</v-btn>
+                </v-dialog>
+              </v-col>
+            </v-row>
 
             <!-- Date et Heure de la deadline -->
-            <v-text-field
-              v-model="deadlineDateTime"
-              label="Date et Heure maximum pour s'inscrire"
-              readonly
-              outlined
-              prepend-icon="mdi-calendar-clock"
-              @click:prepend="deadlineOpenDateTime"
-            ></v-text-field>
+            <p>Date et heure maximum pour s'inscrire de l'évènement</p>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="deadlineDateFormatted"
+                  label="Date maximum pour s'inscire"
+                  readonly
+                  outlined
+                  prepend-icon="mdi-calendar"
+                  @click:prepend="deadlineDateDialog = true"
+                />
 
-            <v-dialog v-model="deadlineFormatted" persistent max-width="290px">
-              <v-date-picker v-model="deadlineDate" locale="fr" style="height: 50%;"/>
-              <v-time-picker v-model="deadlineTime" format="24hr" locale="fr" style="height: 50%;"/>
-              
-              <v-btn text @click="deadlineSaveDateTime">OK</v-btn>
-              <v-btn text @click="deadlineFormatted = false">Annuler</v-btn>
-            </v-dialog>
+                <v-dialog v-model="deadlineDateDialog" persistent max-width="290px">
+                  <v-date-picker v-model="deadlineDate" locale="fr" :first-day-of-week="1"/>
+                  <v-btn  color="primary" @click="formattedDeadlineDate">OK</v-btn>
+                  <v-btn  color="secondary" @click="deadlineDateDialog = false">Annuler</v-btn>
+                </v-dialog>
+              </v-col>
+
+              <v-col>
+                <v-text-field
+                  v-model="deadlineTime"
+                  label="Heure maximum pour s'inscire"
+                  readonly
+                  outlined
+                  prepend-icon="mdi-clock"
+                  @click:prepend="deadlineTimeDialog = true"
+                />
+
+                <v-dialog v-model="deadlineTimeDialog" persistent max-width="290px">
+                  <v-time-picker v-model="deadlineTime" locale="fr" format="24hr" />
+                  <v-btn  color="primary" @click="formattedDeadlineTime">OK</v-btn>
+                  <v-btn  color="secondary" @click="deadlineTimeDialog = false">Annuler</v-btn>
+                </v-dialog>
+              </v-col>
+            </v-row>
           </div>
 
           <div v-if="currentStep === 3" style="text-align: center;">
@@ -343,15 +403,24 @@ export default {
       deadlineDateTime: '',
       deadlineDate: '',
       deadlineTime: '',
-      deadlineFormatted: false,
+      deadlineDateFormatted : '',
+      deadlineTimeFormatted : '',
+      deadlineDateDialog: false,
+      deadlineTimeDialog: false,
       debutDateTime: '',
       debutDate: '',
       debutTime: '',
-      debutFormatted: false,
+      debutDateFormatted : '',
+      debutTimeFormatted : '',
+      debutDateDialog: false,
+      debutTimeDialog: false,
       finDateTime: '',
       finDate: '',
       finTime: '',
-      finFormatted: false,
+      finDateFormatted : '',
+      finTimeFormatted : '',
+      finDateDialog: false,
+      finTimeDialog: false,
       errorMessage: null,
       successMessage: false, // Nouveau champ pour le message de succès
       loading: false, // Ajout de l'état de chargement
@@ -395,6 +464,45 @@ export default {
         reader.readAsDataURL(file);
       }
       this.imageEvent = event.target.files[0];
+    },
+    formattedDebutDate() {
+      if (this.debutDate) {
+        const [year, month, day] = this.debutDate.split("-");
+        this.debutDateFormatted = `${day}-${month}-${year}`;
+        this.debutDateDialog = false;      
+      }
+    },
+    formattedDebutTime() {
+      if (this.debutTime) {
+        this.debutTimeFormatted = this.debutTime;
+        this.debutTimeDialog = false;      
+      }
+    },
+    formattedFinDate() {
+      if (this.finDate) {
+        const [year, month, day] = this.finDate.split("-");
+        this.finDateFormatted = `${day}-${month}-${year}`;
+        this.finDateDialog = false;
+      }
+    },
+    formattedFinTime() {
+      if (this.finTime) {
+        this.finTimeFormatted = this.finTime;
+        this.finTimeDialog = false;
+      }
+    },
+    formattedDeadlineDate() {
+      if (this.deadlineDate) {
+        const [year, month, day] = this.deadlineDate.split("-");
+        this.deadlineDateFormatted = `${day}-${month}-${year}`;
+        this.deadlineDateDialog = false;
+      }
+    },
+    formattedDeadlineTime() {
+      if (this.deadlineTime) {
+        this.deadlineTimeFormatted = this.deadlineTime;
+        this.deadlineTimeDialog = false;
+      }
     },
     // Récupération des suggestions d'adresses
     async fetchAddresses(adresse) {
@@ -512,11 +620,33 @@ export default {
       this.descriptionError = 'Veuillez remplir le champ.'; // Message d'erreur si le champ est vide
       return false;
     },
+    createDate(date, time) {
+      if (!date || !time) {
+        console.error("Date ou heure manquante :", { date, time });
+        return null;
+      }
+      try {
+        const [year, month, day] = date.split("-");
+        const [hours, minutes] = time.split(":");
+        return new Date(year, month - 1, day, hours, minutes);
+      } catch (error) {
+        console.error("Erreur lors de la création de l'objet Date :", error);
+        return null;
+      }
+    },
     validateDates() {
-      const startDate = new Date(this.debutDateTime);
-      const endDate = new Date(this.finDateTime);
-      const deadline = new Date(this.deadlineDateTime);
+      this.debutDateTime = `${this.debutDate} ${this.debutTime}`;
+      this.finDateTime = `${this.finDate} ${this.finTime}`;
+      this.deadlineDateTime = `${this.deadlineDate} ${this.deadlineTime}`;
 
+      const startDate = this.createDate(this.debutDate, this.debutTime)
+      const endDate = this.createDate(this.finDate, this.finTime)
+      const deadline = this.createDate(this.deadlineDate, this.deadlineTime)
+
+      if(startDate == null || endDate == null || deadline == null){
+        this.errorMessage = 'Veuillez remplir tous les champs.';
+        return false;
+      }
       if (endDate < deadline) {
         this.errorMessage = 'La date limite d\'inscription ne peut pas être après à la date de fin.';
         return false;
@@ -572,33 +702,6 @@ export default {
       // Si tout est valide
       this.nombreDeParticipantsError = "";
       return true;
-    },
-    deadlineOpenDateTime() {
-      this.deadlineFormatted = true;
-    },
-    deadlineSaveDateTime() {
-      if (this.deadlineDate && this.deadlineTime) {
-        this.deadlineDateTime = `${this.deadlineDate} ${this.deadlineTime}`;
-        this.deadlineFormatted = false;
-      }
-    },
-    debutOpenDateTime() {
-      this.debutFormatted = true;
-    },
-    debutSaveDateTime() {
-      if (this.debutDate && this.debutTime) {
-        this.debutDateTime = `${this.debutDate} ${this.debutTime}`;
-        this.debutFormatted = false;
-      }
-    },
-    finOpenDateTime() {
-      this.finFormatted = true;
-    },
-    finSaveDateTime() {
-      if (this.finDate && this.finTime) {
-        this.finDateTime = `${this.finDate} ${this.finTime}`;
-        this.finFormatted = false;
-      }
     },
     async createEvent() {
       if (!this.validateDates()) {
@@ -672,14 +775,14 @@ export default {
       this.country = '';
     },
     async allDisciplines() {
-            try {
-                //const response = await axios.get('http://localhost:3000/api/events/disciplines');
-                const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
-                this.disciplines = response.data.map(d => d.discipline); // Map pour extraire les noms
-              } catch (error) {
-                console.error('Erreur lors de la récupération des disciplines:', error);
-            }
-        },
+      try {
+          //const response = await axios.get('http://localhost:3000/api/events/disciplines');
+          const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
+          this.disciplines = response.data.map(d => d.discipline); // Map pour extraire les noms
+        } catch (error) {
+          console.error('Erreur lors de la récupération des disciplines:', error);
+      }
+   },
   },
   mounted() {
     this.allDisciplines();
@@ -713,9 +816,6 @@ export default {
   }
   .column {
       width: 50%; /* Chaque colonne prend la moitié de la largeur */
-  }
-  .dateHeure {
-    max-height: 100% !important;
   }
   .no-shadow {
     box-shadow: none !important;
