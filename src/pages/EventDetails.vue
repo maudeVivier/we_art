@@ -89,8 +89,6 @@
             {{ formatDate(event.deadline) }} {{  formatTime(event.deadline) }}
         </v-row>
 
-        <v-row><br></v-row>
-
         <!-- Description -->
         <v-row class="event-info">
           <v-col>
@@ -98,22 +96,41 @@
             {{ event.description }}
           </v-col>
         </v-row>
+
+        <!-- Organisateur -->
+        <v-row>
+          <v-col>
+            <p style="font-size:20px; margin-bottom: 3px">Organisateur : </p>
+          </v-col>
+          <v-col @click="goToUserPage(event.organisateur.id)" class="d-flex flex-column" style="cursor: pointer;">
+            <!-- Image de l'organisateur -->
+            <v-avatar size="64" class="mb-2">
+              <img :src="event.organisateur.image_user" :alt="`${event.organisateur.firstname} ${event.organisateur.lastname}`" />
+            </v-avatar>
+
+            <!-- Nom et prénom de l'organisateur -->
+            <p  style="font-size:16px; margin: 0;">
+              {{ event.organisateur.firstname }} {{ event.organisateur.lastname }}
+            </p>
+          </v-col>
+        </v-row>
+
         <!-- Participants -->
         <v-row>
           <v-col>
-            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants ? event.participants.length-1 : 0 }}/{{ event.nombre_de_participants_max }})</p>
+            <p style="font-size:20px; margin-bottom: 3px">Participants : ({{ event.participants ? event.participants.length : 0 }}/{{ event.nombre_de_participants_max }})</p>
           </v-col>
         </v-row>
         <!-- Liste des participants -->
         <v-row>
           <v-col @click="goToUserPage(participant.id)" v-for="participant in event.participants" :key="participant.id" class="d-flex flex-column align-center" style="cursor: pointer;">
             <!-- Image du participant -->
-            <v-avatar  v-if="participant.idUser != participant.id_organisateur" size="64" class="mb-2">
+            <v-avatar size="64" class="mb-2">
               <img :src="participant.image_user" :alt="`${participant.firstname} ${participant.lastname}`" />
             </v-avatar>
 
             <!-- Nom et prénom du participant -->
-            <p  v-if="participant.idUser != participant.id_organisateur" style="font-size:16px; text-align: center; margin: 0;">
+            <p style="font-size:16px; text-align: center; margin: 0;">
               {{ participant.firstname }} {{ participant.lastname }}
             </p>
           </v-col>
@@ -210,11 +227,10 @@ export default {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
+        // const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
         const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
-        console.log("id de l'organisateur: ", this.event.id_organisateur)
-        console.log("id connecte: ", this.$store.getters.user.idUser)
+
         // Vérification de la participation après avoir récupéré l'événement
         await this.checkParticipation();
         await this.checkListeWait();
@@ -249,7 +265,7 @@ export default {
     async checkParticipation() { // fonction pour afficher le bouton Participer ou se désinscire à un évènement
       if (this.userConnected) {
         try {
-          //const response = await axios.get(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
+          // const response = await axios.get(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.get(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
           this.alreadyParticipating = response.data.participating;
         } catch (error) {
@@ -261,7 +277,7 @@ export default {
     async checkListeWait() { // fonction pour afficher le bouton Ne plus être notifier ou etre notifier à un évènement
       if (this.userConnected) {
         try {
-          //const response = await axios.get(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+          // const response = await axios.get(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.get(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           this.alreadyListeEvent = response.data.participating;
         } catch (error) {
@@ -273,7 +289,7 @@ export default {
     async addListeEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          //const response = await axios.post(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+          // const response = await axios.post(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.post(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
 
           console.log('utilisateur ajouté a la liste d\'attente evenement :', response.data);
@@ -292,7 +308,7 @@ export default {
     async unlistWaitFromEvent() { // fonction pour se desincrire de la liste d'attente d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            //const response = await axios.delete(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+            // const response = await axios.delete(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
             const response = await axios.delete(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
 
             console.log('utilisateur supprimer a l evenement :', response.data);
@@ -310,7 +326,7 @@ export default {
     async participateEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          //const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+          // const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
           const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
             id_event: this.event.id,
             id_user: this.userConnected.idUser,
@@ -332,7 +348,7 @@ export default {
     async unregisterFromEvent() { // fonction pour se desincrire d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            //const response = await axios.delete(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+            // const response = await axios.delete(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
             const response = await axios.delete(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
               id_event: this.event.id,
               id_user: this.userConnected.idUser,
@@ -375,8 +391,6 @@ export default {
       }
     },
   },
-  
-
 };
 </script>
 

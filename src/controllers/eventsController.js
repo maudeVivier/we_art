@@ -463,7 +463,7 @@ exports.createEvent = async (req, res) => {
  * /api/eventDetails/{id}:
  *   get:
  *     summary: Récupérer un événement par ID
- *     description: Renvoie les détails d'un événement spécifique à partir de son ID, y compris le nombre de participants, la validation de la deadline, et la disponibilité des places.
+ *     description: Renvoie les détails d'un événement spécifique, y compris les participants (sans inclure l'organisateur), les informations sur l'organisateur, le nombre de participants, la validation de la deadline, et la disponibilité des places.
  *     tags: [Events]
  *     parameters:
  *       - in: path
@@ -473,13 +473,6 @@ exports.createEvent = async (req, res) => {
  *         schema:
  *           type: integer
  *           example: 1
- *       - in: query
- *         name: userId
- *         required: false
- *         description: ID de l'utilisateur pour vérifier sa participation.
- *         schema:
- *           type: integer
- *           example: 10
  *     responses:
  *       200:
  *         description: Détails de l'événement.
@@ -548,15 +541,12 @@ exports.createEvent = async (req, res) => {
  *                 is_deadline_valid:
  *                   type: boolean
  *                   example: true
-  *                 is_start_date_passed:
+ *                 is_start_date_passed:
  *                   type: boolean
  *                   example: true
  *                 is_participant_limit_valid:
  *                   type: boolean
  *                   example: true
- *                 already_participating:
- *                   type: boolean
- *                   example: false
  *                 participants:
  *                   type: array
  *                   items:
@@ -574,6 +564,21 @@ exports.createEvent = async (req, res) => {
  *                       image_user:
  *                         type: string
  *                         example: "alice.jpg"
+ *                 organisateur:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     firstname:
+ *                       type: string
+ *                       example: "Jean"
+ *                     lastname:
+ *                       type: string
+ *                       example: "Dupont"
+ *                     image_user:
+ *                       type: string
+ *                       example: "jean.jpg"
  *       404:
  *         description: Événement non trouvé.
  *         content:
@@ -595,41 +600,57 @@ exports.createEvent = async (req, res) => {
  *                   type: string
  *                   example: "Erreur lors de la récupération de l'événement."
  */
+
 exports.getEventById = async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query(
-            `SELECT e.*, 
-                ds.icon as icon_discipline,
+            `SELECT 
+                e.*, 
+                ds.icon AS icon_discipline,
                 COUNT(pe.id_user) AS participant_count, 
                 e.deadline > NOW() AS is_deadline_valid,
-                e.start_date AS is_start_date_passed,
                 e.start_date > NOW() AS is_start_date_passed,
                 e.nombre_de_participants_max > COUNT(pe.id_user) AS is_participant_limit_valid
             FROM events e
-            LEFT JOIN participantsevents pe ON e.id = pe.id_event
-            LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
+            LEFT JOIN participantsevents pe 
+              ON e.id = pe.id_event 
+              AND pe.id_user != e.id_organisateur -- Exclure l'organisateur ici
+            LEFT JOIN discipline_metadata ds 
+              ON e.discipline = ds.discipline
             WHERE e.id = $1
-            GROUP BY e.id, ds.icon `, [id]);
+            GROUP BY e.id, ds.icon`,
+            [id]
+          );
 
         if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Événement non trouvé' });
         }
-
 
         // Récupérer les participants associés à cet événement
         const participantsResult = await pool.query(
             `SELECT u.id, u.firstname, u.lastname, u.image_user 
             FROM participantsevents pe
             INNER JOIN users u ON pe.id_user = u.id
-            WHERE pe.id_event = $1`, 
+            INNER JOIN events e ON e.id = $1
+            WHERE pe.id_event = $1
+            AND u.id != e.id_organisateur`, 
+            [id]
+        );
+
+        // Récupérer toutes les informations sur l'organisateur de l'évènement 
+        const organisateurResult = await pool.query(
+            `SELECT u.id, u.firstname, u.lastname, u.image_user
+            FROM users u
+            INNER JOIN events e ON u.id = e.id_organisateur 
+            WHERE e.id = $1`,
             [id]
         );
 
         // Fusionner les résultats
         const event = result.rows[0];
         event.participants = participantsResult.rows;
-
+        event.organisateur = organisateurResult.rows[0];
 
         res.json(event);
     } catch (err) {
@@ -695,8 +716,7 @@ exports.getEventById = async (req, res) => {
  */
 exports.checkUserParticipation = async (req, res) => {
     const { eventId, userId } = req.params;
-    console.log("ici, ", eventId, userId)
-
+    
     try {
       const result = await pool.query(
         'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
