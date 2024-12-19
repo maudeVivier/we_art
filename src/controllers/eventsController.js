@@ -15,11 +15,11 @@ const moment = require('moment'); // Librairie pour manipuler les dates
  *   get:
  *     summary: Récupérer tous les événements
  *     description: >
- *       Retourne la liste de tous les événements dans la base de données avec le nombre de participants pour chaque événement.
+ *       Retourne la liste de tous les événements disponibles dans la base de données avec le nombre de participants pour chaque événement.
  *       Les prix sont interprétés comme suit :
  *       - `-1` : Prix libre
  *       - `0` : Gratuit
- *       - Supérieur à `0` : Montant en euros *     
+ *       - Supérieur à `0` : Montant en euros.     
  *     tags: [Events]
  *     parameters:
  *       - in: query
@@ -30,9 +30,7 @@ const moment = require('moment'); // Librairie pour manipuler les dates
  *             Liste des disciplines pour filtrer, séparées par des virgules.
  *             Exemple : "Musique,Danse".
  *             Les disciplines acceptées sont définies dans le type ENUM
- *             `disciplines_types` de la base de données : Musique, Danse, Théâtre,
- *             Peinture, Dessin, Poterie, Arts textiles, Photographie, Création
- *             de bijoux, Gravure, Sculpture.
+ *             `disciplines_types` de la base de données.
  *       - in: query
  *         name: prix
  *         schema:
@@ -41,12 +39,46 @@ const moment = require('moment'); // Librairie pour manipuler les dates
  *             Filtrer par prix :
  *             - `-1` pour prix libre
  *             - `0` pour gratuit
- *             - Une valeur supérieure à 0 pour les événements payants
+ *             - Une valeur supérieure à 0 pour les événements payants.
  *       - in: query
  *         name: prix_max
  *         schema:
  *           type: integer
- *           description: Renvoi tous les événements dont le prix est inférieur ou égal à la valeur donnée
+ *           description: Retourne tous les événements dont le prix est inférieur ou égal à la valeur donnée.
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           enum: [today, week, weekend, month]
+ *           description: >
+ *             Filtrer par plage temporelle :
+ *             - `today` : événements d'aujourd'hui
+ *             - `week` : événements de la semaine en cours
+ *             - `weekend` : événements du week-end
+ *             - `month` : événements du mois en cours.
+ *       - in: query
+ *         name: level
+ *         schema:
+ *           type: string
+ *           description: Filtrer par niveau (exemple : "Débutant").
+ *       - in: query
+ *         name: latitude
+ *         schema:
+ *           type: number
+ *           format: float
+ *           description: Latitude pour filtrer les événements par localisation.
+ *       - in: query
+ *         name: longitude
+ *         schema:
+ *           type: number
+ *           format: float
+ *           description: Longitude pour filtrer les événements par localisation.
+ *       - in: query
+ *         name: rayon
+ *         schema:
+ *           type: number
+ *           format: float
+ *           description: Rayon (en kilomètres) autour de la localisation spécifiée pour filtrer les événements.
  *     responses:
  *       200:
  *         description: Liste des événements avec le nombre de participants.
@@ -140,6 +172,8 @@ const moment = require('moment'); // Librairie pour manipuler les dates
  *                   example: "Erreur lors de la récupération des évènements."
  */
 exports.getAllEvents = async (req, res) => {
+    const idUser = req.query.idUser
+
     const allowedDisciplinesResult = await pool.query(`
         SELECT unnest(enum_range(NULL::discipline_type)) AS discipline
     `);
@@ -188,7 +222,6 @@ exports.getAllEvents = async (req, res) => {
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
             LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
-
         `;
         const conditions = [];
         const values = [];
@@ -232,11 +265,17 @@ exports.getAllEvents = async (req, res) => {
             values.push(latitude, longitude, rayon); // On passe les paramètres à la requête
         }
 
+        conditions.push(`e.start_date >= NOW()`); // Ne pas afficher les evenements deja passes
+        if(idUser){
+            conditions.push(`e.id_organisateur != $${values.length + 1}`);
+            values.push(idUser)
+        }
         
         if (conditions.length > 0) {
             query += ` WHERE ${conditions.join(' AND ')}`;
         }
         query += ' GROUP BY e.id, ds.icon';
+        query += ' ORDER BY e.start_date ASC'; // Tri par start_date croissante
         const result = await pool.query(query,values)
         res.json(result.rows);
     } catch (err) {
@@ -439,7 +478,6 @@ exports.createEvent = async (req, res) => {
            
 
             const newEvent = result.rows[0];
-            console.log('(server.js) New Event:', newEvent);
 
             const text = "Vous êtes inscrit à l'événement " + name;
             await pool.query(
@@ -910,7 +948,7 @@ exports.removeUserFromEvent = async (req, res) => {
             'SELECT * FROM participantsevents WHERE id_user = $1 AND id_event = $2',
             [userId, eventId]
         );
-        console.log(participationCheck.rowCount)
+
         if (participationCheck.rowCount === 0) {
             // L'utilisateur n'est pas inscrit à l'événement
             return res.status(404).json({ message: "L'utilisateur n'est pas inscrit à cet événement." });
@@ -1106,8 +1144,6 @@ exports.addUserToListAttenteEvent = async (req, res) => {
             console.log("L'utilisateur est déjà dans la liste d'attente pour cet événement.");
             return res.status(409).json({ message: "L'utilisateur est déjà dans la liste d'attente pour cet événement." });
         }
-
-
 
         // Insérer dans la table de jointure listeattentesevents
         await pool.query(
@@ -1407,7 +1443,6 @@ exports.postMessageConvEvent = async (req, res) => {
 
         const user = userCheck.rows[0];
         console.log("2")
-
 
         // Vérifier si l'événement existe
         const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);

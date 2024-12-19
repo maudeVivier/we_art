@@ -378,6 +378,9 @@ export default {
     };
   },
   computed: {
+    userConnected() {
+      return this.$store.getters.user;
+    },
     filteredEvents() {
       // Filter events based on search input
       if(this.mode==="map"){
@@ -579,9 +582,17 @@ export default {
             queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
           }
         }
+
+        let response;
         // Effectuer la requête avec ou sans filtres selon cleanFilters
-        // const response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
-        const response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
+        if (this.userConnected) {
+            // response = await axios.get(`http://localhost:3000/api/events${queryParams}&idUser=${this.userConnected.idUser}`);
+            response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}&idUser=${this.userConnected.idUser}`);
+
+        } else {
+            // response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
+            response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
+        }
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);

@@ -16,8 +16,6 @@
         <v-icon>mdi-home</v-icon>
       </v-btn>
 
-     
-
       <v-btn
         v-if="isAuthenticated" 
         :to="{ name: 'MyEvents' }"
@@ -71,14 +69,12 @@
 
       <v-btn
         :to="{ name: 'ListEvents' }"
-        :class="{ 'btn-active': active === 2 }"
+        :class="{ 'btn-active': isAuthenticated ? active === 2 : active === 1 }"
         @click="fetchEventsCountNotifs"
       >
         <span>Explorer</span>
         <v-icon>mdi-earth</v-icon>
       </v-btn>
-
-
 
       <v-btn
         v-if="isAuthenticated" 
@@ -103,20 +99,17 @@
           <v-icon>mdi-forum</v-icon>
         </v-badge>
 
-
         <template v-else>
           <span>Conversations</span>
           <v-icon>mdi-forum</v-icon>
         </template>
-
-
       </v-btn>
 
       <!-- Changer dynamiquement Connexion en Profil -->
       <v-btn 
       @click="fetchEventsCountNotifs"
       :to="isAuthenticated ? { name: 'UserProfile' } : { name: 'Login' }"
-      :class="{ 'btn-active': active === 4 }"
+      :class="{ 'btn-active': isAuthenticated ? active === 4 : active === 2 }"
       >
         <span>{{ isAuthenticated ? 'Profil' : 'Connexion' }}</span>
         <v-icon>{{ isAuthenticated ? 'mdi-account-circle' : 'mdi-account' }}</v-icon>
