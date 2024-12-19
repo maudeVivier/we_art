@@ -83,6 +83,12 @@
           </v-col>
         </v-row>
 
+        <!-- Deadline -->
+        <v-row class="justify-end">
+            <v-icon color="primary" class="mr-1">mdi-calendar-clock</v-icon>
+            {{ formatDate(event.deadline) }} {{  formatTime(event.deadline) }}
+        </v-row>
+
         <v-row><br></v-row>
 
         <!-- Description -->
