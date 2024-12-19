@@ -1812,43 +1812,47 @@ exports.getUpcomingEvents = async (req, res) => {
         const discipline = req.query.discipline; 
         const idUser = req.query.idUser;
 
-        // Requête pour récupérer les 5 derniers événements avec les conditions demandées
         let query = `
-            SELECT e.*, ds.icon as icon_discipline, COUNT(pe.id_user) AS participant_count
+            SELECT e.*, ds.icon AS icon_discipline, COUNT(pe.id_user) AS participant_count
             FROM events e
             LEFT JOIN participantsevents pe ON e.id = pe.id_event
             LEFT JOIN discipline_metadata ds ON e.discipline = ds.discipline
             WHERE e.start_date > NOW()
-            AND e.deadline > NOW()  
-            AND e.id_organisateur != $1
+            AND e.deadline > NOW()
+        `;
+
+        const values = [];
+        let paramIndex = 1;
+
+        if (idUser) {
+            query += ` AND e.id_organisateur != $${paramIndex}
             AND e.id NOT IN (
                 SELECT id_event
                 FROM participantsevents
-                WHERE id_user = $1
-            )
-        `;
-
-        if (discipline) {
-            query += ` AND e.discipline = $2`;
-            query += `
-            GROUP BY e.id, ds.icon
-            HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
-            ORDER BY e.start_date ASC 
-            LIMIT $3`;
-        }else{
-            query += `
-            GROUP BY e.id, ds.icon
-            HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
-            ORDER BY e.start_date ASC 
-            LIMIT $2`;
+                WHERE id_user = $${paramIndex}
+            )`;
+            values.push(idUser);
+            paramIndex++;
         }
 
-        const values = discipline ? [idUser, discipline, nbElements] : [idUser, nbElements];
+        if (discipline) {
+            query += ` AND e.discipline = $${paramIndex}`;
+            values.push(discipline);
+            paramIndex++;
+        }
+
+        query += `
+            GROUP BY e.id, ds.icon
+            HAVING COUNT(pe.id_user) < e.nombre_de_participants_max
+            ORDER BY e.start_date ASC
+            LIMIT $${paramIndex}`;
+        values.push(nbElements);
+
+        // Exécution de la requête
         const result = await pool.query(query, values);
 
-        // Retourner les résultats
-        res.json(result.rows);
-    } catch (err) {
+        res.status(200).json(result.rows);
+    } catch (error) {
         console.error('Erreur lors de la récupération des derniers événements à venir:', err);
         res.status(500).send({ error: 'Erreur lors de la récupération des derniers événements à venir' });
     }

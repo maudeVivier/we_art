@@ -159,10 +159,19 @@ export default {
     },
     async fetchEvents(discipline = '') {
       this.loading = true; // Start loading
-      const disciplineQuery = discipline ? `?discipline=${discipline}&idUser=${this.$store.getters.user.idUser}` : `?idUser=${this.$store.getters.user.idUser}`;
+      let disciplineQuery = discipline ? `?discipline=${discipline}` : '';
+      if(this.userConnected){
+        disciplineQuery = discipline ? `?discipline=${discipline}&idUser=${this.$store.getters.user.idUser}` : `?idUser=${this.$store.getters.user.idUser}`;
+        }
       try {
         if(disciplineQuery === ""){
-          const response = await axios.get(`https://we-art.onrender.com/api/events/upcomingEvents?idUser=${this.$store.getters.user.idUser}`);
+          let response;
+          if(this.userConnected){
+            response = await axios.get(`https://we-art.onrender.com/api/events/upcomingEvents?idUser=${this.$store.getters.user.idUser}`);
+          }
+          else{
+            response = await axios.get(`https://we-art.onrender.com/api/events/upcomingEvents`);
+          }
           this.events = response.data;
         }else{
           const response = await axios.get(`https://we-art.onrender.com/api/events/upcomingEvents${disciplineQuery}`);
