@@ -1382,6 +1382,7 @@ exports.getUserNotifsEvents = async (req, res) => {
                                                 SELECT COUNT(*) 
                                                 FROM participantsevents pe 
                                                 WHERE pe.id_event = e.id
+                                                AND pe.id_user != e.id_organisateur
             )`,
             [userId]
         );
@@ -1460,6 +1461,7 @@ exports.getUserNotifsCount = async (req, res) => {
                                                 SELECT COUNT(*) 
                                                 FROM participantsevents pe 
                                                 WHERE pe.id_event = e.id
+                                                AND pe.id_user != e.id_organisateur
             )`,
             [userId]
         );

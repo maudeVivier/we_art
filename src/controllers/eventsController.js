@@ -60,7 +60,7 @@ const moment = require('moment'); // Librairie pour manipuler les dates
  *         name: level
  *         schema:
  *           type: string
- *           description: Filtrer par niveau (exemple : "Débutant").
+ *           description: "Filtrer par niveau (exemple : \"Débutant\")."
  *       - in: query
  *         name: latitude
  *         schema:
