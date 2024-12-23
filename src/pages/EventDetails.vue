@@ -136,7 +136,7 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="event.commentaires && event.commentaires.length > 0" ref="messageContainer" class="row-4 message-list">
+        <v-row v-if="isEventEnded" ref="messageContainer" class="row-4 message-list">
           <v-col cols="12">
             <p style="font-size:20px; margin-bottom: 3px">Commentaires :</p>
           </v-col>
@@ -183,7 +183,7 @@
         </v-row>
        
         <!-- Zone de saisie du message -->
-        <v-row v-if="event.id_organisateur != userConnected.idUser" class="row-5 message-input">
+        <v-row v-if="event.id_organisateur != userConnected.idUser && isEventEnded" class="row-5 message-input">
           <v-col>
             <v-rating
               v-model="notation"
@@ -308,8 +308,14 @@ export default {
   computed: {
     userConnected() {
         return this.$store.getters.user;
-      },
     },
+    isEventEnded() {
+      const endDate = new Date(this.event.end_date);
+      const currentDate = new Date();
+
+      return endDate < currentDate;
+    }
+  },
   methods: {
     goToUserPage(userId){
       this.$router.push({name:'ProfilOtherUser', params:{idUser:userId}})
