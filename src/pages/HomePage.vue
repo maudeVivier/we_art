@@ -2,7 +2,7 @@
   <v-app>
 
     <v-main>
-      <v-container fluid class="text-center my-5">
+      <v-container fluid class="text-center mt-5">
         <!-- Section Logos -->
         <div class="logo" justify="center"  >
           <v-img
@@ -11,7 +11,7 @@
           ></v-img>
         </div>
 
-        <v-row class="my-2">
+        <v-row class="mt-2">
           <v-col>
 
             <div
@@ -43,7 +43,7 @@
           </v-col>
         </v-row>
 
-        <v-carousel v-if="events.length > 0" hide-delimiters class="carousel">
+        <v-carousel v-if="events.length > 0" hide-delimiters class="carousel" style="max-height: 34vh;">
           <v-carousel-item
             v-for="(event, index) in events"
             :key="index"
@@ -79,12 +79,19 @@
             </v-img>
           </v-carousel-item>
         </v-carousel>
+         
 
         <!-- Loading Spinner -->
         <v-col v-if="loading" cols="12" class="text-center">
           <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
           <p>Chargement des événements...</p>
         </v-col>
+
+        <span class="d-flex justify-center align-center">
+          <v-img :src="randomImage" max-height="54vh" max-width="54vw" alt="Image aléatoire" />
+
+        </span>
+        
       </v-container>
     </v-main>
   </v-app>
@@ -93,11 +100,20 @@
 <script>
 // Importation des images
 import Logo from '@/assets/we_art.svg'; // Chemin relatif vers ton logo situé dans le même dossier
+
+import Dance1 from '@/assets/Dance1.png';
+import Discussion1 from '@/assets/Discussion1.png';
+import groupJazz from '@/assets/groupJazz.png';
+import Musee1 from '@/assets/Musee1.png';
+import peinture1 from '@/assets/peinture1.png';
+import vase from '@/assets/vase.png';
+
 import axios from 'axios';
 
 export default {
   data() {
     return {
+      imgHome : [Dance1, Discussion1, groupJazz, Musee1, peinture1, vase],
       Logo,
       events: [],
       loading : false,
@@ -111,7 +127,10 @@ export default {
   computed : {
     userConnected() {
       return this.$store.getters.user;
-    }
+    },
+    randomImage() {
+      return this.imgHome[Math.floor(Math.random() * this.imgHome.length)];
+    },
   },
   methods: {
     async fetchDisciplines() {
