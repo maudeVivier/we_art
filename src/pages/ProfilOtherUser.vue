@@ -45,7 +45,7 @@
               small
             >
             </v-rating>
-            <p>
+            <p v-if="user.type === 'Organizer'">
               Nombre de notes : {{ user.rating_count }}
             </p>
           </v-col>
