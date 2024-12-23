@@ -136,7 +136,6 @@ export default {
     },
     
     centerMapOnEvent(event) {
-      console.log('Clic sur la vignette', event); // Vérifie si cette méthode est appelée
       this.center = [event.latitude, event.longitude]; // Centre la carte sur l'événement sélectionné
       const index = this.nearbyEvents.findIndex(e => e.id === event.id);
       

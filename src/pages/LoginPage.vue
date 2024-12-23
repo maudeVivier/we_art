@@ -81,7 +81,6 @@ export default {
           email: this.email,
           password: this.password,
         });
-        console.log("la reponse est = ", response)
         if (response.data.msg == "connecte"){
           const user = {
             idUser: response.data.idUser,

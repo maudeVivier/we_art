@@ -758,7 +758,6 @@ export default {
         if (response.data.exists) {
           this.emailError = `Cet email est déjà utilisé.`;
           this.errorEmailExist = true;
-          console.log("email existant : ",this.errorEmailExist);
           return false;
         } else {
           this.emailError = '';
@@ -1050,7 +1049,6 @@ export default {
       const codeRegex = /^[0-9]{4}$/;
       this.verificationCodeError = codeRegex.test(verificationCodeString) ? '' : 'Veuillez entrer un code de 4 chiffres valide.';      // Si le code est valide, procéder à la requête
       if (!this.verificationCodeError) {
-        console.log("token : ",verificationCodeString,"mail : ", this.email);  
         try {
           const response = await axios.post('https://we-art.onrender.com/api/verify-code', {
             token: verificationCodeString, // Le code de vérification
@@ -1058,8 +1056,6 @@ export default {
           });
           // Vérification du code selon le code de réponse
           if (response.status === 200) {
-              console.log(response.data.message); // "Email vérifié avec succès"
-              // Set success message and open dialog
               this.successMessage = 'Nous avons bien créé votre compte.';
               this.errorMessage = '';
               this.dialog = true;  // Open the dialog for success
@@ -1068,7 +1064,6 @@ export default {
               return true; // Validation réussie
           } else {
               this.verificationCodeError = 'Une erreur est survenue, veuillez réessayer.'; // Gestion d'autres codes d'erreur
-              console.log(response.data.message);
           }
         } catch (error) {
           // Gestion des erreurs lors de l'appel à l'API

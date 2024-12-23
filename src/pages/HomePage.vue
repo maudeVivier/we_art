@@ -137,7 +137,6 @@ export default {
       try {
         this.loadingFilter = true;
         if(this.userConnected){
-          console.log("userConnected", this.userConnected)
           const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/interets`);
           if(response.data.length > 0){
             this.disciplines = response.data // Map pour extraire les noms

@@ -386,7 +386,6 @@
       },
       editInfos() {
         this.editedUser = { ...this.user }; // recupere les infos de l'utilisateur connecté
-        console.log("edited user = ", this.editedUser.interets)
         //Manipulations pour afficher les champs non texte
         //Avoir la date de naissance dans le bon format pour l'afficher
         this.editedUser.birthday = (new Intl.DateTimeFormat('fr-FR', {

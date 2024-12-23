@@ -122,7 +122,6 @@ export default {
       try {
         this.loading=true
         const response = await axios.post(`https://we-art.onrender.com/api/users/${this.idSearchUser}`);
-        console.log("la reponse est = ", response)
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse
       } catch (error) {
         console.error('Erreur lors de la récupération des informations utilisateur :', error);

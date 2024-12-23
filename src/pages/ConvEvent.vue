@@ -163,7 +163,6 @@ export default {
 
     if(this.$route.params.id) {
       this.eventId = this.$route.params.id;
-      console.log("entrer ici : ", this.$route.params)
 
       // Initialiser la connexion Socket.IO
       this.socket = io('https://we-art.onrender.com');
@@ -171,9 +170,6 @@ export default {
 
       // Rejoindre une room spécifique à l'événement
       this.socket.emit('joinEventRoom', this.eventId);
-
-      console.log("identifant de l'event : ", this.eventId)
-      console.log("je suis connecté : ", this.socket.connected)
 
       // Écouter les nouveaux messages
       this.socket.on('newMessage', (message) => {
@@ -191,8 +187,6 @@ export default {
   },
   methods: {
     async reinitNotif(){
-      console.log("je rentre dans la fonction reinitNotif")
-
       await axios.patch(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
     },
 
@@ -207,8 +201,6 @@ export default {
     },
     async fetchConvMsgEvents() {
       this.userId = this.$store.getters.user.id;
-
-      console.log("ici je rentre : ", this.eventId)
       this.loading = true; // Start loading
       try {
         const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
@@ -225,7 +217,6 @@ export default {
         this.$nextTick(() => {
           this.scrollToBottom();
         });
-        console.log("liste message : ", this.listMsg)
       } catch (error) {
         console.error('Erreur lors de la récupération des message de la conversations : ', error);
       } finally {
@@ -255,22 +246,6 @@ export default {
       
       this.loading = true;
       try {
-        /*console.log("j'envoi le message : ", this.newMessage.trim())
-        console.log("avec cette event id : ", this.userConnected.idUser)
-
-        const response = await axios.post(
-          `https://we-art.onrender.com/api/events/${this.eventId}/messages`,
-          {
-            texte: this.newMessage.trim(),
-            userId: this.userConnected.idUser,
-          }
-        );
-
-        // Ajouter le nouveau message à la liste existante
-        this.listMsg.push(response.data);
-
-        // Réinitialiser la zone de saisie
-        this.newMessage = "";*/
         const messageData = {
           texte: this.newMessage,
           userId: this.userConnected.idUser,
