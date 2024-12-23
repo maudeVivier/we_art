@@ -197,19 +197,19 @@
         </v-carousel>
 
         <!-- Mes ateliers -->
-        <v-row>
-        <v-col cols="12">
-          <h3 class="text-center">Organisés par moi</h3>
-        </v-col>
+        <v-row v-if="userConnected && userConnected.type === 'Organizer'">
+          <v-col cols="12">
+            <h3 class="text-center">Organisés par moi</h3>
+          </v-col>
         </v-row>
 
-        <v-row v-if="myEvents.length <= 0">
+        <v-row v-if="userConnected && userConnected.type === 'Organizer' && myEvents.length <= 0">
           <v-col cols="12" class="text-center">
             <p>Vous n'avez créé aucun atelier</p>
           </v-col>
         </v-row>
         
-        <v-carousel v-if="myEvents.length > 0" hide-delimiters class="carousel" style="height: 35vh">
+        <v-carousel v-if="userConnected && userConnected.type === 'Organizer' && myEvents.length > 0" hide-delimiters class="carousel" style="height: 35vh">
           <v-carousel-item
             v-for="(event, index) in myEvents"
             :key="index"
