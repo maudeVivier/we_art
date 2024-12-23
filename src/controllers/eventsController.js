@@ -685,10 +685,21 @@ exports.getEventById = async (req, res) => {
             [id]
         );
 
+        // Récupérer toutes les notation de l'évènement 
+        const notationResult = await pool.query(
+            `SELECT u.id as idUser, u.firstname, u.lastname, u.image_user, ce.notation, ce.description, ce.created_at, ce.id as idComment
+            FROM commentairesevents ce
+            INNER JOIN events e ON ce.idevent = e.id 
+            INNER JOIN users u ON ce.iduser = u.id
+            WHERE e.id = $1`,
+            [id]
+        );
+
         // Fusionner les résultats
         const event = result.rows[0];
         event.participants = participantsResult.rows;
         event.organisateur = organisateurResult.rows[0];
+        event.commentaires = notationResult.rows;
 
         res.json(event);
     } catch (err) {
@@ -1316,7 +1327,7 @@ exports.addComment = async (req, res) => {
 
     try {
         // Vérification de la notation
-        if (notation < 1 || notation > 5) {
+        if (notation < 0 || notation > 5) {
             return res.status(400).json({ error: "La notation doit être comprise entre 1 et 5." });
         }
 
@@ -1332,9 +1343,29 @@ exports.addComment = async (req, res) => {
             return res.status(404).json({ error: "Événement introuvable." });
         }
 
+        const event = eventCheck.rows[0];
+        if (new Date(event.end_date) > new Date()) {
+            return res.status(400).json({ error: "Vous ne pouvez pas commenter un événement dont la date de fin n'est pas passée." });
+        }
+
+        // Vérifier que c'est pas l'organisateur qui commente
+        if (event.id_organisateur === userId) {
+            return res.status(403).json({ error: "Vous ne pouvez pas commenter votre propre événement." });
+        }
+
+        // Vérifier si l'utilisateur est un participant de l'événement
+        const participantCheck = await pool.query(
+            'SELECT * FROM participantsEvents WHERE id_user = $1 AND id_event = $2',
+            [userId, eventId]
+        );
+        if (participantCheck.rowCount === 0) {
+            return res.status(403).json({ error: "Vous n'êtes pas un participant de cet événement." });
+        }
+
+
         // Insérer le commentaire dans la base de données
         const result = await pool.query(
-            'INSERT INTO commentairesEvents (notation, description, idUser, idEvent) VALUES ($1, $2, $3, $4) RETURNING *',
+            'INSERT INTO commentairesEvents (notation, description, idUser, idEvent, created_at) VALUES ($1, $2, $3, $4, NOW()) RETURNING *',
             [notation, description, userId, eventId]
         );
 
@@ -1908,7 +1939,7 @@ exports.getUpcomingEvents = async (req, res) => {
 
         res.status(200).json(result.rows);
     } catch (error) {
-        console.error('Erreur lors de la récupération des derniers événements à venir:', err);
+        console.error('Erreur lors de la récupération des derniers événements à venir:', error);
         res.status(500).send({ error: 'Erreur lors de la récupération des derniers événements à venir' });
     }
 };

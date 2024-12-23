@@ -98,7 +98,7 @@
         </v-row>
 
         <!-- Organisateur -->
-        <v-row>
+        <v-row v-if="event.organisateur">
           <v-col>
             <p style="font-size:20px; margin-bottom: 3px">Organisateur : </p>
           </v-col>
@@ -135,7 +135,95 @@
             </p>
           </v-col>
         </v-row>
+
+        <v-row v-if="event.commentaires && event.commentaires.length > 0" ref="messageContainer" class="row-4 message-list">
+          <v-col cols="12">
+            <p style="font-size:20px; margin-bottom: 3px">Commentaires :</p>
+          </v-col>
+          <v-col
+            v-for="com in event.commentaires"
+            :key="com.idcomment"
+            cols="12"
+          >
+            <v-row class="d-flex align-start" no-gutters>
+              <v-col @click="goToUserPage(com.iduser)" class="d-flex flex-column" cols="auto" :style="{ alignSelf: 'flex-end', cursor: 'pointer' }">
+                <v-avatar size="32" class="photo-left">
+                  <img :src="com.image_user"/>
+                </v-avatar>
+              </v-col>
+
+              <!-- Bloc de message (texte) -->
+              <v-col class="message-text flex-grow-1 message-left">
+                <div class="message-header">
+                  <p @click="goToUserPage(com.iduser)" class="mb-1 font-weight-bold" style="cursor:pointer">
+                    {{ com.firstname }} {{ com.lastname }}
+                  </p>
+                  <p class="mb-2 font-weight-bold" style="font-size: 0.9rem;">
+                    {{ formatDate(com.created_at) }} à {{ formatTime(com.created_at) }}
+                  </p>
+                </div>
+                <div class="message-body">
+                  <v-rating
+                    :value="Number(com.notation)"
+                    length="5"
+                    color="primary"
+                    background-color="grey"
+                    empty-icon="mdi-star-outline"
+                    :half-increments="true"
+                    full-icon="mdi-star"
+                    readonly
+                    small
+                    class="custom-spacing"
+                  ></v-rating>
+                  <p class="mb-0">{{ com.description }}</p>
+                </div>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+       
+        <!-- Zone de saisie du message -->
+        <v-row v-if="event.id_organisateur != userConnected.idUser" class="row-5 message-input">
+          <v-col>
+            <v-rating
+              v-model="notation"
+              length="5"
+              :half-increments="true"
+              color="primary"
+              background-color="grey"
+              empty-icon="mdi-star-outline"
+              full-icon="mdi-star"
+              large
+            >
+            </v-rating>
+          </v-col>
+          <v-col
+            cols="12"
+            style="display: flex; align-items: center;" 
+          >
+          
+            <v-textarea
+              v-model="newComment"
+              label="Écrivez votre commentaire..."
+              rows="2"
+              outlined
+              no-resize
+            />
+            <v-btn
+              color="primary"
+              :disabled="loading || !newComment.trim()"
+              @click="sendCommentaire"
+              style="margin-left: 10px;" 
+            >
+              Envoyer
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-container>
+
+
+
+
 
       <!-- Snackbar pour le message d'inscription à l'evenement -->
       <v-snackbar v-model="successMessageParticipe" timeout="3000">
@@ -208,6 +296,9 @@ export default {
       successMessageListeEvent: false,
       alreadyListeEvent: false,
       successMessageDesinscireListWait:false,
+
+      newComment : '',
+      notation : 0,
     };
   },
   mounted() {
@@ -223,11 +314,31 @@ export default {
     goToUserPage(userId){
       this.$router.push({name:'ProfilOtherUser', params:{idUser:userId}})
     },
+    async sendCommentaire(){
+      if(this.userConnected){
+        try {
+          //const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/comments`, {
+          const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/comments`, {
+            userId: this.userConnected.idUser,
+            description: this.newComment,
+            notation: this.notation,
+          });
+          console.log('commentaire ajouté :', response.data);
+          this.newComment = '';
+          this.notation = 0;
+          this.fetchEventDetails(this.event.id);
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout du commentaire', error);
+        }
+      }else{
+        this.$router.push('/login');
+      }
+    },
 
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        // const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
+        //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
         const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
 
@@ -443,4 +554,37 @@ export default {
   border: 2px solid;
   background-color: rgb(143, 170, 143); /* Gris-vert */
 }
+
+.message-left {
+  background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
+  border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
+  color: #424242 !important;
+  text-align: left;
+  margin-right: auto; /* Aligne à gauche */
+  max-width: 90%; /* Largeur maximale */
+}
+
+  /* Avatar gauche */
+  .photo-left {
+    margin-right: 10px; /* Décale l'avatar à gauche */
+    order: 1; /* Met l'avatar avant le texte */
+  }
+
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 0 10px;
+  }
+
+  .message-body {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+  .custom-spacing {
+    margin-top: -2vh;  /* Ajuste l'écart au-dessus */
+    margin-bottom: -1vh; /* Ajuste l'écart en dessous */
+    margin-left: -0.75vw; /* Ajuste l'écart à gauche */
+  }
+
 </style>
