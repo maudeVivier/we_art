@@ -184,6 +184,15 @@ exports.getUserById = async (req, res) => {
             return res.status(404).json({ error: 'Utilisateur non trouvé' });
         }
 
+        // Récupérer la moyenne des notes (notation) et le nombre de notes (rating_count) pour un organisateur
+        const ratingResult = await pool.query(
+            'SELECT COALESCE(AVG(c.notation), 0) AS notation, COALESCE(COUNT(c.id), 0) AS rating_count ' +
+            'FROM commentairesevents c ' +
+            'INNER JOIN events e ON e.id = c.idevent ' +
+            'WHERE e.id_organisateur = $1',
+            [userId] 
+        );
+
         const interetResult = await pool.query(
             'SELECT i.discipline, dm.icon ' +
             'FROM interet i ' +
@@ -198,6 +207,8 @@ exports.getUserById = async (req, res) => {
             discipline: row.discipline,
             icon: row.icon
         }));
+        user.notation = ratingResult.rows[0].notation;  // Moyenne des notes
+        user.rating_count = ratingResult.rows[0].rating_count;
 
 
         res.json(user);

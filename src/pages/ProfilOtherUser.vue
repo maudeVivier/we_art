@@ -32,6 +32,22 @@
               {{ user.firstname }} {{ user.lastname }}
               <v-icon v-if="user.is_verified" color="primary">mdi-check-decagram</v-icon>
             </h4>
+            <v-rating
+              v-if="user.type === 'Organizer'"
+              :value="Number(user.notation)"
+              length="5"
+              color="primary"
+              background-color="grey"
+              empty-icon="mdi-star-outline"
+              :half-increments="true"
+              full-icon="mdi-star"
+              readonly
+              small
+            >
+            </v-rating>
+            <p>
+              Nombre de notes : {{ user.rating_count }}
+            </p>
           </v-col>
         </v-row>
 
