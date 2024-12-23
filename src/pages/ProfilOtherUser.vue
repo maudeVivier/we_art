@@ -121,7 +121,6 @@ export default {
     async fetchUserDetails() {
       try {
         this.loading=true
-        //const response = await axios.post(`http://localhost:3000/api/users/${this.idSearchUser}`);
         const response = await axios.post(`https://we-art.onrender.com/api/users/${this.idSearchUser}`);
         console.log("la reponse est = ", response)
         this.user = response.data; // Remplissez l'objet utilisateur avec les données de la réponse

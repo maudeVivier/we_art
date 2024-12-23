@@ -77,7 +77,6 @@ export default {
 
     async submitLogin() {
       try {
-        //const response = await axios.post('http://localhost:3000/api/users/login', {
         const response = await axios.post('https://we-art.onrender.com/api/users/login', {
           email: this.email,
           password: this.password,

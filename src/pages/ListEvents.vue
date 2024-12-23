@@ -594,11 +594,9 @@ export default {
         let response;
         // Effectuer la requête avec ou sans filtres selon cleanFilters
         if (this.userConnected) {
-            // response = await axios.get(`http://localhost:3000/api/events${queryParams}&idUser=${this.userConnected.idUser}`);
             response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}&idUser=${this.userConnected.idUser}`);
 
         } else {
-            // response = await axios.get(`http://localhost:3000/api/events${queryParams}`);
             response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
         }
         this.events = response.data;

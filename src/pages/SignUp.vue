@@ -754,7 +754,6 @@ export default {
       
       // Vérification dans la base de données si l'email n'est pas déjà utilisé
       try {
-        //const response = await axios.get(`http://localhost:3000/api/users/email/${this.email}`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
         if (response.data.exists) {
           this.emailError = `Cet email est déjà utilisé.`;
@@ -987,7 +986,6 @@ export default {
           `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
           formData
         );
-        //const response = await axios.post(`http://localhost:3000/api/users`, {
         const response = await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
@@ -1054,8 +1052,6 @@ export default {
       if (!this.verificationCodeError) {
         console.log("token : ",verificationCodeString,"mail : ", this.email);  
         try {
-          //const response = await axios.post(`http://localhost:3000/api/verify-code`, {
-
           const response = await axios.post('https://we-art.onrender.com/api/verify-code', {
             token: verificationCodeString, // Le code de vérification
             email: this.email // L'email de l'utilisateur

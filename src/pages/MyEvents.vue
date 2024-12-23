@@ -324,7 +324,6 @@ export default {
     async participateEvent(eventId) {
       if(this.userConnected){ // utilisateur connecté
         try {
-          //const response = await axios.post(`http://localhost:3000/api/events/${eventId}/users/${this.userConnected.idUser}`);
           const response = await axios.post(`https://we-art.onrender.com/api/events/${eventId}/users/${this.userConnected.idUser}`);
 
           console.log('utilisateur ajouté a l evenement :', response.data);
@@ -343,7 +342,6 @@ export default {
     async refuseEvent(eventId) {
       if(this.userConnected){ // utilisateur connecté
         try {
-          //const response = await axios.delete(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           await axios.delete(`https://we-art.onrender.com/api/events/listWait/${eventId}/users/${this.userConnected.idUser}`);
 
           this.fetchEvents();
@@ -378,7 +376,6 @@ export default {
     async fetchEvents() {
       this.loading = true; // Start loading
       try {
-        //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/events`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events`);
         this.events = response.data;
       } catch (error) {
@@ -390,7 +387,6 @@ export default {
     async fetchMyEvents() {
       this.loading = true; // Start loading
       try {
-        // const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/myEvents`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/myEvents`);
         this.myEvents = response.data;
       } catch (error) {
@@ -406,7 +402,6 @@ export default {
 
     async fetchEventsNotifs() {
       try {
-        // const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/notifsevents`);
         const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/notifsevents`);
         this.eventsNotifs = response.data;
       } catch (error) {

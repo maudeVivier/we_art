@@ -166,7 +166,6 @@ export default {
       console.log("entrer ici : ", this.$route.params)
 
       // Initialiser la connexion Socket.IO
-      //this.socket = io('http://localhost:3000');
       this.socket = io('https://we-art.onrender.com');
 
 
@@ -195,8 +194,6 @@ export default {
       console.log("je rentre dans la fonction reinitNotif")
 
       await axios.patch(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
-      //await axios.patch(`http://localhost:3000/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
-
     },
 
     goToUserPage(userId){
@@ -215,8 +212,6 @@ export default {
       this.loading = true; // Start loading
       try {
         const response = await axios.get(`https://we-art.onrender.com/api/events/${this.eventId}/messages`);
-        //const response = await axios.get(`http://localhost:3000/api/events/${this.eventId}/messages`);
-        console.log("response : ", response.data)
         this.orgaId = response.data.idOrga;
         this.firstnameOrga = response.data.firstnameOrga;
         this.lastnameOrga = response.data.lastnameOrga;

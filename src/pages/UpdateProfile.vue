@@ -461,7 +461,6 @@
         
         // Vérification dans la base de données si l'email n'est pas déjà utilisé
         try {
-          // const response = await axios.get(`http://localhost:3000/api/users/email/${this.editedUser.email}`);
           const response = await axios.get(`https://we-art.onrender.com/api/users/email/${this.email}`);
           if (response.data.exists && this.user.email !== this.editedUser.email) {
             this.emailError = 'Cet email est déjà utilisé.';
@@ -630,7 +629,6 @@
           }
 
           try {
-            //const response = await axios.patch(`http://localhost:3000/api/users/${this.user.id}`, this.user);
             const response = await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
             this.$store.commit('updateUser', {
               email: this.user.email,
@@ -650,7 +648,6 @@
       async fetchUserDetails() {
         try {
           this.loading = true
-          //const response = await axios.post(`http://localhost:3000/api/users/${this.userConnected.idUser}`);
           const response = await axios.post(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}`);
           this.user = response.data;          
           this.editInfos();

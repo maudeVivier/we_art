@@ -136,7 +136,6 @@ export default {
     async fetchEventsCountNotifs() {
       if (this.userConnected) {
         try {
-          //const response = await axios.get(`http://localhost:3000/api/users/${this.userConnected.idUser}/notifscount`);
           const response = await axios.get(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/notifscount`);
           console.log('Réponse de la requête:', response);
           this.numberNotif = response.data.count;

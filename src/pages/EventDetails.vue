@@ -323,7 +323,6 @@ export default {
     async sendCommentaire(){
       if(this.userConnected){
         try {
-          //const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/comments`, {
           const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/comments`, {
             userId: this.userConnected.idUser,
             description: this.newComment,
@@ -344,7 +343,6 @@ export default {
     async fetchEventDetails(id) {
       this.loading = true;
       try {
-        //const response = await axios.get(`http://localhost:3000/api/eventDetails/${id}`);
         const response = await axios.get(`https://we-art.onrender.com/api/eventDetails/${id}`);
         this.event = response.data;
 
@@ -382,7 +380,6 @@ export default {
     async checkParticipation() { // fonction pour afficher le bouton Participer ou se désinscire à un évènement
       if (this.userConnected) {
         try {
-          // const response = await axios.get(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.get(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`);
           this.alreadyParticipating = response.data.participating;
         } catch (error) {
@@ -394,7 +391,6 @@ export default {
     async checkListeWait() { // fonction pour afficher le bouton Ne plus être notifier ou etre notifier à un évènement
       if (this.userConnected) {
         try {
-          // const response = await axios.get(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.get(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           this.alreadyListeEvent = response.data.participating;
         } catch (error) {
@@ -406,7 +402,6 @@ export default {
     async addListeEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          // const response = await axios.post(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
           const response = await axios.post(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
 
           console.log('utilisateur ajouté a la liste d\'attente evenement :', response.data);
@@ -425,7 +420,6 @@ export default {
     async unlistWaitFromEvent() { // fonction pour se desincrire de la liste d'attente d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            // const response = await axios.delete(`http://localhost:3000/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
             const response = await axios.delete(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
 
             console.log('utilisateur supprimer a l evenement :', response.data);
@@ -443,7 +437,6 @@ export default {
     async participateEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          // const response = await axios.post(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
           const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
             id_event: this.event.id,
             id_user: this.userConnected.idUser,
@@ -465,7 +458,6 @@ export default {
     async unregisterFromEvent() { // fonction pour se desincrire d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            // const response = await axios.delete(`http://localhost:3000/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
             const response = await axios.delete(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
               id_event: this.event.id,
               id_user: this.userConnected.idUser,

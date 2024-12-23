@@ -92,7 +92,6 @@ export default {
   mounted() {
     this.fetchConvEvents();
 
-    //this.socket = io('http://localhost:3000');
     this.socket = io('https://we-art.onrender.com');
 
     this.socket.emit('joinUserNotif', this.userConnected.idUser);
@@ -143,7 +142,6 @@ export default {
       this.loading = true; // Start loading
       try {
         const response = await axios.get(`https://we-art.onrender.com/api/events/messages/users/${this.userConnected.idUser}`);
-        //const response = await axios.get(`http://localhost:3000/api/events/messages/users/${this.userConnected.idUser}`);
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des conversations des événements:', error);
