@@ -61,7 +61,7 @@
               v-for="event in filteredEvents"
               :key="event.id"
               :lat-lng="[event.latitude, event.longitude]"
-              :icon="customIcon"
+              :icon="getIcon(event.icon_discipline)"
               @click="selectEvent(event)" 
             />
             <!--Ajouter un cercle de rayon-->
@@ -348,12 +348,6 @@ export default {
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       defaultPhotoUrl: require('@/assets/evenementiel.jpg'),
-      customIcon: L.icon({
-        iconUrl: require('@/assets/map.png'),
-        iconSize: [30, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-      }),
       selectedEvent: null, // Événement sélectionné
       currentScrollIndex: 0, // Index de défilement actuel
       //loading: true, // Nouvelle variable pour le chargement
@@ -428,6 +422,20 @@ export default {
     this.fetchEvents(this.clearFilters);
   },
   methods: {
+    getIcon(iconName) {
+      return L.divIcon({
+        className: 'mdi-icon-container',
+        html: `
+          <div style="position: relative;">
+            <img src="${require('@/assets/map.png')}" alt="custom icon" style="width: 30px; height: 41px;"/>
+            <i class="mdi ${iconName}" style="position: absolute; top: 2%; left: 18%; font-size: 1.75em;"></i>
+          </div>
+        `,
+        iconSize: [30, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+      });
+    },
     getUserLocation() {
       return new Promise((resolve) => {
         if (navigator.geolocation) {
