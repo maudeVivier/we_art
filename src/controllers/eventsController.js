@@ -870,7 +870,7 @@ exports.addUserToEvent = async (req, res) => {
         }
 
 
-        // Vérifier si l'utilisateur participe déjà à l'événement
+        // Vérifier si l'utilisateur est déjà dans la liste d'attente de l'événement
         const listWaitCheck = await pool.query(
             'SELECT * FROM listeattentesevents WHERE id_user = $1 AND id_event = $2',
             [userId, eventId]
@@ -884,10 +884,19 @@ exports.addUserToEvent = async (req, res) => {
             );
         }
 
+
+        
+        const messageCountResult = await pool.query(
+            'SELECT COUNT(*) AS message_count FROM conversationsevents WHERE idevent = $1',
+            [eventId]
+        );
+        const messageCount = parseInt(messageCountResult.rows[0].message_count, 10) || 0;
+
+
         // Insérer dans la table de jointure participantsevents
         await pool.query(
-            'INSERT INTO participantsevents (id_user, id_event) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-            [userId, eventId]
+            'INSERT INTO participantsevents (id_user, id_event, notif) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+            [userId, eventId, messageCount]
         );
         console.log("utilisateur ajoute a l evenement avec succes")
         res.status(201).json({ message: "Utilisateur ajouté à l'événement avec succès." });
