@@ -85,8 +85,6 @@
             <template>
               <p class="text-info">Connectez vous ou créez un compte pour vous inscrire</p>
             </template>
-
-
           </v-col>
         </v-row>
 
@@ -190,7 +188,7 @@
         </v-row>
        
         <!-- Zone de saisie du message -->
-        <v-row v-if="userConnected && event.id_organisateur != userConnected.idUser && isEventEnded" class="row-5 message-input">
+        <v-row v-if="userConnected && event.id_organisateur != userConnected.idUser && isEventEnded && isParticipant" class="row-5 message-input">
           <v-col>
             <v-rating
               v-model="notation"
@@ -314,7 +312,13 @@ export default {
       const endDate = new Date(this.event.end_date);
       const currentDate = new Date();
       return endDate < currentDate;
-    }
+    },
+    isParticipant() {
+      if (!this.event.participants || !this.userConnected) return false;
+      return this.event.participants.some(
+        (participant) => participant.id === this.userConnected.idUser
+      );
+    },
   },
   methods: {
     goToUserPage(userId){
