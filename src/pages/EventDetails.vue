@@ -433,6 +433,9 @@ export default {
         this.$router.push('/login');
       }
     },
+    onNewNotif() {
+      this.$store.commit('toggleShouldFetch'); // Mise à jour via le store
+    },
 
     async participateEvent() {
       if(this.userConnected){ // utilisateur connecté
@@ -446,6 +449,7 @@ export default {
           this.successMessageParticipe = true; // Affiche le message de succès
           this.alreadyParticipating = true;
           this.fetchEventDetails(this.event.id);
+          this.onNewNotif();
         } catch (error) {
           console.error('Erreur lors de l\'ajout de l\'utilisateur à l\'évènement', error);
           this.successMessageParticipe = false; // Affiche le message de succès

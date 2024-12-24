@@ -230,7 +230,15 @@ export default {
         this.fetchEventsCountNotifs();
       }
     },
+    '$store.state.shouldFetch'() {
+      this.fetchEventsCountNotifs();
+    },
   },
+  mounted() {
+    if(this.userConnected){
+      this.fetchEventsCountNotifs();
+    }
+  }
 };
 </script>
 

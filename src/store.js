@@ -7,9 +7,14 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: null
+    user: null,
+    shouldFetch : false,
   },
   mutations: {
+    toggleShouldFetch(state) {
+      state.shouldFetch = !state.shouldFetch;
+    },
+
     setUser(state, user ) {
       state.user = user;
     },

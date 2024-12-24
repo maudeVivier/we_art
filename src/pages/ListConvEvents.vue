@@ -97,6 +97,8 @@ export default {
     this.socket.on('notification', (notif) => {
       // notif contient le l'id de l'événement, le nom et prenom du dernier utilisateur a envoyer le msg et le text
       // on modifie l'event correspondant avec ces infos
+      this.onNewMessageReceived();
+
       const event = this.events.find((event) => {
         return event.id_event === parseInt(notif.id_event); 
       });
@@ -114,6 +116,9 @@ export default {
     
   },
   methods: {
+    onNewMessageReceived() {
+      this.$store.commit('toggleShouldFetch'); // Mise à jour via le store
+    },
     formatDate(date) {
       if (!date || isNaN(new Date(date).getTime())) {
         return '';
