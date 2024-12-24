@@ -85,19 +85,6 @@
           cols="12"
           style="display: flex; align-items: center;" 
         >
-        <v-rating
-          v-model="notation"
-          length="5"
-          half-increments="false"
-          color="yellow"
-          background-color="grey"
-          empty-icon="mdi-star-outline"
-          full-icon="mdi-star"
-          large
-          style="margin-right: 10px;"
-          label="Votre note"
-        ></v-rating>
-
           <v-textarea
             v-model="newMessage"
             label="Écrivez votre message..."
