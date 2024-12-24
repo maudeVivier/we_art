@@ -375,7 +375,7 @@ export default {
       return time.replace(':', 'h'); // Remplace ':' par 'h'
     },
     goBack() {
-      this.$router.push('/listEvents');
+      this.$router.go(-1); // Retourne à la page précédente dans l'historique du navigateur
     },
     async checkParticipation() { // fonction pour afficher le bouton Participer ou se désinscire à un évènement
       if (this.userConnected) {

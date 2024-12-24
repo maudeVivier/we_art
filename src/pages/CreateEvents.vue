@@ -9,7 +9,7 @@
           icon
           class="mr-2"
           @click.prevent="prevStep" 
-          :class="{ 'disabled-link': currentStep === 1 || currentStep === 4 }"
+          :class="{ 'disabled-link': currentStep === 4 }"
         > 
         <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
@@ -564,6 +564,10 @@ export default {
     prevStep() {
       if (this.currentStep > 1) {
         this.currentStep--;
+      }else{
+        if(this.currentStep === 1){
+          this.$router.go(-1);
+        }
       }
     },
     nextStep() {        

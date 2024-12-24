@@ -2,20 +2,15 @@
   <v-app>
     <v-main>
       <v-container>
-        <v-row class="my-1 ml-1" style="justify-content: space-between;">
-          <v-btn
-            :to="{name : 'Home'}"
-            exact
-            icon
-            class="mr-2"
-          > 
-          <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
-          <h2>Mes ateliers</h2>
+        <v-row class="my-1 ml-1" align="center" style="position: relative;">
+          <v-col cols="12" style="text-align: center;">
+            <h2 style="text-align: center;">Mes ateliers</h2>
+          </v-col>
           <v-btn
             v-if="this.userConnected && this.$store.getters.user.type === 'Organizer'"
             color="primary"
             @click="goToCreateEvent"
+            style="position: absolute; right: 2vw;"
           >
             <v-icon>mdi-plus</v-icon>
           </v-btn>
@@ -23,7 +18,7 @@
             v-else
             icon
           >
-          </v-btn>   
+          </v-btn>
         </v-row>          
 
         <!-- Notifications -->

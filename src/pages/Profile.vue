@@ -2,12 +2,15 @@
   <v-app>
     <v-main>
       <v-container v-if="!loading">
-        <v-row class="my-1 ml-1 align-center justify-space-between">
-          <v-btn @click="goBack" icon class="mr-2">
-            <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
-          <h2>Mon profil</h2>
-          <v-btn @click="updateUserInfos" icon class="mr-2">
+        <v-row class="my-1 ml-1"  align="center" style="position: relative;">
+          <v-col cols="12" style="text-align: center;">
+            <h2>Mon profil</h2>
+          </v-col>
+          <v-btn 
+            @click="updateUserInfos" 
+            icon 
+            style="position: absolute; right: 2vw;"
+          >
             <v-icon>mdi-cog-outline</v-icon>
           </v-btn>
         </v-row>
@@ -154,9 +157,6 @@ export default {
         month: 'short',
         year: 'numeric',
       }).format(new Date(date));
-    },
-    goBack() {
-      this.$router.go(-1); // Retourne à la page précédente dans l'historique du navigateur
     },
   },
   created() {

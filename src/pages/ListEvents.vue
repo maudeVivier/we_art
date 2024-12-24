@@ -2,15 +2,7 @@
   <v-app>
     <v-main>
       <v-container v-if="!showFiltersBox" style="max-width: 100%;">
-        <v-row class="my-1 ml-1">
-          <v-btn
-            :to="{name : 'Home'}"
-            exact
-            icon
-            class="mr-2"
-          > 
-          <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
+        <v-row class="my-1 ml-1" justify="center" align="center">
           <h2>Explorer des ateliers</h2>
         </v-row>
 

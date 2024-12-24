@@ -2,10 +2,7 @@
   <v-app>
     <v-main>
       <v-container style="max-width: 100%;">
-        <v-row class="my-1 ml-1">
-          <v-btn @click="goBack" icon class="mr-2">
-            <v-icon>mdi-arrow-left</v-icon>
-          </v-btn>
+        <v-row class="my-1 ml-1" justify="center" align="center">
           <h2>Messages</h2>
         </v-row>
 

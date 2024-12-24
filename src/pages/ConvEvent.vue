@@ -3,7 +3,7 @@
       <v-container class="my-container" style="overflow-y: none !important">
         <v-row class="row-1"><!-- <v-row class="mt-1 ml-1"> -->
           <v-btn
-            :to="{name : 'Home'}"
+            @click="goBack"
             exact
             icon
             class="mr-2"
@@ -173,6 +173,9 @@ export default {
     }
   },
   methods: {
+    goBack() {
+      this.$router.go(-1); // Retourne à la page précédente dans l'historique du navigateur
+    },
     async reinitNotif(){
       await axios.patch(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
     },
