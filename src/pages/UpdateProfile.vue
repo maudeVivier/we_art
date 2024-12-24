@@ -18,7 +18,7 @@
             lg="2"
             >
               <v-img
-                :src="user.image_user"
+                :src="user.image_user || photo_default"
                 alt="User Image"
                 class="profil-image"
               ></v-img>
@@ -270,6 +270,7 @@
     name: 'UpdateProfile',
     data() {
       return {
+        photo_default: require('@/assets/defaut_profil.svg'),
         user: {},
         genders: [
           { value: "Man", text: "Homme" },

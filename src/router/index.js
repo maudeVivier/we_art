@@ -8,7 +8,6 @@ import SignUp from '../pages/SignUp.vue'
 import CreateEvents from '../pages/CreateEvents.vue'
 import ListEvents from '../pages/ListEvents.vue'
 import EventDetails from '../pages/EventDetails.vue'; // Page de détails
-import AddFakeData from '../pages/AddFakeData.vue'
 import UserProfile from '../pages/Profile.vue'; // Import du composant Profile
 import ProfilOtherUser from '../pages/ProfilOtherUser.vue'; // Import du composant Profile
 
@@ -75,11 +74,6 @@ const router = new Router({
       name: 'EventDetails',
       component: EventDetails,
       props: true
-    },
-    {
-      path: '/addFakeData',
-      name: 'addFakeData',
-      component: AddFakeData
     },
     {
       path: '/profilOtherUser/:idUser',

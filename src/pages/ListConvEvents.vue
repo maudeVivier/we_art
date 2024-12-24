@@ -29,7 +29,7 @@
                   <!-- Colonne pour l'image -->
                   <v-col cols="3" class="d-flex align-center justify-center">
                     <v-avatar size="64">
-                      <img :src="event.image_event_url || photo_default_catalogue" :alt="event.name" />
+                      <img :src="event.image_event_url || photo_default" :alt="event.name" />
                     </v-avatar>
                   </v-col>
 
@@ -76,7 +76,7 @@ export default {
       search: '',
       events: [],
       loading: false, // Loading state
-      photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
+      photo_default: require('@/assets/defaut_evenement.jpg'), 
     };
   },
   computed: {
@@ -113,9 +113,6 @@ export default {
         this.events = this.events.filter((e) => e.id_event !== parseInt(notif.id_event));
         this.events.unshift(event);
       }
-    
-     
-
     });
     
   },

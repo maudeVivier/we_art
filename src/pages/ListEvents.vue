@@ -121,7 +121,7 @@
                     </div>
                   </v-card-text>
                   <v-img
-                    :src="event.image_event_url"
+                    :src="event.image_event_url || photo_default"
                     :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
                     alt="Image de l'événement"
                     class="event-image"
@@ -186,7 +186,7 @@
                   </div>
                 </v-card-text>
                 <v-img
-                  :src="event.image_event_url"
+                  :src="event.image_event_url || photo_default"
                   :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')" 
                   alt="Image de l'événement"
                   class="event-image"
@@ -340,14 +340,13 @@ export default {
       search: '',
       events: [],
       loading: false, // Loading state
-      photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
+      photo_default: require('@/assets/defaut_evenement.jpg'), 
       mode: 'list', // 'list' ou 'map'
       clearFilters: false,
       zoom: 13,
       center: null, // Coordonnées de Lyon
       url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      defaultPhotoUrl: require('@/assets/evenementiel.jpg'),
       selectedEvent: null, // Événement sélectionné
       currentScrollIndex: 0, // Index de défilement actuel
       //loading: true, // Nouvelle variable pour le chargement
