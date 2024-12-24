@@ -126,7 +126,7 @@
       </v-card>
       
       <v-container v-if="mode==='list' && !showFiltersBox">
-        <v-row class="event-list" v-if="mode==='list'">
+        <v-row>
           <v-col
               v-for="event in filteredEvents"
               :key="event.id"
@@ -575,8 +575,6 @@ export default {
           if (this.selectedDateFilter) {
             queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
           }
-
-          
         }
 
         // Ajouter le filtre de distance
@@ -714,7 +712,7 @@ export default {
   display: flex;
   flex-direction: row;
   width: 100vw;
-  height: 18vh;
+  height: 22vh;
 }
 
 .event-image {
@@ -759,7 +757,7 @@ export default {
 .map-container {
   display: flex;
   flex-direction: column; /* Disposition verticale */
-  height: 77vh; /* L'ensemble prend tout l'écran */
+  height: 67vh; /* L'ensemble prend tout l'écran */
   width: 100vw; /* Largeur totale */
   z-index: 1;
 }
