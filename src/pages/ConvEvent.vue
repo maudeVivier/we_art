@@ -10,12 +10,12 @@
           > 
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
-          <h3 class="ml-3" style="font-size: 1rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%;">
+          <h3 @click="goToEventPage(eventId)" class="ml-3" style="font-size: 1rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 90%; cursor: pointer;">
             {{ nameEvent }}
           </h3>
         </v-row>
 
-        <v-row class="row-2 align-center justify-center"><!-- <v-row class="d-flex align-center justify-center"> -->
+        <v-row @click="goToEventPage(eventId)" class="row-2 align-center justify-center" style="cursor: pointer;"><!-- <v-row class="d-flex align-center justify-center"> -->
           <p style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
             {{ formatDate(start_dateEvent) }}
           </p>
@@ -179,7 +179,9 @@ export default {
     async reinitNotif(){
       await axios.patch(`https://we-art.onrender.com/api/users/${this.userConnected.idUser}/events/${this.eventId}/resetnotif`);
     },
-
+    goToEventPage(eventId){
+      this.$router.push({name:'EventDetails', params:{id:eventId}})
+    },
     goToUserPage(userId){
       this.$router.push({name:'ProfilOtherUser', params:{idUser:userId}})
     },
