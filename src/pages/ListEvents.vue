@@ -585,20 +585,25 @@ export default {
             queryParams += queryParams ? `&date=${this.selectedDateFilter}` : `?date=${this.selectedDateFilter}`;
           }
 
-          // Ajouter le filtre de distance
-          if (this.center && this.center.lat && this.center.lng && this.radius) {
-            queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
-          }
+          
+        }
+
+        // Ajouter le filtre de distance
+        if (this.center && this.center.lat && this.center.lng && this.radius) {
+          queryParams += queryParams ? `&latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}` : `?latitude=${this.center.lat}&longitude=${this.center.lng}&rayon=${this.radius}`;
         }
 
         let response;
         // Effectuer la requête avec ou sans filtres selon cleanFilters
         if (this.userConnected) {
-            response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}&idUser=${this.userConnected.idUser}`);
+          if(queryParams===""){
+            queryParams = "?idUser="+this.userConnected.idUser
+          } else {
+            queryParams += `&idUser=${this.userConnected.idUser}`
+          }
+        } 
+        response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
 
-        } else {
-            response = await axios.get(`https://we-art.onrender.com/api/events${queryParams}`);
-        }
         this.events = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des événements:', error);
