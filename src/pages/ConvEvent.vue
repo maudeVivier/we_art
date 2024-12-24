@@ -1,7 +1,7 @@
 <template>
   <v-app>
       <v-container class="my-container" style="overflow-y: none !important">
-        <v-row class="row-1"><!-- <v-row class="mt-1 ml-1"> -->
+        <v-row class="row-1">
           <v-btn
             @click="goBack"
             exact
@@ -15,7 +15,7 @@
           </h3>
         </v-row>
 
-        <v-row @click="goToEventPage(eventId)" class="row-2 align-center justify-center" style="cursor: pointer;"><!-- <v-row class="d-flex align-center justify-center"> -->
+        <v-row @click="goToEventPage(eventId)" class="row-2 align-center justify-center" style="cursor: pointer;">
           <p style="font-size: 0.9rem; margin: 0; color: #1976D2; text-decoration: underline;">
             {{ formatDate(start_dateEvent) }}
           </p>
@@ -31,7 +31,7 @@
           </p>
         </v-row>
 
-        <v-row @click="goToUserPage(orgaId)" class="row-3 align-center"><!-- <v-row @click="goToUserPage(orgaId)" class="d-flex align-center" style="border-top: 1px solid black; border-bottom: 1px solid black; padding: 5px 10%; cursor: pointer;"> -->
+        <v-row @click="goToUserPage(orgaId)" class="row-3 align-center">
           <v-avatar size="32" class="mr-2 ml-4">
             <img :src="photoOrga" :alt="`${firstnameOrga} ${lastnameOrga}`">
           </v-avatar>
@@ -40,7 +40,7 @@
           </h5>
         </v-row>
 
-        <v-row ref="messageContainer" class="row-4 message-list"><!-- <v-row ref="messageContainer" class="message-list" style="flex-grow: 1; height:80%; overflow-y: auto; align-content: flex-start;"> -->
+        <v-row ref="messageContainer" class="row-4 message-list">
           <v-col
             v-for="msg in listMsg"
             :key="msg.idmessage"
@@ -80,7 +80,7 @@
         </v-row>
 
         <!-- Zone de saisie du message -->
-        <v-row class="row-5 message-input"><!-- <v-row class="message-input" style="height: 20%; position: fixed !important; bottom: 56; left: 0; width: 100%; z-index: 10000;"> -->
+        <v-row class="row-5 message-input">
         <v-col
           cols="12"
           style="display: flex; align-items: center;" 

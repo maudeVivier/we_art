@@ -148,7 +148,7 @@
             />
           </div>
 
-          <div v-if="currentStep === 2" style="text-align: center;">   <!-- Date et Heure de Début et de fin -->
+          <div v-if="currentStep === 2" style="text-align: center;">
             <!-- Date et heure de début -->
             <p>Date et heure de début de l'évènement</p>
             <v-row>
