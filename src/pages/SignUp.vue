@@ -985,7 +985,7 @@ export default {
           `https://api.cloudinary.com/v1_1/${process.env.VUE_APP_CLOUD_NAME}/image/upload`,
           formData
         );
-        const response = await axios.post('https://we-art.onrender.com/api/users', {
+        await axios.post('https://we-art.onrender.com/api/users', {
           firstName: this.firstName,
           lastName: this.name,
           email: this.email,
@@ -1003,7 +1003,6 @@ export default {
           a_propos: this.aPropos,
           interests: this.interests,
         });
-        console.log('Utilisateur ajouté avec succès:', response.data);
 
         // Set success message and open dialog
         this.successMessage = 'Créons ensemble !';
@@ -1180,24 +1179,24 @@ export default {
     justify-content: space-between;
   }
 
-.centered-text {
-  flex-grow: 1; /* Permet au texte de prendre l'espace disponible pour le centrer */
-  text-align: center;
-  font-size: 1.5rem;
-}
+  .centered-text {
+    flex-grow: 1; /* Permet au texte de prendre l'espace disponible pour le centrer */
+    text-align: center;
+    font-size: 1.5rem;
+  }
 
-.disabled-link {
-  pointer-events: none;
-  opacity: 0.5;
-  display: none;
-}
+  .disabled-link {
+    pointer-events: none;
+    opacity: 0.5;
+    display: none;
+  }
 
-.vertical-center{
-  display: flex;
-  height: 100%;
-}
+  .vertical-center{
+    display: flex;
+    height: 100%;
+  }
 
-.custom-error-message {
-  margin-top: -10px;
-}
+  .custom-error-message {
+    margin-top: -10px;
+  }
 </style>

@@ -17,19 +17,9 @@ router.post('/verify-code', verifyEmail);
 router.post('/users/sendEmailCode', resendCode);
 router.post('/users/:id', getUserById);
 
-
-
-
 router.patch('/users/:id', updateUser);
 router.patch('/users/:userId/events/:eventId/resetnotif', resetNotif);
 
-
-
-
 router.delete('/users/:id', deleteUser);
-
-
-
-
 
 module.exports = router;

@@ -629,7 +629,7 @@
           }
 
           try {
-            const response = await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
+            await axios.patch(`https://we-art.onrender.com/api/users/${this.user.id}`, this.user);
             this.$store.commit('updateUser', {
               email: this.user.email,
               type: updateType,
@@ -637,9 +637,7 @@
               longitude: this.user.longitude,
             });   
 
-
             this.$router.push('/profile');
-            console.log('Informations de l\'utilisateur modifié :', response.data);
           }catch(error){
             console.error('Erreur lors de la modification des informations utilisateur : ', error);
           }

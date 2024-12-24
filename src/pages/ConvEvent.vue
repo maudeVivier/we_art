@@ -136,8 +136,6 @@ export default {
       nameEvent:null,
       start_dateEvent:null,
       cityEvent : null,
-
-
     };
   },
   computed: {
@@ -154,7 +152,6 @@ export default {
       // Initialiser la connexion Socket.IO
       this.socket = io('https://we-art.onrender.com');
 
-
       // Rejoindre une room spécifique à l'événement
       this.socket.emit('joinEventRoom', this.eventId);
 
@@ -168,7 +165,6 @@ export default {
       });
 
       this.reinitNotif();
-
       this.fetchConvMsgEvents();
     }
   },
@@ -265,28 +261,28 @@ export default {
 </script>
 
 <style scoped>
-html, body {
-  overflow: hidden; /* Empêche le défilement de la page entière */
-}
-/* Message de l'utilisateur connecté (droite) */
-.message-right {
-  background-color: #e3f2fd !important; /* Bleu clair pour les messages de l'utilisateur */
-  border-radius: 10px 10px 0 10px; /* Arrondi spécial pour bulle */
-  color: #0d47a1 !important;
-  text-align: left;
-  margin-left: auto; /* Aligne à droite */
-  max-width: 90%; /* Largeur maximale */
-}
+  html, body {
+    overflow: hidden; /* Empêche le défilement de la page entière */
+  }
+  /* Message de l'utilisateur connecté (droite) */
+  .message-right {
+    background-color: #e3f2fd !important; /* Bleu clair pour les messages de l'utilisateur */
+    border-radius: 10px 10px 0 10px; /* Arrondi spécial pour bulle */
+    color: #0d47a1 !important;
+    text-align: left;
+    margin-left: auto; /* Aligne à droite */
+    max-width: 90%; /* Largeur maximale */
+  }
 
-/* Message des autres utilisateurs (gauche) */
-.message-left {
-  background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
-  border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
-  color: #424242 !important;
-  text-align: left;
-  margin-right: auto; /* Aligne à gauche */
-  max-width: 90%; /* Largeur maximale */
-}
+  /* Message des autres utilisateurs (gauche) */
+  .message-left {
+    background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
+    border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
+    color: #424242 !important;
+    text-align: left;
+    margin-right: auto; /* Aligne à gauche */
+    max-width: 90%; /* Largeur maximale */
+  }
 
   /* Avatar gauche */
   .photo-left {

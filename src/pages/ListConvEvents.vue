@@ -48,14 +48,12 @@
             </v-col>
         </v-row>
       </v-container>
-     
-        
+
       <!-- Loading Spinner -->
       <v-col v-if="loading" cols="12" class="text-center">
         <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
         <p>Chargement des conversations...</p>
       </v-col>
-
     </v-main>
   </v-app>
 </template>
@@ -64,7 +62,6 @@
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
 import { io } from 'socket.io-client';
-
 
 export default {
   data() {
@@ -113,7 +110,6 @@ export default {
         this.events.unshift(event);
       }
     });
-    
   },
   methods: {
     onNewMessageReceived() {
@@ -164,31 +160,31 @@ export default {
 </script>
 
 <style scoped>
-.event-conv-card {
-  padding: 4px;
-  transition: box-shadow 0.2s ease;
-}
+  .event-conv-card {
+    padding: 4px;
+    transition: box-shadow 0.2s ease;
+  }
 
-.event-conv-card:hover {
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-}
+  .event-conv-card:hover {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+  }
 
-.truncate-text {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: normal;
-}
+  .truncate-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
 
-.truncate-text:nth-of-type(1) {
-  -webkit-line-clamp: 2; /* Nom de l'événement : 1 ligne */
-}
+  .truncate-text:nth-of-type(1) {
+    -webkit-line-clamp: 2; /* Nom de l'événement : 1 ligne */
+  }
 
-.truncate-text:nth-of-type(2) {
-  -webkit-line-clamp: 1; /* Dernier message : 1 ligne */
-}
-.no-shadow {
+  .truncate-text:nth-of-type(2) {
+    -webkit-line-clamp: 1; /* Dernier message : 1 ligne */
+  }
+  .no-shadow {
     box-shadow: none !important;
     border-radius: 0 !important;
   }

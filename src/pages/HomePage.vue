@@ -13,7 +13,6 @@
 
         <v-row class="mt-2">
           <v-col>
-
             <div
               class="discipline-scroll-container d-flex align-center"
               style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
@@ -80,7 +79,6 @@
           </v-carousel-item>
         </v-carousel>
          
-
         <!-- Loading Spinner -->
         <v-col v-if="loading" cols="12" class="text-center">
           <v-progress-circular indeterminate color="primary" size="60"></v-progress-circular>
@@ -89,7 +87,6 @@
 
         <span class="d-flex justify-center align-center">
           <v-img :src="randomImage" max-height="54vh" max-width="54vw" alt="Image aléatoire" />
-
         </span>
         
       </v-container>
@@ -99,16 +96,15 @@
 
 <script>
 // Importation des images
-import Logo from '@/assets/we_art.svg'; // Chemin relatif vers ton logo situé dans le même dossier
-
-import Dance1 from '@/assets/Dance1.png';
-import Discussion1 from '@/assets/Discussion1.png';
-import Discussion2 from '@/assets/Discussion2.png';
-import groupJazz from '@/assets/groupJazz.png';
-import Musee1 from '@/assets/Musee1.png';
-import peinture1 from '@/assets/peinture1.png';
-import vase from '@/assets/vase.png';
-import Com1 from '@/assets/Com1.png';
+import Logo from '@/assets/we_art.svg'; 
+import Dance1 from '@/assets/Dance1.svg';
+import Discussion1 from '@/assets/Discussion1.svg';
+import Discussion2 from '@/assets/Discussion2.svg';
+import groupJazz from '@/assets/groupJazz.svg';
+import Musee1 from '@/assets/Musee1.svg';
+import peinture1 from '@/assets/peinture1.svg';
+import vase from '@/assets/vase.svg';
+import Com1 from '@/assets/Com1.svg';
 
 import axios from 'axios';
 
@@ -147,13 +143,10 @@ export default {
             const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
             this.disciplines = response.data // Map pour extraire les noms
           }
-
-
         }else{
           const response = await axios.get('https://we-art.onrender.com/api/events/disciplines');
           this.disciplines = response.data // Map pour extraire les noms
         }
-       
       } catch (error) {
         console.error('Erreur lors de la récupération des disciplines:', error);
       } finally {
@@ -208,7 +201,6 @@ export default {
     // Redirect to the event details page with the event ID
     this.$router.push({ path: `/eventDetails/${event.id}` });
     },
-
   }
 };
 </script>
@@ -262,103 +254,101 @@ export default {
   }
 
   .event-text {
-  padding: 4px;
-}
+    padding: 4px;
+  }
 
-.event-details {
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%; /* Prend toute la hauteur disponible */
-}
+  .event-details {
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Prend toute la hauteur disponible */
+  }
 
-.event-title {
-  font-weight: bold;
-  margin-bottom: 8px;
-}
+  .event-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
 
-.event-info > div {
-  font-size:  0.70rem !important;
-  display: flex;
-  height: 5% !important;
-}
+  .event-info > div {
+    font-size:  0.70rem !important;
+    display: flex;
+    height: 5% !important;
+  }
 
-.event-location,
-.event-date-time,
-.event-discipline {
-  flex: 1;
-}
+  .event-location,
+  .event-date-time,
+  .event-discipline {
+    flex: 1;
+  }
 
-.event-card {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  height: 18vh;
-}
+  .event-card {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 18vh;
+  }
 
-.event-image {
-  width: 35%;
-  height: 90%;
-  display: flex;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 2px solid #b0b0b0;
-  margin-right: 4px;
-}
+  .event-image {
+    width: 35%;
+    height: 90%;
+    display: flex;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #b0b0b0;
+    margin-right: 4px;
+  }
 
-.price-container {
-  padding: 2px 4px; 
-  border-radius: 8px;
-  display: inline-flex;
-  max-width: fit-content;
-  align-items: center;
+  .price-container {
+    padding: 2px 4px; 
+    border-radius: 8px;
+    display: inline-flex;
+    max-width: fit-content;
+    align-items: center;
 
-}
+  }
 
-.free-price {
-  color: white;
-  font-weight: bold;
-  border: 2px solid;
-  background-color: rgb(185, 184, 184); /* Gris */
-}
+  .free-price {
+    color: white;
+    font-weight: bold;
+    border: 2px solid;
+    background-color: rgb(185, 184, 184); /* Gris */
+  }
 
-.paid-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(151, 210, 151); /* Vert */
-}
+  .paid-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(151, 210, 151); /* Vert */
+  }
 
-.free-choice-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(143, 170, 143); /* Gris-vert */
-}
+  .free-choice-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(143, 170, 143); /* Gris-vert */
+  }
 
-.event-info-card {
-  background-color: white;
-  border-radius: 8px;
-  padding: 8px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  width: 90%;
-  max-width: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
+  .event-info-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  }
 
-.event-info-text {
-  color: black;
-}
+  .event-info-text {
+    color: black;
+  }
 
-.imageCaroussel{
-  width: 100%;
-  height:60%;
-}
-
-
+  .imageCaroussel{
+    width: 100%;
+    height:60%;
+  }
 </style>

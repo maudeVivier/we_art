@@ -68,7 +68,6 @@ export default {
         return this.$store.getters.user;
       },
     },
-
   methods: {
     ...mapActions(['login']), // Importer l'action login de Vuex
     togglePasswordVisibility() {
@@ -124,21 +123,20 @@ export default {
 </script>
 
 <style scoped>
-.logo {
-max-width: 30%;
-height: 30%;
-width: 70%; 
-display: block;
-margin: 0 auto;  /* Center horizontally */
-margin-top: 10%;
-}
+  .logo {
+  max-width: 30%;
+  height: 30%;
+  width: 70%; 
+  display: block;
+  margin: 0 auto;  /* Center horizontally */
+  margin-top: 10%;
+  }
 
-.formulaire {
-  margin-top: 25%;
-}
+  .formulaire {
+    margin-top: 25%;
+  }
 
-.error-message {
-  color: red;
-  /* font-size: 0.7rem; */
-}
+  .error-message {
+    color: red;
+  }
 </style>

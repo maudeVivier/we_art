@@ -313,9 +313,8 @@ export default {
     async participateEvent(eventId) {
       if(this.userConnected){ // utilisateur connecté
         try {
-          const response = await axios.post(`https://we-art.onrender.com/api/events/${eventId}/users/${this.userConnected.idUser}`);
+          await axios.post(`https://we-art.onrender.com/api/events/${eventId}/users/${this.userConnected.idUser}`);
 
-          console.log('utilisateur ajouté a l evenement :', response.data);
           this.fetchEvents();
           this.fetchEventsNotifs();
           this.handleNotificationsUpdate()

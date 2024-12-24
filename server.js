@@ -29,7 +29,7 @@ const io = socketIo(server, {
   },
 });
 
-// Configurer CORS pour autoriser les requêtes de localhost:8001
+// Configurer CORS pour autoriser les requêtes de localhost
 const corsOptions = {
   origin: '*', // Remplacez par l'URL de votre frontend
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
@@ -52,28 +52,20 @@ app.use('/api', eventsRoutes);
 
 // Gestion des connexions WebSocket conv event
 io.on('connection', (socket) => {
-  console.log(`Un utilisateur s'est connecté : ${socket.id}`);
-
   socket.on('joinUserNotif', (userId) => {
-
     if (userId) {
       socket.join(`user_${userId}`);
-      console.log(`Utilisateur ${userId} connecté et ajouté à sa room personnelle user_${userId}`);
     }
   });
-
-  
 
   // Rejoindre une "room" spécifique pour un événement
   socket.on('joinEventRoom', (eventId) => {
     socket.join(eventId);
-    console.log(`Utilisateur rejoint la room de l'événement : ${eventId}`);
   });
 
   // Gestion de l'envoi d'un message
   socket.on('sendMessage', async (data) => {
     const { texte, userId, eventId } = data;
-    console.log(`Message reçu : ${texte}, utilisateur : ${userId}, événement : ${eventId}`);
 
     try {
       // Insérer le message dans la base de données
@@ -123,11 +115,8 @@ io.on('connection', (socket) => {
         };
 
         io.to(`user_${participantId}`).emit('notification', notification);
-        console.log(`Notification envoyée à l'utilisateur ${participantId}`);
       
       });
-
-      console.log('Message diffusé avec succès');
     } catch (err) {
       console.error('Erreur lors de l\'insertion du message :', err);
     }

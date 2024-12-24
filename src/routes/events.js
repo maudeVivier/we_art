@@ -12,9 +12,6 @@ router.get('/events/disciplines', allDisciplines);
 router.get('/events/:eventId/messages', getConvMessagesEvent);
 router.get('/events/:eventId/users/:userId', checkUserParticipation);
 
-
-
-
 router.post('/events', createEvent);
 router.post('/events/listWait/:eventId/users/:userId', addUserToListAttenteEvent);
 router.post('/events/:eventId/comments', addComment);
@@ -23,6 +20,5 @@ router.post('/events/:eventId/messages', postMessageConvEvent);
 
 router.delete('/events/listWait/:eventId/users/:userId', removeUserFromListAttenteEvent); 
 router.delete('/events/:eventId/users/:userId', removeUserFromEvent); // Nouvelle route DELETE
-
 
 module.exports = router;

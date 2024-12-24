@@ -443,7 +443,6 @@ exports.getAllEvents = async (req, res) => {
  */
 exports.createEvent = async (req, res) => {
     const { name, description, street, postal_code, city, country, start_date, end_date, discipline, niveau, prix, nombre_de_participants_max, deadline, id_organisateur, image_url } = req.body;
-    console.log('(server.js) POST : ' + name + ' ' + description + ' ' + start_date + ' ' + end_date);
 
     try {
         // Géocodage de l'adresse pour obtenir latitude et longitude
@@ -865,10 +864,8 @@ exports.addUserToEvent = async (req, res) => {
 
         if (participationCheck.rowCount > 0) {
             // L'utilisateur participe déjà à l'événement
-            console.log("L'utilisateur participe déjà à cet événement.");
             return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
         }
-
 
         // Vérifier si l'utilisateur est déjà dans la liste d'attente de l'événement
         const listWaitCheck = await pool.query(
@@ -883,8 +880,6 @@ exports.addUserToEvent = async (req, res) => {
                 [userId, eventId]
             );
         }
-
-
         
         const messageCountResult = await pool.query(
             'SELECT COUNT(*) AS message_count FROM conversationsevents WHERE idevent = $1',
@@ -892,13 +887,11 @@ exports.addUserToEvent = async (req, res) => {
         );
         const messageCount = parseInt(messageCountResult.rows[0].message_count, 10) || 0;
 
-
         // Insérer dans la table de jointure participantsevents
         await pool.query(
             'INSERT INTO participantsevents (id_user, id_event, notif) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
             [userId, eventId, messageCount]
         );
-        console.log("utilisateur ajoute a l evenement avec succes")
         res.status(201).json({ message: "Utilisateur ajouté à l'événement avec succès." });
     } catch (err) {
         console.error("Erreur lors de l'ajout de l'utilisateur à l'événement:", err);
@@ -1148,7 +1141,6 @@ exports.addUserToListAttenteEvent = async (req, res) => {
 
         if (participationCheck.rowCount > 0) {
             // L'utilisateur participe déjà à l'événement
-            console.log("L'utilisateur participe déjà à cet événement.");
             return res.status(409).json({ message: "L'utilisateur participe déjà à cet événement." });
         }
 
@@ -1161,7 +1153,6 @@ exports.addUserToListAttenteEvent = async (req, res) => {
 
         if (participationListAttenteCheck.rowCount > 0) {
             // L'utilisateur est déjà dans la liste d'attente pour cet événement
-            console.log("L'utilisateur est déjà dans la liste d'attente pour cet événement.");
             return res.status(409).json({ message: "L'utilisateur est déjà dans la liste d'attente pour cet événement." });
         }
 
@@ -1170,7 +1161,6 @@ exports.addUserToListAttenteEvent = async (req, res) => {
             'INSERT INTO listeattentesevents (id_user, id_event) VALUES ($1, $2) ON CONFLICT (id_user, id_event) DO NOTHING',
             [userId, eventId]
         );
-        console.log("utilisateur ajoute a la liste d'attente de l' evenement avec succes")
         res.status(201).json({ message: "Utilisateur ajouté à la liste d'attente de l'événement avec succès." });
     } catch (err) {
         console.error("Erreur lors de l'ajout de l'utilisateur à l'événement:", err);
@@ -1389,7 +1379,6 @@ exports.addComment = async (req, res) => {
 exports.allDisciplines = async (req, res) => {
     try{
         const result = await pool.query("SELECT * from discipline_metadata");
-        console.log("resultat des disciplines : ", result.rows)
         res.json(result.rows);
     }catch(error){
         console.error("Erreur lors de la récupération des disciplines : ", error)
@@ -1468,11 +1457,8 @@ exports.allDisciplines = async (req, res) => {
  *         description: Erreur interne lors de l'ajout du message.
  */
 exports.postMessageConvEvent = async (req, res) => {
-    console.log("ici je rentre")
     const { texte, userId } = req.body;
     const { eventId } = req.params;
-    console.log("ici je 2 = ", texte, " et " , userId, " et encore ", eventId)
-
 
     try {
         // Vérifier si l'utilisateur existe
@@ -1482,21 +1468,18 @@ exports.postMessageConvEvent = async (req, res) => {
         }
 
         const user = userCheck.rows[0];
-        console.log("2")
 
         // Vérifier si l'événement existe
         const eventCheck = await pool.query('SELECT * FROM events WHERE id = $1', [eventId]);
         if (eventCheck.rowCount === 0) {
             return res.status(404).json({ error: "Événement introuvable." });
         }
-        console.log("ici je 3")
 
         // Insérer le message dans la base de données
         const result = await pool.query(
             'INSERT INTO conversationsEvents (texte, idUser, idEvent, dateHours) VALUES ($1, $2, $3, NOW()) RETURNING *',
             [texte, userId, eventId]
         );
-        console.log("ici je 4")
 
         const message = result.rows[0];
 
@@ -1648,11 +1631,6 @@ exports.getConvMessagesEvent = async (req, res) => {
             ORDER BY c.dateHours ASC`,
             [eventId]
         );
-
-        // Si aucun message n'est trouvé
-        //if (result.rowCount === 0) {
-        //    return res.status(404).json({ error: "Aucun message trouvé pour cet événement." });
-        //}
 
         const response = {
             idOrga: eventCheck.rows[0].idorga,

@@ -376,7 +376,7 @@ export default {
     return {
       currentStep: 1,
       steps: 3,
-      photo_default: require('@/assets/ajouter_photo.png'),
+      photo_default: require('@/assets/ajouter_photo.svg'),
       imageEvent: null,
       name: '',
       discipline: '',
@@ -730,7 +730,7 @@ export default {
           this.prix = 0;
         }
 
-        const response = await axios.post('https://we-art.onrender.com/api/events', {
+        await axios.post('https://we-art.onrender.com/api/events', {
           name: this.name,
           description: this.description,
           street: this.street,
@@ -748,7 +748,6 @@ export default {
           image_url: imageUrl,
         });
 
-        console.log('Événement ajouté:', response.data);
         this.resetForm();
         this.errorMessage = null;
         this.successMessage = true; // Affiche le message de succès

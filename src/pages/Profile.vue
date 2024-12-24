@@ -115,14 +115,12 @@ export default {
       photo_default: require('@/assets/defaut_profil.svg'),
     };
   },
-
   computed: {
     userConnected() {
       return this.$store.getters.user;
     },
   },
   methods: {
-    
     ...mapActions(['logout']), // Importation de l'action logout de Vuex
 
     async fetchUserDetails() {
@@ -167,10 +165,10 @@ export default {
 </script>
 
 <style scoped>
-.profil-image {
-  width: 130px; 
-  height: 130px; 
-  object-fit: cover;
-  border-radius: 50%;
-}
+  .profil-image {
+    width: 130px; 
+    height: 130px; 
+    object-fit: cover;
+    border-radius: 50%;
+  }
 </style>

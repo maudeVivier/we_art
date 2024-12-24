@@ -228,10 +228,6 @@
         </v-row>
       </v-container>
 
-
-
-
-
       <!-- Snackbar pour le message d'inscription à l'evenement -->
       <v-snackbar v-model="successMessageParticipe" timeout="3000">
         Nous avons bien enregistré votre participation pour cet évènement!
@@ -256,7 +252,6 @@
           <v-btn text v-bind="attrs" @click="successMessageDesinscireListWait = false">Fermer</v-btn>
         </template>
       </v-snackbar>
-
       
       <!-- Snackbar pour le message de copie du lien -->
       <v-snackbar v-model="shareSuccessMessage" timeout="3000">
@@ -303,7 +298,6 @@ export default {
       successMessageListeEvent: false,
       alreadyListeEvent: false,
       successMessageDesinscireListWait:false,
-
       newComment : '',
       notation : 0,
     };
@@ -319,7 +313,6 @@ export default {
     isEventEnded() {
       const endDate = new Date(this.event.end_date);
       const currentDate = new Date();
-
       return endDate < currentDate;
     }
   },
@@ -330,12 +323,11 @@ export default {
     async sendCommentaire(){
       if(this.userConnected){
         try {
-          const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/comments`, {
+          await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/comments`, {
             userId: this.userConnected.idUser,
             description: this.newComment,
             notation: this.notation,
           });
-          console.log('commentaire ajouté :', response.data);
           this.newComment = '';
           this.notation = 0;
           this.fetchEventDetails(this.event.id);
@@ -409,9 +401,8 @@ export default {
     async addListeEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          const response = await axios.post(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+          await axios.post(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
 
-          console.log('utilisateur ajouté a la liste d\'attente evenement :', response.data);
           this.successMessageListeEvent = true; // Affiche le message de succès
           this.alreadyListeEvent = true;
         } catch (error) {
@@ -427,9 +418,8 @@ export default {
     async unlistWaitFromEvent() { // fonction pour se desincrire de la liste d'attente d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            const response = await axios.delete(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
+            await axios.delete(`https://we-art.onrender.com/api/events/listWait/${this.event.id}/users/${this.userConnected.idUser}`);
 
-            console.log('utilisateur supprimer a l evenement :', response.data);
             this.successMessageDesinscireListWait = true; // Affiche le message de succès
             this.alreadyListeEvent = false;
           } catch (error) {
@@ -447,12 +437,11 @@ export default {
     async participateEvent() {
       if(this.userConnected){ // utilisateur connecté
         try {
-          const response = await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+          await axios.post(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
             id_event: this.event.id,
             id_user: this.userConnected.idUser,
           });
 
-          console.log('utilisateur ajouté a l evenement :', response.data);
           this.successMessageParticipe = true; // Affiche le message de succès
           this.alreadyParticipating = true;
           this.fetchEventDetails(this.event.id);
@@ -469,12 +458,11 @@ export default {
     async unregisterFromEvent() { // fonction pour se desincrire d'un evenement
       if(this.userConnected){ // utilisateur connecté
           try {
-            const response = await axios.delete(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
+            await axios.delete(`https://we-art.onrender.com/api/events/${this.event.id}/users/${this.userConnected.idUser}`, {
               id_event: this.event.id,
               id_user: this.userConnected.idUser,
             });
 
-            console.log('utilisateur supprimer a l evenement :', response.data);
             this.successMessageDesinscire = true; // Affiche le message de succès
             this.alreadyParticipating = false;
             this.fetchEventDetails(this.event.id);

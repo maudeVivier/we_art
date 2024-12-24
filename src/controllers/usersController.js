@@ -15,8 +15,6 @@ const transporter = nodemailer.createTransport({
  *     description: Gestion des utilisateurs
  */
 
-
-
 // GET - Récupérer tous les utilisateurs
 /**
  * @swagger
@@ -387,7 +385,6 @@ exports.createUser = async (req, res) => {
         );
 
         const newUser = result.rows[0];
-        console.log('Nouvel utilisateur inséré :', newUser);
 
         if (interests && interests.length > 0) {
             for (let i = 0; i < interests.length; i++) {
@@ -491,8 +488,6 @@ exports.resendCode = async (req, res) => {
             [verificationToken, email]
         );
 
-        console.log("le resultat de la requete = ", result.rows)
-
         if (result.rowCount === 0) {
             return res.status(404).json({
                 message: 'Utilisateur introuvable avec cet email.',
@@ -524,7 +519,6 @@ const sendVerificationEmail = async (email, firstName, lastName, verificationTok
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("E-mail envoyé avec succès à :", email);
     } catch (error) {
         console.error('Erreur lors de l\'envoi de l\'email :', error);
         throw new Error('Erreur lors de l\'envoi de l\'email');
@@ -870,7 +864,6 @@ exports.updateUser = async (req, res) => {
         const updatedUser = result.rows[0];
 
         // Si des intérêts sont fournis, on les gère
-        console.log("interests = ", interests)
         if (interests) {
             // Suppression des anciens intérêts
             await pool.query('DELETE FROM interet WHERE id_user = $1', [id]);

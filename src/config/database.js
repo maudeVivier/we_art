@@ -7,11 +7,9 @@ const pool = new Pool({
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
-//--------------    décommenter ces lignes suivants si veux tourner en local
     ssl: {
         rejectUnauthorized: false  // Autorise les certificats auto-signés (utile pour certaines configurations)
     }
-//--------------
 });
 
 pool.connect((err, client, release) => {

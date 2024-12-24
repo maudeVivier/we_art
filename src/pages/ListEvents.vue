@@ -358,7 +358,6 @@ export default {
       userLatitude: null,  // Latitude de l'utilisateur
       userLongitude: null, // Longitude de l'utilisateur
       radius : 10, // Rayon de recherche
-
     };
   },
   computed: {
@@ -417,7 +416,7 @@ export default {
         className: 'mdi-icon-container',
         html: `
           <div style="position: relative;">
-            <img src="${require('@/assets/map.png')}" alt="custom icon" style="width: 30px; height: 41px;"/>
+            <img src="${require('@/assets/map.svg')}" alt="custom icon" style="width: 30px; height: 41px;"/>
             <i class="mdi ${iconName}" style="position: absolute; top: 2%; left: 18%; font-size: 1.75em;"></i>
           </div>
         `,
@@ -679,114 +678,114 @@ export default {
 </script>
 
 <style scoped>
-.event-text {
-  padding: 4px;
-}
+  .event-text {
+    padding: 4px;
+  }
 
-.event-details {
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%; /* Prend toute la hauteur disponible */
-}
+  .event-details {
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%; /* Prend toute la hauteur disponible */
+  }
 
-.event-title {
-  font-weight: bold;
-  margin-bottom: 8px;
-}
+  .event-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
 
-.event-info > div {
-  font-size:  0.70rem !important;
-  display: flex;
-  height: 5% !important;
-}
+  .event-info > div {
+    font-size:  0.70rem !important;
+    display: flex;
+    height: 5% !important;
+  }
 
-.event-location,
-.event-date-time,
-.event-discipline {
-  flex: 1;
-}
+  .event-location,
+  .event-date-time,
+  .event-discipline {
+    flex: 1;
+  }
 
-.event-card {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-}
+  .event-card {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+  }
 
-.event-image {
-  width: 35%;
-  height: 90%;
-  display: flex;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 2px solid #b0b0b0;
-  margin-right: 4px;
-}
+  .event-image {
+    width: 35%;
+    height: 90%;
+    display: flex;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #b0b0b0;
+    margin-right: 4px;
+  }
 
-.price-container {
-  padding: 2px 4px; 
-  border-radius: 8px;
-  display: inline-flex;
-  max-width: fit-content;
-  align-items: center;
+  .price-container {
+    padding: 2px 4px; 
+    border-radius: 8px;
+    display: inline-flex;
+    max-width: fit-content;
+    align-items: center;
 
-}
+  }
 
-.free-price {
-  color: white;
-  font-weight: bold;
-  border: 2px solid;
-  background-color: rgb(185, 184, 184); /* Gris */
-}
+  .free-price {
+    color: white;
+    font-weight: bold;
+    border: 2px solid;
+    background-color: rgb(185, 184, 184); /* Gris */
+  }
 
-.paid-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(151, 210, 151); /* Vert */
-}
+  .paid-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(151, 210, 151); /* Vert */
+  }
 
-.free-choice-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(143, 170, 143); /* Gris-vert */
-}
+  .free-choice-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(143, 170, 143); /* Gris-vert */
+  }
 
-/* Style pour la map */
-.map-container {
-  display: flex;
-  flex-direction: column; /* Disposition verticale */
-  height: 65vh; /* L'ensemble prend tout l'écran */
-  width: 100vw; /* Largeur totale */
-  z-index: 1;
-}
+  /* Style pour la map */
+  .map-container {
+    display: flex;
+    flex-direction: column; /* Disposition verticale */
+    height: 65vh; /* L'ensemble prend tout l'écran */
+    width: 100vw; /* Largeur totale */
+    z-index: 1;
+  }
 
-.custom-map {
-  flex: 1; /* La carte prend tout l'espace disponible */
-  width: auto;
-  height: auto;
-  position: relative;
-  z-index: 1; /* Place la carte en arrière-plan */
-}
+  .custom-map {
+    flex: 1; /* La carte prend tout l'espace disponible */
+    width: auto;
+    height: auto;
+    position: relative;
+    z-index: 1; /* Place la carte en arrière-plan */
+  }
 
-.events-carousel {
-  height: 30vh; /* Position du carousel en hauteur 30vh depuis le bas */
-  width: 100vw;
-  overflow-x: auto;
-  display: flex;
-  align-items: center;
-  z-index: 10;
-  position: absolute;
-  bottom: 0;
-}
+  .events-carousel {
+    height: 30vh; /* Position du carousel en hauteur 30vh depuis le bas */
+    width: 100vw;
+    overflow-x: auto;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+    position: absolute;
+    bottom: 0;
+  }
 
-.carousel-inner {
-  display: flex; /* Aligne les éléments en ligne */
-  transition: transform 0.3s ease; /* Animation pour le défilement */
-  white-space: nowrap; /* Empêche le retour à la ligne */
-  gap: 10px;
-}
-.compact-checkbox {
-  margin-bottom: 0.5%; /* Ajustez l'espace entre les cases */
-  padding: 0;
-}
+  .carousel-inner {
+    display: flex; /* Aligne les éléments en ligne */
+    transition: transform 0.3s ease; /* Animation pour le défilement */
+    white-space: nowrap; /* Empêche le retour à la ligne */
+    gap: 10px;
+  }
+  .compact-checkbox {
+    margin-bottom: 0.5%; /* Ajustez l'espace entre les cases */
+    padding: 0;
+  }
 </style>
