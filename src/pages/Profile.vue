@@ -20,7 +20,7 @@
           lg="2"
           >
             <v-img
-              :src="user.image_user"
+              :src="user.image_user || photo_default"
               alt="User Image"
               class="profil-image"
             ></v-img>
@@ -111,6 +111,7 @@ export default {
     return {
       user: {},     // Objet pour stocker les informations de l'utilisateur
       loading: true,
+      photo_default: require('@/assets/defaut_profil.svg'),
     };
   },
 

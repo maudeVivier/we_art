@@ -540,7 +540,7 @@ export default {
   data() {
     return {
       logo: require('@/assets/we_art.svg'),
-      photo_default: require('@/assets/image_vierge.svg'),
+      photo_default: require('@/assets/defaut_profil.svg'),
       loading: false,
       currentStep: 1,
       steps: 7,

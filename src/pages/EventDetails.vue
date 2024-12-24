@@ -16,7 +16,7 @@
         <!-- Image de l'événement -->
         <v-row class="event-info">
           <v-col cols="12" class="text-center">
-            <v-img :src="event.image_event_url" alt="Image de l'événement" class="event-image"></v-img>
+            <v-img :src="event.image_event_url || photo_default" alt="Image de l'événement" class="event-image"></v-img>
           </v-col>
         </v-row>
 
@@ -288,7 +288,7 @@ export default {
     return {
       loading: false,
       event: {},
-      photo_default: require('@/assets/evenementiel.jpg'),
+      photo_default: require('@/assets/defaut_evenement.jpg'),
       successMessageParticipe: false,
       successMessageDesinscire: false,
       alreadyParticipating : false,
@@ -504,63 +504,63 @@ export default {
 </script>
 
 <style scoped>
-.event-title {
-  font-weight: bold;
-  margin-top: 5px;
-}
+  .event-title {
+    font-weight: bold;
+    margin-top: 5px;
+  }
 
-.col {
-  padding: 8px;
-}
+  .col {
+    padding: 8px;
+  }
 
-.event-info {
-  font-size: 14px !important;
-}
+  .event-info {
+    font-size: 14px !important;
+  }
 
-.event-image {
-  max-width: 100%;
-  max-height: 300px;
-  display: flex;
-  object-fit: contain !important;
-  border-radius: 8px;
-  border: 2px solid #b0b0b0;
-}
+  .event-image {
+    max-width: 100%;
+    max-height: 300px;
+    display: flex;
+    object-fit: contain !important;
+    border-radius: 8px;
+    border: 2px solid #b0b0b0;
+  }
 
-.price-container {
-  padding: 2px 4px; 
-  border-radius: 8px;
-  display: inline-flex;
-  max-width: fit-content;
-  align-items: center;
-}
+  .price-container {
+    padding: 2px 4px; 
+    border-radius: 8px;
+    display: inline-flex;
+    max-width: fit-content;
+    align-items: center;
+  }
 
-.free-price {
-  color: white;
-  font-weight: bold;
-  border: 2px solid;
-  background-color: rgb(185, 184, 184); /* Gris */
-}
+  .free-price {
+    color: white;
+    font-weight: bold;
+    border: 2px solid;
+    background-color: rgb(185, 184, 184); /* Gris */
+  }
 
-.paid-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(151, 210, 151); /* Vert */
-}
+  .paid-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(151, 210, 151); /* Vert */
+  }
 
-.free-choice-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(143, 170, 143); /* Gris-vert */
-}
+  .free-choice-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(143, 170, 143); /* Gris-vert */
+  }
 
-.message-left {
-  background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
-  border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
-  color: #424242 !important;
-  text-align: left;
-  margin-right: auto; /* Aligne à gauche */
-  max-width: 90%; /* Largeur maximale */
-}
+  .message-left {
+    background-color: #f1f1f1 !important; /* Gris clair pour les messages des autres */
+    border-radius: 10px 10px 10px 0; /* Arrondi spécial pour bulle */
+    color: #424242 !important;
+    text-align: left;
+    margin-right: auto; /* Aligne à gauche */
+    max-width: 90%; /* Largeur maximale */
+  }
 
   /* Avatar gauche */
   .photo-left {

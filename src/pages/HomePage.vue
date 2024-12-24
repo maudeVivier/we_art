@@ -50,7 +50,7 @@
             @click="showDetails(event)"
           >
             <v-img
-              :src="event.image_event_url"
+              :src="event.image_event_url || photo_default"
               :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')"
               alt="Image de l'événement"
               class="imageCaroussel"
@@ -118,6 +118,7 @@ export default {
       events: [],
       loading : false,
       disciplines: [],
+      photo_default: require('@/assets/defaut_evenement.jpg'),
     };
   },
   mounted() {

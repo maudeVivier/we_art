@@ -82,7 +82,7 @@
                     </div>
                   </v-card-text>
                   <v-img
-                    :src="event.image_event_url"
+                    :src="event.image_event_url || photo_default"
                     alt="Image de l'événement"
                     class="event-image"
                   ></v-img>
@@ -117,7 +117,7 @@
             @click="showDetails(event)"
           >
             <v-img
-              :src="event.image_event_url"
+              :src="event.image_event_url || photo_default"
               :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')"
               alt="Image de l'événement"
               class="imageCaroussel"
@@ -166,7 +166,7 @@
             @click="showDetails(event)"
           >
             <v-img
-              :src="event.image_event_url"
+              :src="event.image_event_url || photo_default"
               :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')"
               alt="Image de l'événement"
               class="imageCaroussel"
@@ -216,7 +216,7 @@
             @click="showDetails(event)"
           >
             <v-img
-              :src="event.image_event_url"
+              :src="event.image_event_url || photo_default"
               :lazy-src="event.image_event_url.replace('/upload/', '/upload/q_auto,w_auto/')"
               alt="Image de l'événement"
               class="imageCaroussel"
@@ -265,7 +265,7 @@ export default {
       search: '',
       events: [],
       loading: false, // Loading state
-      photo_default_catalogue: require('@/assets/evenementiel.jpg'), 
+      photo_default: require('@/assets/defaut_evenement.jpg'), 
       eventsNotifs: [],
       myEvents : [],
     };
@@ -421,141 +421,141 @@ export default {
 </script>
 
 <style scoped>
-.v-card-title {
-  font-size: 20%;
-  font-weight: bold;
-}
+  .v-card-title {
+    font-size: 20%;
+    font-weight: bold;
+  }
 
-p {
-  margin: 0;
-  padding: 5px 0;
-}
+  p {
+    margin: 0;
+    padding: 5px 0;
+  }
 
-.d-flex {
-  display: flex;
-}
+  .d-flex {
+    display: flex;
+  }
 
-.event-text {
-  padding: 4px;
-}
+  .event-text {
+    padding: 4px;
+  }
 
-.event-details {
-  flex-direction: column;
-  justify-content: space-between;
-  height: 90%; /* Prend toute la hauteur disponible */
-  
-}
+  .event-details {
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90%; /* Prend toute la hauteur disponible */
+    
+  }
 
-.event-title {
-  font-weight: bold;
-  margin-bottom: 8px;
-}
+  .event-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
 
-.event-date-time {
-  margin-bottom: 0px;
-}
+  .event-date-time {
+    margin-bottom: 0px;
+  }
 
-.event-price {
-  margin-bottom: 0px;
-}
+  .event-price {
+    margin-bottom: 0px;
+  }
 
-.event-title {
-  font-weight: bold;
-  margin-bottom: 0px;
-  padding: 0px !important;
-}
+  .event-title {
+    font-weight: bold;
+    margin-bottom: 0px;
+    padding: 0px !important;
+  }
 
-.event-info > div {
-  font-size:  0.70rem !important;
-  display: flex;
-  height: 5% !important;
-}
+  .event-info > div {
+    font-size:  0.70rem !important;
+    display: flex;
+    height: 5% !important;
+  }
 
-.event-location,
-.event-date-time,
-.event-discipline {
-  flex: 1;
-}
+  .event-location,
+  .event-date-time,
+  .event-discipline {
+    flex: 1;
+  }
 
-.event-card-wait {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  height: 18vh;
-  background-color: rgb(224, 65, 65) !important;
-}
+  .event-card-wait {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 18vh;
+    background-color: rgb(224, 65, 65) !important;
+  }
 
-.event-card {
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  height: 18vh;
-}
-.event-image {
-  width: 35%;
-  height: 90%;
-  display: flex;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 2px solid #b0b0b0;
-  margin-right: 4px;
-}
+  .event-card {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 18vh;
+  }
+  .event-image {
+    width: 35%;
+    height: 90%;
+    display: flex;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #b0b0b0;
+    margin-right: 4px;
+  }
 
-.price-container {
-  padding: 2px 4px; 
-  border-radius: 8px;
-  display: inline-flex;
-  max-width: fit-content;
-  align-items: center;
+  .price-container {
+    padding: 2px 4px; 
+    border-radius: 8px;
+    display: inline-flex;
+    max-width: fit-content;
+    align-items: center;
 
-}
+  }
 
-.free-price {
-  color: white;
-  font-weight: bold;
-  border: 2px solid;
-  background-color: rgb(185, 184, 184); /* Gris */
-}
+  .free-price {
+    color: white;
+    font-weight: bold;
+    border: 2px solid;
+    background-color: rgb(185, 184, 184); /* Gris */
+  }
 
-.paid-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(151, 210, 151); /* Vert */
-}
+  .paid-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(151, 210, 151); /* Vert */
+  }
 
-.free-choice-price {
-  color: white;
-  border: 2px solid;
-  background-color: rgb(143, 170, 143); /* Gris-vert */
-}
+  .free-choice-price {
+    color: white;
+    border: 2px solid;
+    background-color: rgb(143, 170, 143); /* Gris-vert */
+  }
 
-.imageCaroussel{
-  width: 100%;
-  height:60%;
-}
+  .imageCaroussel{
+    width: 100%;
+    height:60%;
+  }
 
-.event-info-card {
-  background-color: white;
-  border-radius: 8px;
-  padding: 8px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  width: 90%;
-  max-width: 400px;
-  height: 12vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-}
+  .event-info-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 400px;
+    height: 12vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  }
 
-.event-info-text {
-  color: black;
-  text-align: center;
-}
+  .event-info-text {
+    color: black;
+    text-align: center;
+  }
 </style>

@@ -17,10 +17,10 @@
           lg="2"
           >
             <v-img
-              :src="user.image_user"
+              :src="user.image_user || photo_default"
               alt="User Image"
               class="profil-image"
-            ></v-img>
+            />
           </v-col>
           <v-col
           cols="auto"
@@ -106,6 +106,7 @@ export default {
       user: {},     // Objet pour stocker les informations de l'utilisateur
       loading: true,
       idSearchUser : null,
+      photo_default: require('@/assets/defaut_profil.svg'),
     };
   },
   mounted(){
