@@ -103,17 +103,19 @@ import Logo from '@/assets/we_art.svg'; // Chemin relatif vers ton logo situé d
 
 import Dance1 from '@/assets/Dance1.png';
 import Discussion1 from '@/assets/Discussion1.png';
+import Discussion2 from '@/assets/Discussion2.png';
 import groupJazz from '@/assets/groupJazz.png';
 import Musee1 from '@/assets/Musee1.png';
 import peinture1 from '@/assets/peinture1.png';
 import vase from '@/assets/vase.png';
+import Com1 from '@/assets/Com1.png';
 
 import axios from 'axios';
 
 export default {
   data() {
     return {
-      imgHome : [Dance1, Discussion1, groupJazz, Musee1, peinture1, vase],
+      imgHome : [Dance1, Discussion1, Discussion2, groupJazz, Musee1, peinture1, vase, Com1],
       Logo,
       events: [],
       loading : false,
