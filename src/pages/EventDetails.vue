@@ -62,7 +62,7 @@
           </v-col>
 
           <!-- Bouton d'inscription/désinscription -->
-          <v-col cols="6" v-if="event.id_organisateur !== this.$store.getters.user.idUser">
+          <v-col cols="6" v-if="this.$store.getters.isAuthenticated && event.id_organisateur !== this.$store.getters.user.idUser">
             <template v-if="alreadyParticipating && event.is_start_date_passed">
               <v-btn color="red" @click="unregisterFromEvent">Se désinscrire</v-btn>
             </template>
@@ -80,6 +80,13 @@
                 <v-btn color="red" @click="unlistWaitFromEvent">Ne plus être notifié</v-btn>
               </template>
             </template>
+          </v-col>
+          <v-col cols="6" v-if="!this.$store.getters.isAuthenticated">
+            <template>
+              <p class="text-info">Connectez vous ou créez un compte pour vous inscrire</p>
+            </template>
+
+
           </v-col>
         </v-row>
 
@@ -183,7 +190,7 @@
         </v-row>
        
         <!-- Zone de saisie du message -->
-        <v-row v-if="event.id_organisateur != userConnected.idUser && isEventEnded" class="row-5 message-input">
+        <v-row v-if="userConnected && event.id_organisateur != userConnected.idUser && isEventEnded" class="row-5 message-input">
           <v-col>
             <v-rating
               v-model="notation"
