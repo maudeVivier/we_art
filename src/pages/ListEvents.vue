@@ -12,7 +12,6 @@
             class="mr-2"
             @click="showFilters"
           > 
-          <!-- mettre  :to="{ name: 'XXX' }" pour afficher les filtres -->
           <v-icon>mdi-tune-variant</v-icon>
         </v-btn>
           <v-spacer></v-spacer>
@@ -77,6 +76,7 @@
               >
                 <v-card
                   class="event-card flex-row"
+                  style="height: 18vh"
                   @click="showDetails(event)"
                   hover
                 >
@@ -137,6 +137,7 @@
             >
               <v-card
                 class="event-card flex-row"
+                style="height: 22vh"
                 @click="showDetails(event)"
                 hover
               >
@@ -196,10 +197,8 @@
 
       <v-container v-if="showFiltersBox && !loadingFilter" style="max-width: 100%;">
         <v-row>
-          
           <v-col style="display: flex; justify-content: space-between;">
             <h2>Filtres</h2>
-
             <v-btn
               icon
               @click="showFiltersBox = false"
@@ -712,7 +711,6 @@ export default {
   display: flex;
   flex-direction: row;
   width: 100vw;
-  height: 22vh;
 }
 
 .event-image {
@@ -757,7 +755,7 @@ export default {
 .map-container {
   display: flex;
   flex-direction: column; /* Disposition verticale */
-  height: 67vh; /* L'ensemble prend tout l'écran */
+  height: 65vh; /* L'ensemble prend tout l'écran */
   width: 100vw; /* Largeur totale */
   z-index: 1;
 }
@@ -771,7 +769,7 @@ export default {
 }
 
 .events-carousel {
-  height: 25vh; /* Position du carousel en hauteur 25vh depuis le bas */
+  height: 30vh; /* Position du carousel en hauteur 30vh depuis le bas */
   width: 100vw;
   overflow-x: auto;
   display: flex;

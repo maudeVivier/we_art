@@ -2,10 +2,8 @@
   <v-app>
     <v-main>
       <v-container>
-        <v-row class="my-1 ml-1" align="center" style="position: relative;">
-          <v-col cols="12" style="text-align: center;">
-            <h2 style="text-align: center;">Mes ateliers</h2>
-          </v-col>
+        <v-row class="my-1 ml-1 justify-center">
+          <h2 style="text-align: center;">Mes ateliers</h2>
           <v-btn
             v-if="this.userConnected && this.$store.getters.user.type === 'Organizer'"
             color="primary"
@@ -99,13 +97,12 @@
             <h3 class="text-center">À venir</h3>
           </v-col>
         </v-row>
-
         <v-row v-if="upcomingEvents.length <= 0">
           <v-col cols="12" class="text-center">
             <p>Aucun événements à venir</p>
           </v-col>
         </v-row>
-        <v-carousel v-if="numberUpcomingEvents > 0 && upcomingEvents.length > 0" hide-delimiters class="carousel" style="height: 35vh">
+        <v-carousel v-if="numberUpcomingEvents > 0 && upcomingEvents.length > 0" hide-delimiters class="carousel" style="height: 45vh">
           <v-carousel-item
             v-for="(event, index) in upcomingEvents"
             :key="index"
@@ -148,13 +145,12 @@
             <h3 class="text-center">Passé</h3>
           </v-col>
         </v-row>
-
         <v-row v-if="numberPastEvents <= 0">
           <v-col cols="12" class="text-center">
             <p>Vous n'avez participé à aucun événement</p>
           </v-col>
         </v-row>
-        <v-carousel v-if="numberPastEvents > 0 && pastEvents.length > 0" hide-delimiters class="carousel" style="height: 35vh">
+        <v-carousel v-if="numberPastEvents > 0 && pastEvents.length > 0" hide-delimiters class="carousel" style="height: 45vh">
           <v-carousel-item
             v-for="(event, index) in pastEvents"
             :key="index"
@@ -197,13 +193,11 @@
             <h3 class="text-center">Organisés par moi</h3>
           </v-col>
         </v-row>
-
         <v-row v-if="userConnected && userConnected.type === 'Organizer' && myEvents.length <= 0">
           <v-col cols="12" class="text-center">
             <p>Vous n'avez créé aucun atelier</p>
           </v-col>
         </v-row>
-        
         <v-carousel v-if="userConnected && userConnected.type === 'Organizer' && myEvents.length > 0" hide-delimiters class="carousel" style="height: 35vh">
           <v-carousel-item
             v-for="(event, index) in myEvents"

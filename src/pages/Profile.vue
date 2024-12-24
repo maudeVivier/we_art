@@ -2,10 +2,8 @@
   <v-app>
     <v-main>
       <v-container v-if="!loading">
-        <v-row class="my-1 ml-1"  align="center" style="position: relative;">
-          <v-col cols="12" style="text-align: center;">
-            <h2>Mon profil</h2>
-          </v-col>
+        <v-row class="my-1 ml-1  justify-center">
+          <h2>Mon profil</h2>
           <v-btn 
             @click="updateUserInfos" 
             icon 

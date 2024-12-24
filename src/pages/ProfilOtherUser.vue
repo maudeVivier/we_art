@@ -6,7 +6,7 @@
           <v-btn @click="goBack" icon class="mr-2">
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
-          <h2>Utilisateurs</h2>
+          <h2>Utilisateur</h2>
         </v-row>
 
         <v-row class="justify-space-start align-center">
